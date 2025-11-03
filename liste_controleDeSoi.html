@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste du Contrôle de Soi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DU CONTROLE DE SOI</h1>
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-2" data-spell="Contrôle de la peur">Contrôle de la peur</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-2" data-spell="Résistance au sommeil">Résistance au sommeil</div>
+            <div class="spell-node col-4" data-spell="Audition sélective">Audition sélective</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-1" data-spell="Catalepsie">Catalepsie</div>
+            <div class="spell-node col-2" data-spell="Contrôle de la faim/soif">Contrôle de la faim/soif</div>
+            <div class="spell-node col-3" data-spell="Dissipation du poison">Dissipation du poison</div>
+            <div class="spell-node col-5" data-spell="Voix puissante">Voix puissante</div>
+            <div class="spell-node col-6" data-spell="Vivacité physique">Vivacité physique</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-1" data-spell="Repos méditatif">Repos méditatif</div>
+            <div class="spell-node col-2" data-spell="Résistance à la maladie">Résistance à la maladie</div>
+            <div class="spell-node col-4" data-spell="Imperméabilité mentale">Imperméabilité mentale</div>
+            <div class="spell-node col-5" data-spell="Corps élastique">Corps élastique</div>
+            <div class="spell-node col-6" data-spell="Réflexes éclairs">Réflexes éclairs</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-1" data-spell="Ralentissement de l'activité">Ralentissement de l'activité</div>
+            <div class="spell-node col-3" data-spell="Exacerbation de la perception">Exacerbation de la perception</div>
+            <div class="spell-node col-5" data-spell="Force">Force</div>
+            <div class="spell-node col-6" data-spell="Coup dévastateur">Coup dévastateur</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-2" data-spell="Contrôle de la douleur">Contrôle de la douleur</div>
+            <div class="spell-node col-4" data-spell="Renforcement mental">Renforcement mental</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-2" data-spell="Rigidification du corps">Rigidification du corps</div>
+            <div class="spell-node col-6" data-spell="Concentration de l'influx">Concentration de l'influx</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-1" data-spell="Contrôle de la fatigue">Contrôle de la fatigue</div>
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-3" data-spell="Résistance aux températures extrêmes">Résistance aux températures
+                extrêmes</div>
+            <div class="spell-node col-5" data-spell="Déplacement du félin">Déplacement du félin</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-1" data-spell="Guérison des blessures">Guérison des blessures</div>
+            <div class="spell-node col-6" data-spell="Surpuissance physique">Surpuissance physique</div>
+        </div>
+
+        <!-- Niveau 12 (vide) -->
+        <div class="level">
+            <div class="level-number">12</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-1" data-spell="Ressouder ses membres">Ressouder ses membres</div>
+            <div class="spell-node col-3" data-spell="Résistance à la magie">Résistance à la magie</div>
+        </div>
+
+        <!-- Niveau 20 -->
+        <div class="level">
+            <div class="level-number">20</div>
+            <div class="spell-node col-1" data-spell="Régénération">Régénération</div>
+        </div>
+
+        <!-- Niveau 25 (vide) -->
+        <div class="level">
+            <div class="level-number">25</div>
+        </div>
+
+        <!-- Niveau 30 (vide) -->
+        <div class="level">
+            <div class="level-number">30</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données des capacités du Contrôle de Soi
+        const spellsData = {
+            "Contrôle de la peur": {
+                level: 1,
+                portée: "-",
+                incantation: "1 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège calme instantanément toute peur qui troublait le magicien. Tant qu'il demeure actif, le magicien se sent tranquille et agit sans la gêne due à l'angoisse ou même l'appréhension. Ce sortilège agit également sur les peurs d'origine magique. Notez que le magicien ne sous-estime pas pour autant la difficulté ou le danger d'une entreprise. Il est simplement capable d'en faire abstraction pour se concentrer sur la réalisation de son action."
+            },
+            "Résistance au sommeil": {
+                level: 2,
+                portée: "-",
+                incantation: "5 s",
+                durée: "8 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien met en place un réseau d'ondes magiques qui maintient son cerveau en plein état de veille. Toute velléité de divagation onirique est immédiatement réprimée. Non seulement le magicien ne s'endort pas, mais il n'a pas non plus besoin de se concentrer pour ne pas rêvasser."
+            },
+            "Audition sélective": {
+                level: 2,
+                portée: "-",
+                incantation: "2 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège confère au magicien la possibilité de se concentrer sur un son précis et d'oublier les autres. Il devient alors capable de l'entendre comme si le reste de l'environnement sonore n'existait pas. Cette capacité peut notamment se révéler extrêmement utile pour suivre une conversation au milieu du brouhaha. Elle donne également un bonus de +2 aux jets de Perception concernant le son ou l'endroit précis sur lequel se concentre le magicien."
+            },
+            "Catalepsie": {
+                level: 3,
+                portée: "-",
+                incantation: "2 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort donne au corps du magicien l'aspect de la mort. Il cesse de respirer, son cœur cesse de battre, et ses muscles se détendent totalement. Il devient insensible à la douleur, et tout examen, même effectué par un spécialiste, indiquera qu'il est mort. En réalité, le corps du magicien est en sommeil profond. Son cerveau continue à fonctionner, même s'il ne perçoit plus son environnement. Des ondes magiques se diffusent à travers son organisme, le maintenant en vie. Après deux heures, le phénomène cesse et le magicien se réveille. Il reste faible quelques minutes (-2 aux actions physiques), le temps que son corps retrouve son rythme normal de fonctionnement."
+            },
+            "Contrôle de la faim/soif": {
+                level: 3,
+                portée: "-",
+                incantation: "5 s",
+                durée: "12 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort permet au magicien de ne pas ressentir les effets de la faim et de la soif. Non seulement il n'éprouve pas leur tenaillement, mais aussi son corps n'en subit pas les mauvais effets : il conserve la totalité de ses capacités en puisant judicieusement dans ses réserves. Le manque éventuel d'eau et de nourriture n'est pas pour autant effacé. Il attend simplement la fin du sort pour se manifester."
+            },
+            "Dissipation du poison": {
+                level: 3,
+                portée: "-",
+                incantation: "2 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Par ce sort, le magicien provoque une réaction défensive de son corps contre toute substance étrangère s'y étant introduite. Le système immunitaire du corps, stimulé par les ondes magiques, détruit alors toute trace de cette (ces) substance(s). Ce sort est également efficace pour éliminer la présence (et donc les effets) de l'alcool ou de n'importe quelle drogue. De plus, cette réaction défensive ne se dissipe que progressivement, de sorte que le sort confère pour une dizaine de minute une immunité à toute nouvelle inoculation de poison."
+            },
+            "Voix puissante": {
+                level: 3,
+                portée: "-",
+                incantation: "2 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège confère au magicien la possibilité de donner à sa voix une énorme puissance. Cela peut lui permettre de se faire entendre à une très grande distance (dépendant bien sûr de la configuration des lieux) et/ou de couvrir sans difficulté les bruits environnants (brouhaha de conversations, combats, etc.), même s'ils sont particulièrement forts (tonnerre, chute d'eau, etc.)."
+            },
+            "Vivacité physique": {
+                level: 3,
+                portée: "-",
+                incantation: "2 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien devient temporairement plus agile et plus rapide : ce sort augmente de 4 points la Vivacité physique du magicien. Ce bonus s'applique à tous les jets du magicien sous cet attribut. Ses scores de compétence ne sont en revanche pas modifiés. Le magicien se dépasse mieux, court un peu plus vite, saute un peu plus loin... En termes de jeu, il bénéficie d'un bonus de +2 à tous ses jets liés à la compétence 'Déplacement dans la nature' : escalade, natation, équilibre, acrobatie, etc."
+            },
+            "Repos méditatif": {
+                level: 4,
+                portée: "-",
+                incantation: "15 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien, au lieu de dormir, entre dans un état de transe méditative, plus intense encore que le sommeil le plus profond. Son cerveau est le centre d'une intense activité de rangement et de réorganisation des souvenirs. Son corps, qui peut demeurer assis pour peu qu'il ait un dossier, est totalement relâché. Il est parcouru par des ondes magiques régénératrices. Chaque heure de repos méditatif équivaut à 3 heures de sommeil normal. A la fin des 2 heures que dure le sort, le magicien a donc récupéré 24 points de fatigue et 6 points de concentration."
+            },
+            "Résistance à la maladie": {
+                level: 4,
+                portée: "-",
+                incantation: "5 s",
+                durée: "12 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège a pour effet de réguler la circulation des substances dans le corps du magicien, afin d'empêcher la prolifération de tout corps vivant étranger. Non seulement le magicien sera insensible, pendant la durée du sort, à toute contamination par un germe présent dans son environnement (sauvegardes automatiquement réussies) ; mais il sera de plus capable d'expulser toute maladie s'étant déjà insinuée en lui : il lui suffira pour cela de réussir un jet de résistance à la maladie (jet sous Constitution modifié par la virulence de la maladie), mais avec cette fois un bonus de +8."
+            },
+            "Imperméabilité mentale": {
+                level: 4,
+                portée: "-",
+                incantation: "5 s",
+                durée: "6 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège rend le magicien totalement insensible aux scrutations de son esprit. Il devient notamment imperméable aux sorts d'empathie, de détection du mensonge, de sonder les esprits et de sentir les êtres vivants. Les magiciens utilisant ces sortilèges sur lui détecteront la présence d'une barrière mentale forte, mais seulement s'ils réussissent un jet de sentir la magie. De plus, le magicien peut refuser tout contact télépathique qu'il juge inopportun."
+            },
+            "Corps élastique": {
+                level: 4,
+                portée: "-",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le corps du magicien devient parfaitement élastique, de sorte qu'il peut à volonté le déformer, par la seule force de son esprit. Cette souplesse extraordinaire présente bien sûr des intérêts immédiats : se glisser dans un conduit sinueux, se défaire de liens en contorsionnant ses poignets, etc. Elle revêt également des avantages en combat, où elle permet de déformer son corps afin d'esquiver le coup d'un adversaire. Pour cette raison, tous les jets d'esquive du magicien bénéficient d'un bonus de +1. De plus, les coups d'armes contondantes sont amortis par l'élasticité du corps et infligent 3 points de dommages de moins que normalement."
+            },
+            "Réflexes éclairs": {
+                level: 4,
+                portée: "-",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Des ondes magiques accélèrent la vitesse de propagation des messages le long des nerfs du magicien. Cela améliore considérablement sa rapidité de réaction : ses perceptions parviennent plus vite au cerveau et les ordres de celui-ci arrivent plus rapidement aux muscles. En termes de jeu, le score de Vivacité mentale du magicien est temporairement augmenté de 6 points (le magicien a donc beaucoup moins de risques d'être surpris). Cela s'applique à tous les jets du magicien sous cet attribut. Ses scores de compétence ne sont en revanche pas modifiés. Le magicien bénéficie en outre d'un bonus de +2 à tous ses jets de parade ou d'esquive."
+            },
+            "Ralentissement de l'activité": {
+                level: 5,
+                portée: "-",
+                incantation: "5 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège permet au magicien de survivre dans un environnement extrêmement hostile. Il régule en effet inconsciemment le fonctionnement de son corps, afin de concentrer ses forces et son énergie pour ses fonctions vitales. Son corps se retrouve dans un état semi-léthargique. Toutes les actions du magicien s'effectuent avec la difficulté 'Très difficile' (malus de -6 aux jets). Seules les sauvegardes contre les sortilèges sans intermédiaire physique demeurent normales. Cet état de demi-veille permet au magicien de consommer 20 fois moins d'oxygène que la normale. Il est ainsi capable de plonger plus d'une demi-heure sous l'eau sans respirer. Il a également besoin de 10 fois moins d'eau et de nourriture."
+            },
+            "Exacerbation de la perception": {
+                level: 5,
+                portée: "-",
+                incantation: "5 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien devient extrêmement sensible à son environnement. Tous ses jets de Sixième sens s'effectuent avec un bonus de +4. De plus, s'il se concentre sur ses perceptions, il bénéficie de même d'un bonus de +4 à ses jets de Perception. Combiné avec le sortilège de résistance au sommeil, ce sort transforme en fait le magicien en une sentinelle idéale, à la vigilance indéfectible et aux sens particulièrement aiguisés."
+            },
+            "Force": {
+                level: 5,
+                portée: "-",
+                incantation: "2 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort augmente temporairement de 4 points la Force du magicien. Il modifie par là même ses jets de Force, les armes qu'il est en mesure d'utiliser et les dommages qu'il inflige, mais pas ses compétences, pour des raisons de simplicité."
+            },
+            "Coup dévastateur": {
+                level: 5,
+                portée: "-",
+                incantation: "spécial",
+                durée: "1 action",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort ressemble dans son principe au Kia en art martial : le magicien concentre fortement son énergie dans le coup qu'il est en train de donner. Grâce à cela, il bénéficie d'un bonus de +2 à son attaque et d'un bonus de +4 aux dommages qu'elle inflige, à condition qu'il s'agisse d'une attaque physique directe. Exceptionnellement, le lancement du sort ne nécessite pas de composante gestuelle particulière (le magicien porte simplement normalement son attaque) et s'appuie uniquement sur des composantes vocales (le magicien prononce les paroles donnant corps à la magie tout en portant son coup)."
+            },
+            "Contrôle de la douleur": {
+                level: 6,
+                portée: "-",
+                incantation: "2 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "1 zone de son corps",
+                description: "Ce sortilège bloque les signaux de douleur qu'une zone sévèrement blessée adresse au cerveau. Le magicien est alors capable de continuer à utiliser cette partie de son corps sans malus. Concrètement, cela signifie que le seuil d'incapacité d'une zone choisie descend temporairement de 4 points. Cet effet peut se cumuler avec d'autres (notamment l'avantage Résistance à la douleur ou le désavantage Rage), de sorte que le seuil final d'incapacité de la zone ciblée peut très bien être de -5 ou -6. De plus, ce sort peut être lancé de façon préventive, avant qu'un coup ne soit effectivement reçu."
+            },
+            "Renforcement mental": {
+                level: 6,
+                portée: "-",
+                incantation: "4 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège de défense confère momentanément un bonus de +6 à tous les jets de caractéristique sous la Volonté ou l'Abstraction. Cela traduit un renforcement magique des connexions internes du cerveau ; ce renforcement favorise la transmission directe des instructions du cerveau vers le corps. Il peut s'avérer particulièrement utile pour se protéger des sorts mentaux de Maîtrise des esprits ou d'Illusion."
+            },
+            "Rigidification du corps": {
+                level: 7,
+                portée: "-",
+                incantation: "4 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien tisse à travers son corps un réseau d'ondes magiques, qui protègent ses tissus et les aident à se contracter pour mieux encaisser un choc. Le magicien dispose alors de 30 points d'armure qu'il peut répartir comme il le souhaite entre les toutes les zones sauf la tête (pas plus de 7 points sur une même zone). Il peut ainsi par exemple engendrer une armure naturelle de 6 points sur le torse et l'abdomen et 4 points sur chaque bras et chaque jambe. Ces points d'armure sont à considérer exactement comme ceux provenant d'une armure physique : le nombre de points d'armure protégeant une zone est systématiquement soustrait du nombre de points de vie qu'une attaque lui inflige."
+            },
+            "Contrôle de la fatigue": {
+                level: 8,
+                portée: "-",
+                incantation: "10 s",
+                durée: "12 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort permet au magicien de 'stocker' un certain nombre de points de fatigue afin de les utiliser ultérieurement. Il peut stocker le nombre de points de son choix : le lancement du sort coûte au total 8 points de concentration et un nombre de points de fatigue exactement égal au nombre de points stockés. La magie du sort, sous la forme d'énergie stockée, circule dans le corps du magicien. Pendant toute la durée du sort, toute perte de points de fatigue est divisée par deux (arrondie au choix), la moitié manquante étant prélevée sur la réserve circulant dans le corps du magicien. Bien sûr, une fois que cette réserve est vide la perte de points de fatigue redevient normale."
+            },
+            "Résistance aux températures extrêmes": {
+                level: 9,
+                portée: "-",
+                incantation: "5 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort innerve d'ondes magiques protectrices toutes les cellules constituant la couche externe du magicien. Celui-ci est alors capable de supporter sans dommages ni gêne des températures allant de -30°C (jusqu'à -50°C s'il est chaudement vêtu) à +60°C. Il peut supporter sans dommages mais avec douleur des températures comprises entre -50°C (-70°C s'il est chaudement vêtu) et +80°C. Enfin, les dommages que lui infligent le feu ou le froid magique (par exemple un Éclair de feu ou un Souffle glacé) sont divisés par deux, avant sauvegarde éventuelle."
+            },
+            "Guérison des blessures": {
+                level: 10,
+                portée: "-",
+                incantation: "15 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort permet au magicien de soigner ses blessures. Des ondes magiques réparatrices circulent dans son corps et guérissent ses tissus endommagés. Le coût total du sort est de 10 points de concentration (coût fixe) et 1 point de fatigue par point de vie perdu que le magicien souhaite soigner (coût variable). Le magicien choisit parmi ses blessures celles qu'il souhaite guérir et dans quelle proportion. Aucune distinction n'est faite entre points de vie généraux et localisés, ou en fonction de l'état de la zone (points de vie négatifs et points de vie positifs). L'incantation ne dure que quinze secondes, mais ensuite la guérison des blessures exige un certain temps : 1 minute par point de vie récupéré."
+            },
+            "Déplacement du félin": {
+                level: 9,
+                portée: "-",
+                incantation: "8 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort renforce considérablement les muscles et les terminaisons nerveuses qui interviennent dans le déplacement du magicien. Il devient capable d'extraordinaires exploits, équivalant approximativement au double des possibilités du corps humain : il peut ainsi courir sur une courte distance à une vitesse atteignant 80 km/h, sauter à 5 mètres de hauteur, faire des bonds de 20 mètres en longueur. Grâce au développement des terminaisons nerveuses, il contrôle parfaitement ces divers mouvements, comme s'il avait toujours été capable de les accomplir."
+            },
+            "Concentration de l'influx": {
+                level: 7,
+                portée: "-",
+                incantation: "4 s",
+                durée: "1 action",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien concentre toute son énergie physique et mentale en vue de la réalisation d'une action physique particulièrement importante. Il gagne un bonus de +6 pour la réaliser. Il peut s'agir de n'importe quelle action physique ne requérant pas plus de quelques secondes pour être réalisée : une action de combat au corps à corps, un tir de projectile, un saut, la levée d'un poids, etc. Le magicien passe le tour précédant l'action à lancer son sortilège et à concentrer son influx. S'il était en combat, il conserve sa feinte de corps normale et peut quand même se défendre (esquive ou parade), mais ses jets de défense subissent un malus de -2."
+            },
+            "Ressouder ses membres": {
+                level: 15,
+                portée: "-",
+                incantation: "1 min",
+                durée: "permanent",
+                sauvegarde: "spéciale",
+                zone: "le magicien",
+                description: "Ce sortilège peut permettre au magicien de restaurer son intégrité physique en ressoudant une partie de son corps (main, bras, jambe, oreille, etc.) qui avait été détachée. Néanmoins, il existe un risque que le sort échoue. Le risque d'échec est calculé de la même façon que pour le sort 'Ressouder les membres' dans la liste de l'Harmonie. Le risque de base est de 0%, mais il augmente de 1% par jour les trente premiers jours et de 1% par semaine les cinquante semaines suivantes (donc un maximum cumulé de 80%). Le magicien est conscient du risque d'échec au moment de lancer le sort et peut renoncer."
+            },
+            "Résistance à la magie": {
+                level: 15,
+                portée: "-",
+                incantation: "15 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège entoure le magicien d'une gaine d'ondes magiques qui le protège des sortilèges indésirables lancés sur lui. Il acquiert un bonus de +6 à toutes ses sauvegardes."
+            },
+            "Surpuissance physique": {
+                level: 10,
+                portée: "-",
+                incantation: "7 s",
+                durée: "variable",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort permet au magicien de provoquer une montée de son influx qui accroît temporairement ses capacités physiques au prix d'une fatigue accrue. Au moment où il lance le sort, le magicien choisit la 'surconcentration' d'influx dont il veut bénéficier : 1 fois, 2 fois, 3 fois, 4 fois ou 5 fois la normale. Il bénéficie ensuite d'un bonus de respectivement +1, +2, +3, +4 ou +5 pour tous les jets de ses actions physiques (y compris sauvegardes contre des sorts à réalité physique tels qu'une boule de feu) et un bonus de moitié, à savoir respectivement +1, +1, +2, +2 ou +3, à sa feinte de corps et aux dommages qu'il inflige en mêlée ou avec une arme de jet."
+            },
+            "Régénération": {
+                level: 20,
+                portée: "-",
+                incantation: "2 min",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège très puissant permet au magicien de régénérer son corps. Il peut ainsi récupérer de virtuellement toutes les blessures. Une fois le sort lancé, des ondes magiques commencent à reconstruire le corps du magicien, guérissant les blessures et reconstituant les tissus disparus. Les plaies se referment, les membres repoussent, etc. La seule vraie limite de ce sort est le temps qu'exige la régénération : une plaie grave sera résorbée en moins quelques heures, laissant à peine une légère cicatrice. Un doigt prendra 2 jours pour repousser, une main 1 semaine, un bras 2 mois. Ce sort ne peut être lancé de manière préventive : il n'a aucun effet sur les blessures reçues après son lancement."
+            },
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme du Contrôle de Soi
+                const connections = [
+                    // Niveau 1 vers 2
+                    ['Contrôle de la peur', 'Résistance au sommeil'],
+                    ['Contrôle de la peur', 'Catalepsie'],
+
+                    // Niveau 2 vers 3
+                    ['Résistance au sommeil', 'Contrôle de la faim/soif'],
+                    ['Résistance au sommeil', 'Dissipation du poison'],
+                    ['Audition sélective', 'Voix puissante'],
+
+                    // Niveau 2 vers 4 (connexion directe)
+                    ['Audition sélective', 'Imperméabilité mentale'],
+
+                    // Niveau 2 vers 5 (connexion directe)
+                    ['Audition sélective', 'Exacerbation de la perception'],
+
+                    // Niveau 3 vers 4
+                    ['Catalepsie', 'Repos méditatif'],
+                    ['Contrôle de la faim/soif', 'Résistance à la maladie'],
+                    ['Vivacité physique', 'Réflexes éclairs'],
+                    ['Vivacité physique', 'Corps élastique'],
+
+                    // Niveau 4 vers 5
+                    ['Repos méditatif', 'Ralentissement de l\'activité'],
+                    ['Dissipation du poison', 'Exacerbation de la perception'],
+                    ['Imperméabilité mentale', 'Renforcement mental'],
+                    ['Corps élastique', 'Force'],
+                    ['Réflexes éclairs', 'Coup dévastateur'],
+
+                    // Niveau 5 vers 6
+                    ['Résistance à la maladie', 'Contrôle de la douleur'],
+                    
+
+                    // Niveau 6 vers 7
+                    ['Contrôle de la douleur', 'Rigidification du corps'],
+
+                    // Niveau 7 vers 8
+                    ['Ralentissement de l\'activité', 'Contrôle de la fatigue'],
+                    ['Rigidification du corps', 'Résistance aux températures extrêmes'],
+                    ['Renforcement mental', 'Résistance aux températures extrêmes'],
+
+                    // Niveau 8 vers 10
+                    ['Contrôle de la fatigue', 'Guérison des blessures'],
+                    ['Force', 'Déplacement du félin'],
+                    ['Coup dévastateur', 'Concentration de l\'influx'],
+
+                    // Niveau 10 vers 15
+                    ['Guérison des blessures', 'Ressouder ses membres'],
+                    ['Résistance aux températures extrêmes', 'Résistance à la magie'],
+                    ['Concentration de l\'influx', 'Surpuissance physique'],
+
+                    // Niveau 15 vers 20
+                    ['Ressouder ses membres', 'Régénération']
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

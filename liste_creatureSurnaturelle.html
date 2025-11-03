@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Créatures Surnaturelles</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DES CRÉATURES SURNATURELLES</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-4" data-spell="Serviteur invisible">Serviteur invisible</div>
+        </div>
+
+        <!-- Niveau 2 (vide) -->
+        <div class="level">
+            <div class="level-number">2</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-7" data-spell="Invocation démoniaque mineure">Invocation démoniaque mineure</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-2" data-spell="Sentir les créatures surnaturelles">Sentir les créatures
+                surnaturelles</div>
+            <div class="spell-node col-3" data-spell="Lutins de Luhn">Lutins de Luhn</div>
+            <div class="spell-node col-4" data-spell="Lucioles de Siobou">Lucioles de Siobou</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-2" data-spell="Repousser les créatures surnaturelles">Repousser les créatures
+                surnaturelles</div>
+            <div class="spell-node col-4" data-spell="Invocation de fée">Invocation de fée</div>
+            <div class="spell-node col-8" data-spell="Punition">Punition</div>
+        </div>
+
+        <!-- Niveau 6 (vide) -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-5" data-spell="Chiens des enfers">Chiens des enfers</div>
+            <div class="spell-node col-7" data-spell="Invocation démoniaque">Invocation démoniaque</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-1" data-spell="Saut parallèle">Saut parallèle</div>
+            <div class="spell-node col-3" data-spell="Invocation d'un élémental">Invocation d'un élémental</div>
+            <div class="spell-node col-4" data-spell="Chasseur invisible">Chasseur invisible</div>
+            <div class="spell-node col-6" data-spell="Contrôler les démons">Contrôler les démons</div>
+            <div class="spell-node col-8" data-spell="Damnation">Damnation</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-1" data-spell="Communication à travers les plans">Communication à travers les
+                plans</div>
+            <div class="spell-node col-3" data-spell="Invocation de cyclope">Invocation de cyclope</div>
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-1" data-spell="Voyage parallèle">Voyage parallèle</div>
+            <div class="spell-node col-2" data-spell="Globe de protection contre les créatures surnaturelles">Globe de
+                protection contre les créatures surnaturelles</div>
+            <div class="spell-node col-4" data-spell="Destrier de Monrak">Destrier de Monrak</div>
+            <div class="spell-node col-6" data-spell="Porte démoniaque">Porte démoniaque</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-3" data-spell="Fourmis cho-jas">Fourmis cho-jas</div>
+            <div class="spell-node col-7" data-spell="Communion démoniaque">Communion démoniaque</div>
+            <div class="spell-node col-8" data-spell="Téléportation infernale">Téléportation infernale</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-1" data-spell="Voyage entre les plans">Voyage entre les plans</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-3" data-spell="Invocation de drakkon">Invocation de drakkon</div>
+            <div class="spell-node col-6" data-spell="Invocation démoniaque majeure">Invocation démoniaque majeure</div>
+        </div>
+
+        <!-- Niveau 20 (vide) -->
+        <div class="level">
+            <div class="level-number">20</div>
+        </div>
+
+        <!-- Niveau 25 -->
+        <div class="level">
+            <div class="level-number">25</div>
+            <div class="spell-node col-8" data-spell="Mort">Mort</div>
+            <div class="spell-node col-6" data-spell="Alliance démoniaque">Alliance démoniaque</div>
+        </div>
+
+        <!-- Niveau 30 -->
+        <div class="level">
+            <div class="level-number">30</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données des capacités des Créatures Surnaturelles
+        const spellsData = {
+            "Serviteur invisible": {
+                level: 1,
+                portée: "contact",
+                incantation: "2 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien invoque un serviteur invisible qui peut effectuer des tâches simples comme porter des objets, ouvrir des portes ou transmettre des messages. Ce serviteur est complètement invisible et silencieux."
+            },
+            "Sentir les créatures surnaturelles": {
+                level: 4,
+                portée: "50 m",
+                incantation: "3 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort permet au magicien de détecter la présence de créatures surnaturelles dans un rayon de 50 mètres. Il peut distinguer le type de créature (démon, fée, élémentaire, etc.) et sa puissance relative."
+            },
+            "Lutins de Luhn": {
+                level: 4,
+                portée: "contact",
+                incantation: "5 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien invoque de petits lutins espiègles qui l'accompagnent et l'aident dans ses tâches. Ces créatures peuvent porter des objets légers, distraire les ennemis ou effectuer de petites tâches."
+            },
+            "Lucioles de Siobou": {
+                level: 4,
+                portée: "10 m",
+                incantation: "2 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "10 m de rayon",
+                description: "Le magicien invoque des lucioles magiques qui éclairent une zone de 10 mètres de rayon. Ces lucioles peuvent également révéler les créatures invisibles et les pièges magiques."
+            },
+            "Invocation démoniaque mineure": {
+                level: 3,
+                portée: "5 m",
+                incantation: "10 s",
+                durée: "30 min",
+                sauvegarde: "spéciale",
+                zone: "5 m de rayon",
+                description: "Le magicien invoque un petit démon mineur qui lui obéit. Ce démon peut effectuer des tâches simples mais dangereuses, comme attaquer des ennemis ou porter des messages."
+            },
+            "Repousser les créatures surnaturelles": {
+                level: 5,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "spéciale",
+                zone: "20 m de rayon",
+                description: "Ce sort crée une barrière invisible qui repousse toutes les créatures surnaturelles dans un rayon de 20 mètres. Les créatures plus faibles sont complètement repoussées, tandis que les plus puissantes subissent un malus à leurs actions."
+            },
+            "Invocation de fée": {
+                level: 5,
+                portée: "contact",
+                incantation: "8 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien invoque une fée qui peut lui accorder un vœu mineur ou l'aider avec ses pouvoirs magiques. La fée est capricieuse et peut demander quelque chose en retour."
+            },
+            "Punition": {
+                level: 5,
+                portée: "vue",
+                incantation: "3 s",
+                durée: "permanent",
+                sauvegarde: "spéciale",
+                zone: "1 créature",
+                description: "Ce sort inflige une malédiction permanente à une créature surnaturelle, la punissant pour ses actes. La créature subit des malus constants et peut être bannie de certains lieux."
+            },
+            "Saut parallèle": {
+                level: 7,
+                portée: "vue",
+                incantation: "5 s",
+                durée: "1 action",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien peut se téléporter instantanément vers un endroit qu'il peut voir, en passant par un plan parallèle. Cette téléportation est plus rapide et plus sûre que la téléportation normale."
+            },
+            "Invocation d'un élémental": {
+                level: 7,
+                portée: "10 m",
+                incantation: "15 s",
+                durée: "1 h",
+                sauvegarde: "spéciale",
+                zone: "10 m de rayon",
+                description: "Le magicien invoque un élémental (feu, eau, terre ou air) qui lui obéit et peut combattre à ses côtés. L'élémental a ses propres capacités magiques et peut être très puissant."
+            },
+            "Chasseur invisible": {
+                level: 7,
+                portée: "contact",
+                incantation: "10 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien invoque un esprit chasseur invisible qui peut traquer et attaquer des ennemis. Ce chasseur est invisible, silencieux et mortel."
+            },
+            "Chiens des enfers": {
+                level: 6,
+                portée: "20 m",
+                incantation: "12 s",
+                durée: "1 h",
+                sauvegarde: "spéciale",
+                zone: "20 m de rayon",
+                description: "Le magicien invoque une meute de chiens démoniaques qui obéissent à ses ordres. Ces créatures sont redoutables au combat et peuvent traquer leurs proies sur de longues distances."
+            },
+            "Contrôler les démons": {
+                level: 7,
+                portée: "vue",
+                incantation: "8 s",
+                durée: "30 min",
+                sauvegarde: "spéciale",
+                zone: "1 démon",
+                description: "Le magicien peut prendre le contrôle mental d'un démon, le forçant à obéir à ses ordres. Plus le démon est puissant, plus il est difficile à contrôler."
+            },
+            "Invocation démoniaque": {
+                level: 6,
+                portée: "5 m",
+                incantation: "20 s",
+                durée: "1 h",
+                sauvegarde: "spéciale",
+                zone: "5 m de rayon",
+                description: "Le magicien invoque un démon plus puissant que les démons mineurs. Ce démon peut effectuer des tâches complexes et dangereuses, mais il est plus difficile à contrôler."
+            },
+            "Damnation": {
+                level: 7,
+                portée: "vue",
+                incantation: "30 s",
+                durée: "permanent",
+                sauvegarde: "spéciale",
+                zone: "1 créature",
+                description: "Le magicien maudit une créature avec une malédiction infernale permanente. Cette malédiction inflige des souffrances constantes et peut attirer l'attention des démons sur la victime."
+            },
+            "Communication à travers les plans": {
+                level: 8,
+                portée: "illimitée",
+                incantation: "30 s",
+                durée: "10 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien peut communiquer avec des créatures situées dans d'autres plans d'existence. Cette communication est claire et ne peut pas être interceptée par des moyens normaux."
+            },
+            "Invocation de cyclope": {
+                level: 8,
+                portée: "10 m",
+                incantation: "25 s",
+                durée: "2 h",
+                sauvegarde: "spéciale",
+                zone: "10 m de rayon",
+                description: "Le magicien invoque un cyclope géant qui lui obéit. Cette créature est extrêmement puissante au combat et peut effectuer des tâches nécessitant une grande force physique."
+            },
+            "Voyage parallèle": {
+                level: 9,
+                portée: "contact",
+                incantation: "1 min",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien peut voyager entre différents plans d'existence en utilisant des passages parallèles. Ce voyage est plus sûr que la téléportation normale mais prend plus de temps."
+            },
+            "Globe de protection contre les créatures surnaturelles": {
+                level: 9,
+                portée: "contact",
+                incantation: "15 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien crée un globe de protection qui le protège complètement contre toutes les créatures surnaturelles. Aucune créature surnaturelle ne peut pénétrer dans cette zone."
+            },
+            "Destrier de Monrak": {
+                level: 9,
+                portée: "contact",
+                incantation: "20 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien invoque un destrier magique légendaire qui peut voler et voyager à travers les plans. Ce destrier est fidèle et peut combattre aux côtés de son maître."
+            },
+            "Porte démoniaque": {
+                level: 9,
+                portée: "vue",
+                incantation: "45 s",
+                durée: "permanent",
+                sauvegarde: "spéciale",
+                zone: "1 porte",
+                description: "Le magicien crée une porte permanente vers les enfers. Cette porte peut être utilisée pour voyager ou pour invoquer des démons plus facilement."
+            },
+            "Fourmis cho-jas": {
+                level: 10,
+                portée: "50 m",
+                incantation: "30 s",
+                durée: "permanent",
+                sauvegarde: "spéciale",
+                zone: "50 m de rayon",
+                description: "Le magicien invoque une colonie de fourmis géantes intelligentes qui peuvent construire des structures complexes et défendre un territoire. Ces fourmis obéissent au magicien et peuvent être très utiles."
+            },
+            "Communion démoniaque": {
+                level: 10,
+                portée: "illimitée",
+                incantation: "1 h",
+                durée: "permanent",
+                sauvegarde: "spéciale",
+                zone: "le magicien",
+                description: "Le magicien établit un lien permanent avec les enfers, lui permettant d'invoquer des démons plus facilement et de communiquer avec les seigneurs démoniaques."
+            },
+            "Téléportation infernale": {
+                level: 10,
+                portée: "illimitée",
+                incantation: "2 min",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien peut se téléporter instantanément vers n'importe quel endroit en passant par les enfers. Cette téléportation est plus rapide et plus sûre que la téléportation normale."
+            },
+            "Voyage entre les plans": {
+                level: 12,
+                portée: "contact",
+                incantation: "5 min",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien peut voyager librement entre tous les plans d'existence. Ce voyage est sûr et ne prend que quelques minutes, permettant d'explorer des mondes entiers."
+            },
+            "Invocation de drakkon": {
+                level: 15,
+                portée: "20 m",
+                incantation: "1 h",
+                durée: "permanent",
+                sauvegarde: "spéciale",
+                zone: "20 m de rayon",
+                description: "Le magicien invoque un drakkon, une créature draconique légendaire extrêmement puissante. Cette créature peut voler, cracher du feu et possède une intelligence supérieure."
+            },
+            "Invocation démoniaque majeure": {
+                level: 15,
+                portée: "10 m",
+                incantation: "2 h",
+                durée: "permanent",
+                sauvegarde: "spéciale",
+                zone: "10 m de rayon",
+                description: "Le magicien invoque un démon majeur, l'un des seigneurs des enfers. Ce démon est extrêmement puissant et dangereux, mais peut accorder des pouvoirs incroyables à son maître."
+            },
+            "Mort": {
+                level: 25,
+                portée: "vue",
+                incantation: "1 jour",
+                durée: "permanent",
+                sauvegarde: "impossible",
+                zone: "1 créature",
+                description: "Le magicien invoque la Mort elle-même pour réclamer l'âme d'une créature. Cette invocation est extrêmement dangereuse et ne peut être utilisée qu'en dernier recours."
+            },
+            "Alliance démoniaque": {
+                level: 25,
+                portée: "contact",
+                incantation: "1 semaine",
+                durée: "permanent",
+                sauvegarde: "impossible",
+                zone: "le magicien",
+                description: "Le magicien conclut une alliance permanente avec les seigneurs des enfers. Cette alliance accorde des pouvoirs incroyables mais lie le magicien aux enfers pour l'éternité."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme des Créatures Surnaturelles
+                const connections = [
+                    // Niveau 1 vers 4
+                    ['Serviteur invisible', 'Lucioles de Siobou'],
+                    // Niveau 3 vers 6
+                    ['Invocation démoniaque mineure', 'Invocation démoniaque'],
+                    // Niveau 4 vers 5
+                    ['Sentir les créatures surnaturelles', 'Repousser les créatures surnaturelles'],
+                    ['Lucioles de Siobou', 'Invocation de fée'],
+                    ['Invocation démoniaque mineure', 'Punition'],
+
+                    // Niveau 4 vers 7
+                    ['Sentir les créatures surnaturelles', 'Saut parallèle'],
+                    ['Lutins de Luhn', 'Invocation d\'un élémental'],
+
+
+                    // Niveau 5 vers 7
+                    ['Invocation de fée', 'Chasseur invisible'],
+                    ['Punition', 'Damnation'],
+
+                    // Niveau 6 vers 6 (connexions internes)
+                    ['Invocation démoniaque', 'Chiens des enfers'],
+                    ['Invocation démoniaque', 'Contrôler les démons'],
+
+                    // Niveau 7 vers 8
+                    ['Saut parallèle', 'Communication à travers les plans'],
+                    ['Invocation d\'un élémental', 'Invocation de cyclope'],
+
+                    // Niveau 5 vers 9
+                    ['Repousser les créatures surnaturelles', 'Globe de protection contre les créatures surnaturelles'],
+
+                    // Niveau 7 vers 9
+                    ['Chasseur invisible', 'Destrier de Monrak'],
+                    ['Contrôler les démons', 'Porte démoniaque'],
+
+                    // Niveau 8 vers 9
+                    ['Communication à travers les plans', 'Voyage parallèle'],
+
+                    // Niveau 8 vers 10
+                    ['Invocation de cyclope', 'Fourmis cho-jas'],
+
+                    // Niveau 9 vers 10
+                    ['Destrier de Monrak', 'Fourmis cho-jas'],
+                    ['Porte démoniaque', 'Invocation démoniaque majeure'],
+
+                    // Niveau 7 vers 10
+                    ['Damnation', 'Téléportation infernale'],
+                    ['Damnation', 'Communion démoniaque'],
+
+                    // Niveau 9 vers 12
+                    ['Voyage parallèle', 'Voyage entre les plans'],
+
+                    // Niveau 10 vers 15
+                    ['Fourmis cho-jas', 'Invocation de drakkon'],
+
+                    // Niveau 10 vers 25
+                    ['Téléportation infernale', 'Mort'],
+
+                    // Niveau 15 vers 25
+                    ['Invocation démoniaque majeure', 'Alliance démoniaque']
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

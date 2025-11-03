@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Métamorphoses</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DES METAMORPHOSES</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-3" data-spell="Travail du bois">Travail du bois</div>
+            <div class="spell-node col-6" data-spell="Changement de taille">Changement de taille</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-6" data-spell="Changement d'apparence">Changement d'apparence</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-3" data-spell="Travail de la pierre">Travail de la pierre</div>
+            <div class="spell-node col-6" data-spell="Changement de corps">Changement de corps</div>
+            <div class="spell-node col-7" data-spell="Altération de l'aura">Altération de l'aura</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-3" data-spell="Gaine d'invisibilité">Gaine d'invisibilité</div>
+            <div class="spell-node col-6" data-spell="Corps élastique">Corps élastique</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-3" data-spell="Travail du métal">Travail du métal</div>
+
+            <div class="spell-node col-5" data-spell="Forme animale">Forme animale</div>
+            <div class="spell-node col-7" data-spell="Forme végétale">Forme végétale</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-1" data-spell="Transformation en arme">Transformation en arme</div>
+            <div class="spell-node col-3" data-spell="Travail de la matière">Travail de la matière</div>
+            <div class="spell-node col-6" data-spell="Forme gazeuse">Forme gazeuse</div>
+            <div class="spell-node col-7" data-spell="Corps élémentaire">Corps élémentaire</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-2" data-spell="Paume sculptrice">Paume sculptrice</div>
+            <div class="spell-node col-4" data-spell="Transformation élastique">Transformation élastique</div>
+            <div class="spell-node col-5" data-spell="Transformation de groupe">Transformation de groupe</div>
+            <div class="spell-node col-7" data-spell="Forme minérale">Forme minérale</div>
+
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-1" data-spell="Création d'un objet">Création d'un objet</div>
+            <div class="spell-node col-3" data-spell="Transmutation de la matière">Transmutation de la matière</div>
+
+
+
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-1" data-spell="Vaporisation de la matière">Vaporisation de la matière</div>
+            <div class="spell-node col-3" data-spell="Liquéfaction des objets">Liquéfaction des objets</div>
+            <div class="spell-node col-4" data-spell="Solidification de la matière">Solidification de la matière</div>
+            <div class="spell-node col-5" data-spell="Métamorphose du terrain">Métamorphose du terrain</div>
+            <div class="spell-node col-7" data-spell="Corps extensible">Corps extensible</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-4" data-spell="Rigidification des êtres">Rigidification des êtres</div>
+        </div>
+
+        <!-- Niveau 20 -->
+        <div class="level">
+            <div class="level-number">20</div>
+            <div class="spell-node col-1" data-spell="Vaporisation des êtres">Vaporisation des êtres</div>
+            <div class="spell-node col-3" data-spell="Liquéfaction des êtres">Liquéfaction des êtres</div>
+        </div>
+
+        <!-- Niveau 25 -->
+        <div class="level">
+            <div class="level-number">25</div>
+            <div class="spell-node col-7" data-spell="Corps transcendant">Corps transcendant</div>
+        </div>
+
+        <!-- Niveau 30 -->
+        <div class="level">
+            <div class="level-number">30</div>
+
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données des métamorphoses
+        const spellsData = {
+            // Niveau 2
+            "Travail du bois": {
+                level: 2,
+                portée: "5 m",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "0,1 m3",
+                description: "Ce sort permet de sculpter magiquement dans le bois, afin de lui faire adopter la forme souhaitée. Il n'y a pas suppression de matière, simplement déplacement (le volume total est constant). La transformation est presque instantanée.\nIl n'est bien sûr possible de déplacer de la matière que dans un espace vide au départ (ni dans un solide ni dans un liquide n'ayant pas la possibilité de s'étendre ailleurs). Aucune des dimensions finales de l'objet ne peut dépasser 10 fois sa valeur originelle.\nPar ailleurs, ce sortilège n’affecte pas la matière qui se trouve à moins de 10 cm d’une créature intelligente."
+            },
+            "Changement de taille": {
+                level: 2,
+                portée: "-",
+                incantation: "1 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Grâce à ce sortilège, le magicien peut modifier sa taille. Il peut l'augmenter jusqu'au double ou la diminuer jusqu'au cinquième. Le matériel porté par le magicien change également de taille. Bien que son nouveau corps soit différent, le magicien conserve ses capacités physiques précédentes et ses scores dans les différentes caractéristiques et compétences. Le magicien peut de la même façon se servir de ce sort pour modifier la taille d'une autre créature intelligente. Si celle-ci n’est pas consentante, elle a droit à un jet de sauvegarde pour résister. Lorsqu’il est lancé sur une autre créature, le sort a une portée, une durée et un temps d’incantation différents (les valeurs sont celles entre parenthèses ci-dessus)."
+            },
+            "Changement d'apparence": {
+                level: 3,
+                portée: "-(10m)",
+                incantation: "2 s (4s)",
+                durée: "1 h (20min)",
+                sauvegarde: "-(Mag+4)",
+                zone: "le magicien (une créature)",
+                description: "Grâce à ce sortilège, le magicien peut changer les traits de son visage et la forme de son corps. Il peut devenir plus grand ou plus petit, plus mince ou plus gros(le matériel porté par le magicien change pour s'adapter), plus vieux ou plus jeune dans une proportion raisonnable, ou encore changer la couleur de ses cheveux et de ses yeux. Son nouveau corps doit rester toutefois celui d'un individu possible de sa race. Même une personne connaissant très bien le magicien ne peut le reconnaître.En effet, contrairement au sort de la liste des Illusions du même nom, ici la transformation est réelle.Les traits du visage et la voix peuvent être absolument méconnaissables.Seule une déduction purement intellectuelle peut permettre de se douter de l'identité du magicien. Aucun détail physique ne donne la moindre piste.De ce fait, contrairement au sort éponyme de la liste des illusions, les créatures observant le magicien n’ont aucune sauvegarde pour déceler de petites imperfections révélatrices de la transformation. Bien que son nouveau corps soit différent, le magicien conserve ses capacités physiques précédentes et ses scores dans les différentes caractéristiques et compétences. Le magicien peut de la même façon se servir de ce sort pour modifier la taille d'une autre créature intelligente. Si celle-ci n’est pas consentante, elle a droit à un jet de sauvegarde pour résister. Lorsqu’il est lancé sur une autre créature, le sort a une portée, une durée et un temps d’incantation différents (les valeurs sont celles entre parenthèses ci-dessus)."
+            },
+
+            // Niveau 4
+            "Travail de la pierre": {
+                level: 4,
+                portée: "10 m",
+                incantation: "7 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "1 m3",
+                description: "Ce sort permet de sculpter magiquement dans la pierre (et plus généralement dans tout minéral à base de silice ou de calcaire, y compris la terre), afin de lui faire adopter la forme souhaitée. Il n'y a pas suppression de matière, simplement déplacement (le volume total est constant). La transformation est presque instantanée.\nIl n'est bien sûr possible de déplacer de la matière que dans un espace vide au départ (ni dans un solide ni dans un liquide n'ayant pas la possibilité de s'étendre ailleurs). Aucune des dimensions finales de l'objet ne peut dépasser 10 fois sa valeur originelle.\nPar ailleurs, ce sortilège n’affecte pas la matière qui se trouve à moins de 10 cm d’une créature intelligente."
+            },
+            "Altération de l'aura": {
+                level: 4,
+                portée: "-",
+                incantation: "3 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège modifie l’aura magique du magicien. Il fausse ainsi les sortilèges cherchant à déceler sa présence ou à l’analyser (comme les sorts d’Empathie, de Sonder les Esprits ou de Sentir les êtres vivants). L’aura du magicien n’est pas cachée, mais transformée. Ainsi ces sortilèges auront-ils l’impression de fonctionner, mais leurs déductions seront fausses. Le magicien décide librement de l’aura qu’il se donne. Il peut même choisir celle d’un certain type d’animal. Il peut ensuite la modifier comme il le souhaite à tout moment pendant la durée du sort. Il peut notamment choisir la race à laquelle il paraît mentalement appartenir, les émotions et les pensées superficielles qui semblent l’agiter, et jusqu’aux principes de vies qui semblent le guider."
+            },
+            "Changement de corps": {
+                level: 4,
+                portée: "-",
+                incantation: "3 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège est une version plus puissante du sort de Changement d’apparence. Le magicien peut modifier énormément la forme de son propre corps, et notamment paraître appartenir à une autre race que la sienne. Il peut également modifier dans une certaine mesure ses vêtements : leur couleur, leur conformation voire leur texture ; mais il ne pourra pas entièrement en transformer la nature (impossible par exemple de transformer une chemise en armure).\nComme pour le sortilège de Changement d’apparence, le magicien peut de la même façon se servir de ce sort pour modifier le corps et les vêtements d'une autre créature intelligente. Si celle-ci n’est pas consentante, elle a droit à un jet de sauvegarde pour résister. Par ailleurs, la portée, la durée et le temps d’incantation sont alors différents (les valeurs sont celles entre parenthèses ci-dessus)."
+            },
+
+            // Niveau 5
+            "Gaine d'invisibilité": {
+                level: 5,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "1 objet (<1m3)",
+                description: "Le magicien entoure avec ce sort l’objet de son choix d’une gaine d’ondes magiques qui le rend invisible. Ce voile est toutefois fragile et se dissipe en cas de choc violent.\nCe sortilège peut être lancé sur une arme et utilisé en combat, même si là n’est sans doute pas sa meilleure utilisation. Si tel est le cas, le combattant utilisant l'arme invisible subit un malus de -2 pour ses actions (attaque et défense) avec elle, car ne pas la distinguer le gêne. Son adversaire attaque normalement mais défend contre l'arme invisible avec un malus de -4. La gaine d’invisibilité disparaît au premier choc (coup porté ou parade réussie)."
+            },
+            "Corps élastique": {
+                level: 5,
+                portée: "toucher",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Le corps de la créature affectée devient parfaitement élastique, de sorte qu’elle peut à volonté le déformer, par la seule force de son esprit. Cette souplesse extraordinaire permet d’accomplir des actions sinon impossibles : se glisser dans un conduit sinueux, se défaire de liens en contorsionnant ses poignets, etc. Elle revêt également des avantages en combat, où elle permet de déformer son corps afin d’esquiver le coup d’un adversaire. Pour cette raison, tous les jets d’esquive de la créature bénéficient d’un bonus de +1. De plus, les coups d’armes contondantes sont amortis par l’élasticité du corps et infligent 3 points de dommages de moins que normalement."
+            },
+
+            // Niveau 6
+            "Travail du métal": {
+                level: 6,
+                portée: "15 m",
+                incantation: "10 s",
+                durée: "50 min",
+                sauvegarde: "- (Mag+4)",
+                zone: "1 dm3",
+                description: "Ce sort permet de sculpter magiquement dans le métal, afin de lui faire adopter la forme souhaitée.\nIl n'y a pas suppression de matière, simplement déplacement (le volume total est constant). La transformation est presque instantanée.\nIl n'est bien sûr possible de déplacer de la matière que dans un espace vide au départ (ni dans un solide ni dans un liquide n'ayant pas la possibilité de s'étendre ailleurs). Aucune des dimensions finales de l'objet ne peut dépasser 10 fois sa valeur originelle.\nSi l'objet en métal se trouve à moins de 10 cm du corps d'une créature, celle-ci a droit à un jet de sauvegarde pour empêcher la transformation."
+            },
+            "Forme animale": {
+                level: 6,
+                portée: "-",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort permet au magicien de se transformer en un animal. Il n'y a que 3 limitations à cette transformation.\nTout d'abord, le magicien ne peut se métamorphoser en un animal de poids plus de 10 fois supérieur ou 40 fois inférieur au sien (ces proportions pouvant faire l’objet de modulations des effets du sort, voir chapitre « Jouer la magie »).\nEnsuite, il doit avoir déjà vu au moins une fois un animal de cette espèce.\nEnfin, il doit effectivement s'agir d'un animal et non d'un humanoïde (appartenant à une des races décrites dans le chapitre « Les Races » du Livre du Monde) ou d’une créature surnaturelle.\nCette transformation s'opère durant les 5 secondes d'incantation. Ce que le magicien transporte avec lui (jusqu'à 25 kg) est également intégré dans son nouveau corps.\nLe magicien conserve son esprit, mais change totalement de corps. Il est intuitivement capable d'utiliser sa nouvelle forme. En revanche, il ne peut plus lancer de sortilège (sa nouvelle forme interagit trop avec les ondes magiques qu’émet son esprit), ni même parler. En cas de combat, il possède les mêmes scores que l’animal dont il a pris la forme."
+            },
+            "Forme végétale": {
+                level: 6,
+                portée: "-",
+                incantation: "5 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort est identique à celui de « Forme animale », mais s'applique à des transformations en végétaux (plantes, arbres, etc.), et non en animaux.\nIl existe cependant quelques particularités. Tout d'abord, la limitation de poids s'étend ici de 200 fois plus (un grand arbre) à 60 fois moins que le poids du magicien. Ensuite, le magicien conserve une partie de ses facultés de mouvement. Sous forme d'arbre, il pourra ainsi marcher sur ses racines (comme un arbre dieu elfique) ; sous forme de liane, il pourra glisser sur le sol comme un serpent, etc. La vitesse maximale que peut atteindre le magicien sous forme végétale est de 50 cm à la seconde.\nEnfin, le magicien conserve ses perceptions. Il n’est pas capable de parler, en revanche il entend, il voit et il sent. Il devient même sensible à certaines phéromones ou pollens."
+            },
+
+            // Niveau 7
+            "Travail de la matière": {
+                level: 7,
+                portée: "20 m",
+                incantation: "10 s",
+                durée: "1 h",
+                sauvegarde: "- (Mag+4)",
+                zone: "50 kg",
+                description: "Ce sort permet de sculpter magiquement dans n'importe quelle matière inerte (y compris de la matière végétale ou animale morte...). Le magicien peut ainsi lui faire adopter la forme souhaitée. Il n'y a pas suppression de matière, simplement déplacement (le volume total est constant). La transformation est presque instantanée.\nIl n'est bien sûr possible de déplacer de la matière que dans un espace vide au départ (ni dans un solide ni dans un liquide n'ayant pas la possibilité de s'étendre ailleurs). Aucune des dimensions finales de l'objet ne peut dépasser 10 fois sa valeur originelle.\nSi l'objet à modifier se trouve à moins de 10 cm du corps d'une créature, celle-ci a droit à un jet de sauvegarde pour empêcher la transformation.\nL'objet peut se composer de plusieurs matières différentes. Seule sa masse totale importe."
+            },
+            "Transformation en arme": {
+                level: 7,
+                portée: "-",
+                incantation: "10 s",
+                durée: "6 h",
+                sauvegarde: "-",
+                zone: "spéciale",
+                description: "Ce sort permet au magicien de sculpter magiquement dans n'importe quelle matière inerte (le sol, un mur, même de l’eau) afin d’en retirer une arme avec laquelle il est parfaitement possible de combattre. Le magicien est capable d’extraire n’importe quel type d’arme relativement simple et qu’il connaît. Il pose simplement sa main sur la matière concernée et la retire lentement, entraînant avec elle l’arme qui se façonne progressivement en sortant de sa matrice. L’arme ainsi créée présente les mêmes caractéristiques de poids, solidité, etc. qu’une arme de qualité moyenne qui serait achetée dans un commerce."
+            },
+            "Forme gazeuse": {
+                level: 7,
+                portée: "-",
+                incantation: "1 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le sort rend gazeuse l'enveloppe corporelle du magicien (et la partie de son équipement qu’il souhaite, jusqu’à 25 kg). Il devient alors insensible à la plupart des attaques physiques : les coups ne l'atteignent plus, pas plus que les gaz empoisonnés, la chaleur ou le froid. Son esprit reste actif, et il demeure donc sujet aux attaques par sortilège mental. Il bénéficie cependant d'un bonus de +4 à ses sauvegardes éventuelles, ce qui traduit la difficulté à cibler correctement l'attaque. S'il est ainsi presque invulnérable, le magicien est réciproquement presque incapable d'agir. Il continue à percevoir le monde comme avec ses anciens sens et à penser, mais il ne peut déplacer son propre corps que de 15 cm par seconde. Les molécules qui le composent restent groupées, mais suivent les caprices du vent, comme de simples poussières. Il est incapable de communiquer ni bien sûr d'attaquer physiquement. Il peut toujours lancer des sorts, puisque son esprit est encore actif. Mais, ne disposant ni des gestes ni de la parole, son niveau de magie subit le malus habituel de -8 dans ces circonstances."
+            },
+            "Corps élémentaire": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le corps du magicien prend à son choix l’une des cinq formes suivantes : corps de feu, de glace, de pierre, d’air ou d’eau. La partie de son équipement qu’il souhaite (jusqu’à 25 kg) est intégrée à son nouveau corps.\nUn corps de feu est absolument insensible à la chaleur et au feu. En revanche, les dommages dus au froid sont augmentés de 50 %. Il conserve toute sa consistance physique et donc les coups reçus en combat infligent des dommages normaux. Au contact, ce corps inflige 2 points de vie par tour, 1 point pour un contact bref. Cela s’applique d’ailleurs à tous les coups de combats mains nues, qu’ils soient reçus ou donnés (mais c’est l’adversaire qui perd 1 point de vie dans la zone en contact…). Ce corps impressionnera la plupart des créatures, notamment tous les animaux, les dissuadant l’attaquer le magicien. Enfin, le magicien peut enflammer simplement en le touchant tout objet facilement inflammable, comme du tissu.\nUn corps de glace est absolument insensible au froid. En revanche, les dommages infligés par la chaleur ou le feu sont augmentés de 50 %. Il est plus dur que sous sa forme naturelle, ce qui confère au magicien une armure qui réduit de 4 points tous les dommages physiques, sauf ceux fondés sur le feu. Un corps de pierre est très dur. Il confère au magicien une armure naturelle de 10 points (valable contre toute attaque physique, y compris celles par sortilèges), mais lui donne également un malus de -2 à toutes ses actions physiques (y compris ses jets sous des caractéristiques physiques). Un corps d’air conserve une matérialité importante : il pèse environ la moitié du poids normal du magicien. C’est pourquoi celui-ci est incapable de voler. Son faible poids l’autorise en revanche à sauter plus haut et plus loin que d’habitude (sa force reste intacte). La principale différence (et le principal avantage) est que le magicien devient beaucoup plus difficile à distinguer, car il est presque transparent. Quand il est en mouvement, il faut réussir un jet sous P+2 pour le repérer, à condition d’être attentif ou sur ses garde (on peut suivre ensuite son déplacement sans nouveau jet). Quand il est immobile, il faut réussir un jet sous P-4 pour le distinguer, et encore, à condition de scruter les alentours. Le magicien gagne en conséquence un bonus de +4 à tous ses jets de discrétion. Notez toutefois qu’une fois un combat engagé son adversaire n’a plus de jet à faire pour le repérer.\nEnfin, un corps d’eau présente une matérialité quasi normale. Il comporte deux avantages, qui sont de pouvoir respirer sous l’eau et d’encaisser plus facilement les chocs et les coups d’armes contondantes (masse d’arme, etc.) ou perforantes (flèches, etc.). Contre de telles armes, il confère une armure naturelle de 4 points au magicien."
+            },
+
+            // Niveau 8
+            "Paume sculptrice": {
+                level: 8,
+                portée: "-",
+                incantation: "10 s",
+                durée: "15 min",
+                sauvegarde: "-",
+                zone: "spéciale",
+                description: "Ce sort rend le magicien capable de façonner la matière inerte et d’en changer la forme en la touchant à l’aide de sa paume. Les ondes magiques se diffusent à partir de celle-ci est transforment lentement la matière. Il n’y a pas à proprement parler de limite de quantité de matière que le magicien peut ainsi sculpter, hormis la durée du sort et le fait que les ondes magiques prennent un certain temps pour se diffuser à l’intérieur de la matière. La zone à proximité du point de contact (quelques dizaines de centimètres) met ainsi quelques secondes seulement à prendre la nouvelle forme souhaitée. Modifier la matière plus en profondeur prendra nettement plus de temps, d’autant plus qu’il s’agit d’une matière dense. Pendant toute la durée du sort, le magicien peut se déplacer et poser sa paume à un autre endroit pour en façonner s’il le souhaite la forme."
+            },
+            "Transformation élastique": {
+                level: 8,
+                portée: "15 m",
+                incantation: "3 s",
+                durée: "40 min",
+                sauvegarde: "- (Mag)",
+                zone: "25 kg",
+                description: "Ce sortilège rend élastique un objet ou une partie de cet objet. La matière n’importe pas, mais il doit s’agir de matière morte. La consistance de l’objet ressemble alors à celle de la pâte à modeler.L’objet est déformable à l’envi et conserve la forme qu’on lui donne.Bien sûr, il peut être fragmenté en plusieurs parties, comme s’il s’agissait de caoutchouc un peu mou.Au moment de l’expiration du sortilège, l’objet se reforme automatiquement.Cependant, s’il avait été séparé en plusieurs morceaux et que ceux-ci avait été placés dans des endroits qui ne communiquent pas(par exemple dans plusieursbocaux fermés), il se reforme sous une forme définitivement composée d’autant de morceaux.Ce sort n’autorise aucune sauvegarde, sauf pour les objets situés au moins en partie à moins de 10 cm d’une créature intelligente(humanoïde ou créature surnaturelle intelligente).Pour de tels objets, la ou les créatures suffisamment proches effectuent un jet de sauvegarde.La réussite par une seule créature suffit à faire échouer le sort."
+            },
+            "Forme minérale": {
+                level: 8,
+                portée: "5 m",
+                incantation: "5 s",
+                durée: "2 h",
+                sauvegarde: "- (C+1)",
+                zone: "1 créature",
+                description: "Ce sort transforme la créature visée par le magicien (il peut s’agir du magicien lui-même) et son équipement jusqu’à 25 kg en rocher de la forme qu’il souhaite (sans descendre sous 5 cm dans une des dimensions). Le volume global de la créature est à peu près conservé, ce qui fait qu’un humanoïde normal se transformera en rocher d’environ 40 à 50 centimètres de côté. Ce sort requiert normalement le consentement volontaire et conscient de la créature, c’est à dire que la créature par sa disposition d’esprit facilite l’entrée en elle des ondes magiques du magicien. Si la créature n’accorde pas sa pleine collaboration (mentale), elle effectue un jet de sauvegarde. Une créature transformée en rocher conserve la totalité de ses perceptions, y compris la vision. Elle est devenue encore plus dure que du rocher, ce qui lui confère une armure naturelle de 50 contre les armes tranchantes et la plupart des attaques par sort physique (notamment feu, froid et électricité), et de 25 contre les armes contondantes. L’esprit de la créature reste actif, ce qui lui permet de lancer des sorts, mais avec le malus habituel de -8 au niveau de magie dû au fait qu’elle ne puisse ni parler ni faire de gestes. Elle peut également être la cible de sorts mentaux, mais bénéficie alors d’un bonus de +2 à sa sauvegarde en raison de la difficulté à localiser précisément son esprit. Enfin, une créature transformée en rocher ne peut se déplacer. Après les 10 premières minutes, elle peut mettre fin au sort dès qu’elle le souhaite (ou attendre l’expiration normale du sort)."
+            },
+            "Transformation de groupe": {
+                level: 8,
+                portée: "10 m",
+                incantation: "20 s",
+                durée: "30 min",
+                sauvegarde: "- (Mag+4)",
+                zone: "10 créatures",
+                description: "Ce sortilège permet au magicien de transformer le corps de l’ensemble des créatures composant un groupe (il peut le cas échéant en faire partie), comme si chacune de celles-ci était affectée d’un sort de « changement de corps » (le magicien peut modifier la race, augmenter ou diminuer la taille, augmenter ou diminuer la corpulence, vieillir ou rajeunir, modifier les traits du visage, modifier la couleur, la texture et la forme des vêtements, etc.). Bien que la transformation physique soit réelle et non illusoire, les créatures conservent la valeur normale de leurs caractéristiques et de leurs compétences. Les créatures ciblées par le magicien doivent constituer un groupe, c’est-à-dire être proches les unes des autres et former un ensemble relativement compact. Lancer ce sort sur certaines personnes seulement parmi une foule ou autour d’une table ou exclure certaines créatures se trouvant physiquement au sein du groupe est plus       complexe, ce qui se traduit par un malus au niveau de magie lors du lancement du sort (voir chapitre « Jouer la magie »). Le magicien doit par ailleurs retenir une transformation similaire pour l’ensemble des membres du groupe : une même race, un même type de personnes. Le sort n’entraîne pas de sauvegarde si les créatures ciblées sont conscientes de ce que fait le magicien et sont consentantes. Les créatures bénéficient d’une sauvegarde dans le cas contraire."
+            },
+
+            // Niveau 9
+            "Création d'un objet": {
+                level: 9,
+                portée: "-",
+                incantation: "20 s",
+                durée: "6 h",
+                sauvegarde: "-",
+                zone: "spéciale",
+                description: "Ce sort permet au magicien de sculpter magiquement dans n'importe quelle matière inerte (le sol, un mur, même de l’eau) afin d’en retirer un objet de son choix. Le magicien est capable d’extraire n’importe quel type d’objet relativement simple et courant et qu’il connaît, et dont la masse n’excède pas 15 kg. Il pose simplement sa main sur la matière concernée et la retire lentement, entraînant avec elle l’objet qui se façonne progressivement en sortant de sa matrice. L’objet ainsi créé présente les mêmes caractéristiques de poids, solidité, etc. qu’un objet du même type de qualité moyenne qui serait acheté dans un commerce."
+
+            },
+            "Transmutation de la matière": {
+                level: 9,
+                portée: "-",
+                incantation: "10 s",
+                durée: "1 h",
+                sauvegarde: "- (Mag)",
+                zone: "10m x 10m x 1m",
+                description: "Ce sort permet au magicien de changer la nature de la matière d’un objet ou d’une zone. La matière finale doit présenter une masse similaire à celle de la matière d’origine et un état proche. La forme par ailleurs n’est pas modifiée au départ (mais elle évolue ensuite librement pendant la durée du sort). Exemples : ce sort peut transformer un plancher ou une partie de mur en boue, mais pas en eau ou en air ; il peut changer en or un vase en terre cuite, en laine une armure de métal, en paille des flèches de bois, etc. Si l'objet ou la zone à modifier se trouve à moins de 10 cm du corps d'une créature, celle-ci a droit à un jet de sauvegarde pour empêcher latransformation. S’il est réussi, l’objet ou la zone proche de la créature ne subit pas la transmutation. A la fin du sortilège, la matière reprend automatiquement son état normal et sa forme originelle, si cela est possible."
+            },
+
+
+            // Niveau 10
+            "Métamorphose du terrain": {
+                level: 10,
+                portée: "-",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "boule 100 m *",
+                description: "Ce sort permet au magicien de modifier la topographie et la composition du terrain qui l’entoure. Pendant toute la durée du sort, il est capable, en se concentrant (aucune autre activité physique ou intellectuelle complexe), d’apporter des modifications progressives au terrain qui l’entoure, à savoir la topographie, la composition du sol, et celle de la végétation. Il n’est pas capable en revanche de modifier la conformation des constructions artificielles (bâtiments, etc.). La métamorphose du terrain nécessite un certain temps pour se réaliser, d’autant plus important que le changement apporté est substantiel.Ainsi, faire disparaître ou apparaître une sente dans une prairie prend quelques secondes ; ériger une butte couverte de buissons quelques dizaines de secondes ; créer un canyon profond quelques minutes. Le changement s’opère progressivement pendant la durée nécessaire.Le magicien peut à tout moment interrompre sa concentration et la métamorphose en cours, la reprendre plus tard, et à tout moment changer d’avis ou de transformation du terrain alentour.Si le magicien se déplace, il est capable de modifier le terrain autour de sa nouvelle localisation ; le terrain situé désormais hors de la zone d’effets reprend alors quant à lui progressivement sa forme originelle, à la même vitesse que celle qui avait été nécessaire pour en changer la conformation."
+            },
+            "Solidification de la matière": {
+                level: 10,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "- (Mag-3)",
+                zone: "30 m3",
+                description: "Ce sort permet au magicien de rendre solide de la matière liquide sans pour autant en changer la température. La limitation principale est le volume, qui ne doit pas excéder 30 mètres cube. La matière solidifiée doit en outre avoir une forme régulière (convexe).\nLa matière se solidifie et forme un objet teinté de la couleur précédente du liquide. Le volume occupé par l’objet sous sa forme solide est identique à celui qu’il occupait sous sa forme liquide. A la fin du sortilège, la matière reprend automatiquement son état normal.\nCe sort n’autorise aucune sauvegarde, sauf si une créature intelligente (humanoïde ou créature surnaturelle intelligente) se trouve dans la matière à solidifier. Dans ce cas, la ou les créatures concernées effectuent un jet de sauvegarde. La réussite par une seule créature suffit à faire échouer le sort. Si les différentes sauvegardes sont ratées, le sort prend effet et les créatures prises dans le liquide solidifié en sont expulsées vers la zone libre la plus proche."
+            },
+            "Vaporisation de la matière": {
+                level: 10,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "- (Mag-3)",
+                zone: "1 objet",
+                description: "Ce sort permet au magicien de rendre gazeux n’importe quel objet solide ou liquide sans pour autant en changer la température. La seule limitation est le poids, qui ne doit pas excéder 1000 kg. Il est même possible de vaporiser seulement une partie (continue et régulière) d’un objet (une partie d’un mur, par exemple). L’objet se gazéifie et forme un nuage teinté de la couleur précédente de l’objet. Le volume occupé par l’objet sous sa forme gazeuse est à peu près le triple celui qu’il occupait sous sa forme solide ou liquide. À la fin du sortilège, l’objet se reforme automatiquement (si seule une partie d’un objet avait été vaporisée, elle reprend sa place au sein de l’objet en expulsant ce qui s’y trouve). Cependant, si à l’état gazeux il avait été séparé en plusieurs nuages enfermés dans des endroits qui ne communiquent pas (par exemple dans plusieurs bocaux fermés), l’objet se reforme sous une forme définitivement composée d’autant de morceaux. Ce sort n’autorise aucune sauvegarde, sauf pour les objets situés au moins en partie à moins de 10 cm d’une créature intelligente (humanoïde ou créature surnaturelle intelligente). Pour de tels objets, la ou les créatures suffisamment proches effectuent un jet de sauvegarde sous leur don Magie moins 3. La réussite par une seule créature suffit à faire échouer le sort." 
+            },
+            },
+            "Liquéfaction des objets": {
+                level: 10,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "- (Mag-3)",
+                zone: "1 objet",
+                description: "Ce sort permet au magicien de rendre liquide n’importe quel objet solide sans pour autant en changer la température. La seule limitation est le poids, qui ne doit pas excéder 1000 kg. Il est même possible de liquéfier seulement une partie (continue et régulière) d’un objet (une partie d’un mur, par exemple).\nL’objet se liquéfie et forme une flaque d’eau teintée de la couleur précédente de l’objet. Le volume occupé par l’objet sous sa forme liquide est identique à celui qu’il occupait sous sa forme solide.\nA la fin du sortilège, l’objet se reforme automatiquement (si seule une partie d’un objet avait été liquéfiée, elle reprend sa place au sein de l’objet en expulsant ce qui s’y trouve). Cependant, si à l’état liquide l’objet avait été séparé en plusieurs morceaux et que ceux-ci avaient été placés dans des endroits qui ne communiquent pas (par exemple dans plusieurs bocaux fermés), il se reforme sous une forme définitivement composée d’autant de morceaux.\nCe sort n’autorise aucune sauvegarde, sauf pour les objets situés au moins en partie à moins de 10 cm d’une créature intelligente (humanoïde ou créature surnaturelle intelligente). Pour de tels objets, la ou les créatures suffisamment proches effectuent un jet de sauvegarde. La réussite par une seule créature suffit à faire échouer le sort."
+            },
+            "Corps extensible": {
+                level: 10,
+                portée: "-",
+                incantation: "5 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Par ce sort le magicien rend son corps parfaitement élastique (avec des effets identiques à ceux du sort Corps élastique) mais également extensible. Il peut, par la seule force de sa volonté, allonger ses membres jusqu’à 30 fois leur taille normale. La force et le diamètre de ses membres sont réduits en fonction de leur allongement. A l’allongement maximum, le magicien n’a plus dans ses membres qu’un quart de sa force normale. Ainsi, il pourra ouvrir une porte ou soulever un objet peu pondéreux, mais pas combattre avec une épée. De même, au-delà d’une multiplication par 15 de leur taille, les jambes ne sont plus capables de propulser le magicien en l’air (sauter, courir…) et à leur extension maximale (taille multipliée par 30) elles sont à peine capables de le porter. La transformation prend moins d’une seconde à chaque fois. Le magicien peut changer la taille de ses membres autant de fois qu’il le désire jusqu’à l’expiration du sort."
+            },
+
+            // Niveau 15
+            "Rigidification des êtres": {
+                level: 15,
+                portée: "20 m",
+                incantation: "7 s",
+                durée: "2 h",
+                sauvegarde: "(C-4)",
+                zone: "un être vivant",
+                description: "Ce sort rigidifie le corps d’un être vivant, quel qu’il soit et pourvu que son poids n’excède pas 10 tonnes. L’être rigidifié reste vivant et conscient mais perd toute perception de son environnement. Son corps retrouve sa consistance normale lorsque le sortilège prend fin. Extérieurement, le corps de la créature semble être fait de pierre. Il est maintenu parfaitement rigide par les ondes magiques du sortilège et se comporte exactement comme si effectivement il était fait de pierre. Il se trouvera notamment insensible aux attaques physiques, qu’il s’agisse de coups ou de sortilèges. Les créatures intelligentes qui ne sont pas consentantes bénéficient d’un jet de sauvegarde pour résister aux effets du sort. Les animaux ou les végétaux en revanche (ou les créatures intelligentes consentantes) sont affectés sans possibilité de sauvegarde."
+            },
+
+            // Niveau 20
+            "Vaporisation des êtres": {
+                level: 20,
+                portée: "20 m",
+                incantation: "7 s",
+                durée: "3 h",
+                sauvegarde: "(Mag-4)",
+                zone: "un être vivant",
+                description: "Ce sort rend gazeux un être vivant, quel qu'il soit et pourvu que son poids n'excède pas 10 tonnes. L'être gazéifié reste vivant et conscient mais perd toute perception de son environnement. Son corps se reforme lorsque le sortilège prend fin. Si son corps gazéifié est placé dans plusieurs endroit hermétiquement séparé, son corps se reformera cependant en autant de morceaux (le tronc et la tête restant indivisibles). Il lui faudra par la suite les rassembler, soit par un nouveau sort de Vaporisation des êtres, soit par un sort de Ressouder les membres. Il faut toutefois souligner qu'un magicien si avancé dans la liste des Métamorphoses a un respect certain pour la vie et la liberté et qu'il sera toujours réticent à mutiler ainsi un être vivant. Les créatures intelligentes qui ne sont pas consentantes bénéficient d'un jet de sauvegarde pour résister aux effets du sort. Les animaux ou les végétaux en revanche (ou les créatures intelligentes volontaires) sont affectés sans sauvegarde."
+            },
+            "Liquéfaction des êtres": {
+                level: 20,
+                portée: "20 m",
+                incantation: "7 s",
+                durée: "3 h",
+                sauvegarde: "(Foi-4)",
+                zone: "un être vivant",
+                description: "Ce sort liquéfie un être vivant, quel qu’il soit et pourvu que son poids n’excède pas 10 tonnes. L’être liquéfié reste vivant et conscient mais perd toute perception de son environnement. Son corps se reforme lorsque le sortilège prend fin. Si son corps liquéfié est placé dans plusieurs endroit hermétiquement séparé, son corps se reformera cependant en autant de morceaux (le tronc et la tête restant indivisibles). Il lui faudra par la suite les réassembler, soit par un nouveau sort de Liquéfaction des êtres, soit par un sort de Ressouder les membres. Il faut toutefois souligner qu’un magicien si avancé dans la liste des Métamorphoses a un respect certain pour la vie et la liberté et qu’il sera toujours réticent à mutiler ainsi un être vivant. Les créatures intelligentes qui ne sont pas consentantes bénéficient d’un jet de sauvegarde pour résister aux effets du sort. Les animaux ou les végétaux en revanche (ou les créatures intelligentes consentantes) sont affectés sans possibilité de sauvegarde."
+            },
+
+            // Niveau 25
+            "Corps transcendant": {
+                level: 25,
+                portée: "-",
+                incantation: "10 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Grâce à ce sort, le corps et l’équipement (jusqu’à 25 kg) du magicien deviennent partiellement immatériels. Celui-ci apparaît désormais comme une forme éthérée, translucide, fantomatique. Le magicien devient insensible à toute attaque physique : celle-ci traversera simplement son corps comme s’il ne s’agissait que d’un hologramme. Il marche sur le sol mais traverse sans peine les obstacles : une table, un mur, une personne, un arbre, etc. Il peut même en se concentrant se laisser glisser lentement à travers un plancher ne dépassant pas 50 cm. Il conserve la totalité de ses perceptions, sauf lorsqu’il se trouve à l’intérieur de quelque chose (il perd alors ses cinq sens). Il peut encore parler, en revanche ses gestes n’ont aucune matérialité : sous forme éthérée par conséquent il lance tous ses sortilèges avec un malus de –4. Il ne peut par ailleurs tenir d’arme ni combattre physiquement. Il peut à volonté reprendre temporairement une matérialité normale, mais tout passage d’un état à l’autre exige 5 secondes."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme des Métamorphoses
+                const connections = [
+                    // Chaîne artisanale
+                    ['Travail du bois', 'Travail de la pierre'],
+                    ['Travail de la pierre', 'Gaine d\'invisibilité'],
+                    ['Gaine d\'invisibilité', 'Travail du métal'],
+                    ['Travail du métal', 'Travail de la matière'],
+                    ['Travail du métal', 'Transformation en arme'],
+                    ['Transformation en arme', 'Création d\'un objet'],
+                    ['Travail de la matière', 'Transformation élastique'],
+                    ['Travail de la matière', 'Paume sculptrice'],
+                    ['Paume sculptrice', 'Transmutation de la matière'],
+                    ['Transformation élastique', 'Transmutation de la matière'],
+                    ['Transmutation de la matière', 'Vaporisation de la matière'],
+                    ['Transmutation de la matière', 'Liquéfaction des objets'],
+                    ['Transmutation de la matière', 'Solidification de la matière'],
+                    ['Transmutation de la matière', 'Métamorphose du terrain'],
+                    ['Solidification de la matière', 'Rigidification des êtres'],
+                    ['Vaporisation de la matière', 'Vaporisation des êtres'],
+                    ['Liquéfaction des objets', 'Liquéfaction des êtres'],
+
+                    // Chaîne des formes et du corps
+                    ['Changement de taille', 'Changement d\'apparence'],
+                    ['Changement d\'apparence', 'Changement de corps'],
+                    ['Changement d\'apparence', 'Altération de l\'aura'],
+                    ['Changement de corps', 'Transformation de groupe'],
+                    ['Changement de corps', 'Corps élastique'],
+                    ['Corps élastique', 'Forme animale'],
+                    ['Corps élastique', 'Forme végétale'],
+                    ['Forme animale', 'Forme gazeuse'],
+                    ['Forme végétale', 'Forme gazeuse'],
+                    ['Forme gazeuse', 'Forme minérale'],
+                    ['Forme gazeuse', 'coprs élémentaire'],
+                    ['Forme végétale', 'forme gazeuse'],
+                    ['Corps extensible', 'Corps transcendant'],
+                    ['Forme minérale', 'Corps extensible']
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

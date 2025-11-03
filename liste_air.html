@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de l'Air</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+
+        /* Pour Ouragan dévastateur qui s'étend sur 2 colonnes */
+    </style>
+</head>
+
+<body>
+    <h1>Liste de l'Air</h1>
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Ligne 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-2" data-spell="Brise">Brise</div>
+            <div class="spell-node col-4" data-spell="Murmure porté">Murmure porté</div>
+        </div>
+
+        <!-- Ligne 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-1" data-spell="Chute de plumes">Chute de plumes</div>
+            <div class="spell-node col-5" data-spell="Bulle d'air">Bulle d'air</div>
+        </div>
+
+        <!-- Ligne 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-1" data-spell="Lévitation">Lévitation</div>
+            <div class="spell-node col-2" data-spell="Rafale de vent">Rafale de vent</div>
+        </div>
+
+        <!-- Ligne 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-4" data-spell="Influence climatique">Influence climatique</div>
+        </div>
+
+        <!-- Ligne 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-1" data-spell="Vol">Vol</div>
+            <div class="spell-node col-2" data-spell="Contrôle du vent">Contrôle du vent</div>
+            <div class="spell-node col-3" data-spell="Vents tourbillonnants">Vents tourbillonnants</div>
+            <div class="spell-node col-5" data-spell="Nuage suffocant">Nuage suffocant</div>
+            <div class="spell-node col-6" data-spell="Respiration universelle">Respiration universelle</div>
+        </div>
+
+        <!-- Ligne 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-2" data-spell="Armure d'air">Armure d'air</div>
+            <div class="spell-node col-3" data-spell="Mur d'air">Mur d'air</div>
+            <div class="spell-node col-4" data-spell="Globe anti-vent">Globe anti-vent</div>
+        </div>
+
+        <!-- Ligne 7 (vide) -->
+        <div class="level">
+            <div class="level-number">7</div>
+        </div>
+
+        <!-- Ligne 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-2" data-spell="Élémental d'air">Élémental d'air</div>
+            <div class="spell-node col-5" data-spell="Nuage létal">Nuage létal</div>
+        </div>
+
+        <!-- Ligne 9 (vide) -->
+        <div class="level">
+            <div class="level-number">9</div>
+        </div>
+
+        <!-- Ligne 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-1" data-spell="Vaporisation de la matière">Vaporisation de la matière</div>
+        </div>
+
+        <!-- Ligne 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-5" data-spell="Vide">Vide</div>
+        </div>
+
+        <!-- Ligne 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-4" data-spell="Contrôle climatique">Contrôle climatique</div>
+        </div>
+
+        <!-- Ligne 20 -->
+        <div class="level">
+            <div class="level-number">20</div>
+            <div class="spell-node col-1" data-spell="Vaporisation des êtres">Vaporisation des êtres</div>
+            <div class="spell-node col-2" data-spell="Cyclone">Cyclone</div>
+        </div>
+
+        <!-- Ligne 25 -->
+        <div class="level">
+            <div class="level-number">25</div>
+            <div class="spell-node col-2-3" data-spell="Ouragan dévastateur">Ouragan dévastateur</div>
+        </div>
+
+        <!-- Ligne 30 (vide) -->
+        <div class="level">
+            <div class="level-number">30</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données des sorts
+        const spellsData = {
+            "Brise": {
+                level: 1,
+                portée: "20 m",
+                incantation: "1 s",
+                durée: "3 min",
+                sauvegarde: "-",
+                zone: "boule de 15 m (*)",
+                description: "Pendant toute la durée du sort, une brise se fait sentir dans sa zone d'effet (au choix du magicien : boule fixe ou bien boule autour de lui et qui se déplace avec lui). Cette brise peut éteindre les bougies, faire s’envoler des objets légers comme du papier ou encore accélérer d'un facteur 2 le temps de dispersement d'un Nuage suffocant. Elle inflige par ailleurs un malus de -2 à tous les tirs avec une arme à projectile (sauf à une distance de quelques mètres). Notez que cette brise n'a pas de direction fixe, et qu'elle tourbillonne un peu dans tous les sens.",
+
+
+            },
+            "Murmure porté": {
+                level: 1,
+                portée: "100 m",
+                incantation: "1 s",
+                durée: "10 s",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Le vent emporte les mots prononcés par le magicien ou le son qu'il émet jusqu'à un point qu'il a en vue et qui est situé à une portée maximale de 100 mètres. La localisation est très précise, ce qui peut permettre par exemple de murmurer à distance un message à l'oreille de quelqu'un.",
+            },
+            "Bulle d'air": {
+                level: 2,
+                portée: "5 m",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "boule de 3m *",
+                description: "Ce sort crée une boule où il est parfaitement possible de respirer. Il est notamment utile pour respirer dans l'eau. La limite de cette \"bulle\" est constituée d'une couche élastique d'ondes magiques, rappelant le caoutchouc. Il est possible de la déplacer en appuyant sur cette paroi. Celle-ci résistera assez bien aux coups contondants (comme un coup de poing ou de pied), mais se dissipera si quelque chose de tranchant (même un simple couteau) la coupe.",
+            },
+            "Chute de plumes": {
+                level: 2,
+                portée: "50 m",
+                incantation: "1/10 s",
+                durée: "5 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature ciblée est soudain entourée d'une enveloppe d'air qui la propulse vers le haut. La force de cette poussée s'ajuste magiquement afin que la chute du personnage dépasse à peine la vitesse de l'air ambiant. Il tombe ainsi à la vitesse d'une plume, et atterrit délicatement sur le sol.",
+            },
+            "Lévitation": {
+                level: 3,
+                portée: "-",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort entoure le magicien d'une enveloppe d'air qui annule les effets de l'attraction terrestre. Il peut se déplacer librement vers le haut et vers le bas, à une vitesse maximale de 1 mètre par seconde. Cette enveloppe magique est cependant fragile, de sorte que le magicien ne peut lancer de sortilèges d'un niveau supérieur à 3 sans la briser. Le magicien peut emmener avec lui son équipement jusqu'à un poids de 20 kilos. Lorsqu'il est en lévitation, le magicien peut être propulsé horizontalement par une créature en vol. Leur mouvement commun sera cependant ralenti (vitesse de vol divisée par 2). Les compétences physiques du magicien qui lévite sont bridées, du fait qu'il ne dispose plus du sol sur lequel s'appuyer.",
+            },
+            "Rafale de vent": {
+                level: 3,
+                portée: "-",
+                incantation: "2 s",
+                durée: "-",
+                sauvegarde: "-",
+                zone: "cône de 20m x 5m",
+                description: "Grâce à ce sort le magicien provoque une forte rafale de vent capable de déséquilibrer un humain. Cette rafale éteindra un petit feu ou une torche, soulèvera une tenture ou fera tomber une créature en équilibre mal assuré. Les créatures en situation normale (notamment debout) devront effectuer un jet sous la Force avec un bonus de +2 pour ne pas tomber. Si elles étaient en train de se battre, leur attaque subit un malus de -4 pour ce tour. La zone d'effets est un cône partant des mains du magicien et pouvant faire jusqu'à 20 mètres de long et un diamètre terminal de 10 mètres.",
+            },
+            "Influence climatique": {
+                level: 4,
+                portée: "-",
+                incantation: "1 min",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 2 km *",
+                description: "Ce sort permet au magicien de changer légèrement le climat autour de lui. Il peut jouer sur deux facteurs simultanément : le vent et les précipitations. Il peut déplacer chacun d'un cran en plus ou en moins sur les échelles suivantes : - vent nul / vent faible (15 km/h) / vent moyen (30 km/h) / vent fort (50 km/h). - précipitations nulles / bruine / pluie / pluie très forte (ou neige en fonction de la température). Il est possible d'augmenter la puissance de ce sort en augmentant le coût de lancement, jusqu'au maximum d'un triplement : les effets augmentent alors en proportion. Par exemple, un doublement du coût (8 points de concentration et de fatigue au lieu de 4) permet de modifier de 2 crans dans un sens ou l'autre le vent et les précipitations.",
+            },
+            "Vol": {
+                level: 5,
+                portée: "-",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort confère au magicien la capacité de voler. Il manipule inconsciemment l'air qui l'entoure afin de la maintenir en suspension et de le propulser dans la direction qu'il souhaite. Le magicien peut emmener avec lui son équipement jusqu'à un poids de 20 kilos. La vitesse horizontale maximale pouvant être atteinte est d'environ 60 km/h, soit presque un cheval au galop. Atteindre une telle vitesse exige 5 ou 6 secondes. A cette vitesse, il faut au moins 25 m pour s'arrêter. La vitesse maximale en montée verticale est de 30 km/h, tandis qu'en descente elle peut atteindre 250 km/h. Il est difficile de connaître avec précision l'écoulement du temps, c'est pourquoi il est en général plus prudent de s'arrêter de voler avant l'expiration du sort. Celle-ci est en effet brutale, et la chute peut être rude... Notez par ailleurs que le champ magique qui entoure le magicien et lui permet de voler est fragile. Le magicien ne peut lancer un sortilège de niveau supérieur à 3 sans le briser. Enfin, Les compétences physiques du magicien qui lévite sont bridées, du fait qu'il ne dispose plus du sol sur lequel s'appuyer.",
+            },
+            "Contrôle du vent": {
+                level: 5,
+                portée: "-",
+                incantation: "1 min",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 2 km *",
+                description: "Le magicien décide de la force et de la direction du vent à l'intérieur de la zone d'effets. À tout moment il choisit entre : vent nul / vent faible (15 km/h) / vent moyen (30 km/h) / vent fort (50 km/h) / vent très fort (80 km/h). La force et la direction du vent peuvent varier au sein de la zone d'effets, mais d'une façon progressive, sans rupture nette. Le magicien peut décider à volonté de les modifier pendant toute la durée du sort, la transition vers les nouvelles force et direction du vent prenant toutefois quelques instants (de l'ordre de 15 secondes par cran de modification). Si un autre sort de contrôle du vent est lancé, leurs effets s'annulent sur la zone de chevauchement des zones d'effets.",
+                prerequisites: "Rafale de vent"
+            },
+            "Vents tourbillonnants": {
+                level: 5,
+                portée: "-",
+                incantation: "5 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "boule de 20m (*)",
+                description: "La zone d'effets est agitée de forts vents tourbillonnants en tous sens. Le magicien peut soit fixer cette zone à un endroit qu'il a choisi, soit la centrer sur lui et qu'elle se déplace avec lui. Ces vents ne sont pas assez puissants pour empêcher les mouvements de créatures terrestres, même si elles sont légèrement gênées. Mais ils perturbent fortement le mouvement des créatures volantes et il fait perdre leur trajectoire aux projectiles légers tels que les flèches ou les carreaux d'arbalète. Le tir à courte portée subit un malus et -4 au jet de toucher ; celui à moyenne portée un malus de -6 ; celui à longue portée un malus de -8.",
+                prerequisites: "Rafale de vent"
+            },
+            "Nuage suffocant": {
+                level: 5,
+                portée: "30 m",
+                incantation: "3 s",
+                durée: "variable",
+                sauvegarde: "C-1",
+                zone: "10m x 10m x 5m",
+                description: "Ce sort crée un nuage dense de vapeurs colorées et irritantes. Il dure jusqu'à son dispersement dans l'air ambiant. On considère que celui-ci demande 30 secondes à l'air libre, et 1 à 2 minutes à l'intérieur d'une pièce fermée selon son étanchéité. Ces valeurs sont bien sûr susceptibles d'être ajustées en fonction du vent, de la taille de la pièce ou d'autres facteurs du même type. Toute créature se trouvant à l'intérieur du nuage en ressent les effets : la fumée pique affreusement ses yeux, et, si elle la respire, celle-ci irrite ses poumons et la fait tousser. Si elle réussit sa sauvegarde, tant qu'elle reste dans le nuage et pendant 2 tours après en être sorti, la créature effectue toutes ses actions où la vue intervient avec la difficulté \"Malaise\" (malus de -2 au jet). Si elle rate sa sauvegarde, tant qu'elle reste dans le nuage et pendant 4 tours après en être sorti, la créature effectue toutes ses actions où la vue intervient avec la difficulté \"Difficile\" (malus de -4 au jet).",
+                prerequisites: "Bulle d'air"
+            },
+            "Respiration universelle": {
+                level: 5,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Ce sortilège permet à son bénéficiaire de parfaitement respirer en toute circonstance. La magie qui l'entoure recycle en fait l'air qu'il respire au fur et à mesure qu'il l'expire. Il est alors possible de respirer dans l'eau, dans des sables mouvants, et même de ne pas subir les effets de gaz toxiques ambiants.",
+                prerequisites: "Bulle d'air"
+            },
+            "Armure d'air": {
+                level: 6,
+                portée: "-",
+                incantation: "5 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège entoure le magicien d'une enveloppe protectrice d'air très dense. Cette protection diminue automatiquement de 4 points tous les dommages physiques qu'elle reçoit au contact ou par des projectiles lourds (hache, etc.) et de 6 points tous les dommages physiques reçus par des projectiles légers (flèche, carreau d'arbalète, etc.). Elle peut se cumuler avec la protection éventuelle d'une armure. Elle ne réduit pas en revanche les dommages infligés par les sortilèges. Cette armure se dissipe dès lors qu'elle a absorbé 40 points de dommages ou davantage.",
+                prerequisites: "Contrôle du vent"
+            },
+            "Mur d'air": {
+                level: 6,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "20m x 5m x 1m",
+                description: "Ce sortilège crée un grand mur magique au sein duquel l'air est agité de violents tourbillons. Il est absolument impossible de tirer un projectile à travers ce mur : celui-ci est secoué en tous sens et finit par sortir du mur en ayant perdu toute sa puissance. Il faut une vitesse minimale de 20 km/h à une créature pour franchir le mur. Si elle était à pied, elle doit réussir un jet sous sa Vivacité physique avec un malus de -4 pour ne pas tomber au moment où elle en ressort. Si elle volait, sa vitesse et sa direction de sortie sont déterminées aléatoirement. Notez que, à la différence de la plupart des sortilèges créant un mur, celui-ci n'a aucun besoin d'une surface solide sur laquelle s'appuyer.",
+                prerequisites: "Vents tourbillonnants"
+            },
+            "Globe anti-vent": {
+                level: 6,
+                portée: "20 m",
+                incantation: "3 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "boule de 10m (*)",
+                description: "Le magicien crée une zone où le vent ne peut pénétrer, quelle que soit sa force. Il peut soit fixer cette zone à un endroit qu'il a choisi, soit la centrer sur lui et qu'elle se déplace avec lui. Notez que ce sort protège les créatures se trouvant dans sa zone d'effets de sorts tels que Nuage suffocant ou Nuage létal (il expulse instantanément de toute la zone où il prend effet les particules d'air vicié). Il annule également en son sein les effets de sortilèges fondés sur le vent, tels que Tempête de sable. Enfin, un élémental d'air ne pourra pas entrer dans cette zone. Seuls les vents d'un Ouragan dévastateur peuvent franchir cette barrière, et encore sont-ils affaiblis de moitié.",
+                prerequisites: "Influence climatique"
+            },
+            "Élémental d'air": {
+                level: 8,
+                portée: "2 m",
+                incantation: "30 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Par ce sortilège, le magicien invoque pour l'aider une créature venant d'un autre plan d'existence. Il s'agit d'un être composé d'air très dense. L'élémental perçoit les ordres mentaux du magicien, pourvu que celui-ci se trouve à moins de 50 mètres, et il s'y conforme. Il est le plus souvent appelé pour aider le magicien lors d'un combat. Notez que sa force ne lui permet pas de porter un poids supérieur à une vingtaine de kilos. Ses principales qualités sont la mobilité (il vole) et sa quasi-invisibilité. Le magicien peut également utiliser ce sort pour contrôler un élémental d'air qui a été invoqué ou le renvoyer dans son plan d'existence. Dans ce cas, l'incantation est réduite à seulement 5 secondes. L'élémental a droit à une sauvegarde sous respectivement PM+4 pour la prise de contrôle et PM pour le renvoi dans son plan. Les caractéristiques des élémentaux d'air sont décrites en annexe du présent livre de magie et plus en détail dans le chapitre \"Les créatures surnaturelles\" du livre du monde. Leur intelligence est équivalente à celle d'un enfant de quatre ou cinq ans. Ils ont un score de +6 en attaque, +9 en feinte de corps, +6 en esquive et infligent des dommages égaux à 1,5 x marge. Ils sont très difficiles à percevoir.",
+                prerequisites: "Armure d'air, Mur d'air"
+            },
+            "Nuage létal": {
+                level: 8,
+                portée: "30 m",
+                incantation: "5 s",
+                durée: "variable",
+                sauvegarde: "C-3",
+                zone: "10m x 10m x 5m",
+                description: "Ce sortilège est une version renforcée du sort de Nuage suffocant. Il charge l'air de particules toxiques, formant ainsi un nuage épais. Ce nuage se dissipe lentement dans l'air ambiant, perdant alors son pouvoir destructeur. En termes de jeu, le nuage met 30s à se dissiper à l'air ambiant, et environ 1 à 2 minutes à l'intérieur d'une pièce fermée. Ces valeurs sont bien sûr susceptibles d'être ajustées en fonction du vent, de la taille de la pièce ou d'autres facteurs du même type. Le nuage est très épais et on ne peut voir ni dedans ni à travers. La fumée pique affreusement les yeux de toute créature à l'intérieur du nuage. Si elle réussit sa sauvegarde, tant qu'elle reste dans le nuage et pendant 2 tours après en être sorti, la créature effectue toutes ses actions où la vue intervient avec la difficulté \"Malaise\" (malus de -2 au jet). Si elle rate sa sauvegarde, tant qu'elle reste dans le nuage et pendant 4 tours après en être sorti, la créature effectue toutes ses actions où la vue intervient avec la difficulté \"Difficile\" (malus de -4 au jet). Par ailleurs, le caractère empoisonné des particules en suspension brûle les poumons de toute créature qui respire plus de quelques secondes l'air du nuage (parce qu'elle ne s'en protège pas ou parce qu'elle ne parvient plus à retenir sa respiration). La créature perd 1d4 +1 points de vie généraux si elle réussit sa sauvegarde et 2d4 + 2 points de vie généraux si elle la rate.",
+                prerequisites: "Nuage suffocant"
+            },
+            "Vaporisation de la matière": {
+                level: 10,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "- (Mag-3)",
+                zone: "un objet <1000 kg",
+                description: "Ce sort permet au magicien de rendre gazeux n'importe quel objet solide ou liquide sans pour autant en changer la température. La seule limitation est le poids, qui ne doit pas excéder 1000 kg. Il est même possible de vaporiser seulement une partie (continue et régulière) d'un objet (une partie d'un mur, par exemple). L'objet se gazéifie et forme un nuage teinté de la couleur précédente de l'objet. Le volume occupé par l'objet sous sa forme gazeuse est à peu près le triple celui qu'il occupait sous sa forme solide ou liquide. À la fin du sortilège, l'objet se reforme automatiquement (si seule une partie d'un objet avait été vaporisée, elle reprend sa place au sein de l'objet en expulsant ce qui s'y trouve). Cependant, si à l'état gazeux il avait été séparé en plusieurs nuages enfermés dans des endroits qui ne communiquent pas (par exemple dans plusieurs bocaux fermés), l'objet se reforme sous une forme définitivement composée d'autant de morceaux. Ce sort n'autorise aucune sauvegarde, sauf pour les objets situés au moins en partie à moins de 10 cm d'une créature intelligente (humanoïde ou créature surnaturelle intelligente). Pour de tels objets, la ou les créatures suffisamment proches effectuent un jet de sauvegarde sous leur don Magie moins 3. La réussite par une seule créature suffit à faire échouer le sort.",
+                prerequisites: "Élémental d'air, Vol"
+            },
+            "Vide": {
+                level: 12,
+                portée: "30 m",
+                incantation: "5 s",
+                durée: "-",
+                sauvegarde: "-",
+                zone: "volume de 4.000 m3",
+                description: "Ce sort vide la zone d'effets de tout gaz qu'elle contenait. Cette zone peut avoir la forme d'une boule de 10 mètres de rayon ou d'un parallélépipède rectangle (i.e. un cube plus ou moins allongé dans chacune de ses dimensions) d'un volume équivalent (environ 4.000 m3, soit 15 à 20 mètres de côté sur les différentes dimensions). Le magicien peut ne pas voir la zone qu'il cible, mais il ne peut cependant être séparé d'elle par plus que l'équivalent d'une petite porte en bois. Tous les feux dans la zone d'effets s'éteignent instantanément, de même que tout bruit. Les créatures vivantes interrompent leur action, à la recherche d'air, surprises par la soudaine sensation d'étouffer. L'air revient ensuite dans la zone d'effets, mais seulement au rythme que la configuration du lieu rend possible : si la zone d'effets était bien isolée (cave fermée par une trappe relativement étanche, grotte sous-marine, coffre, etc.), l'air ne reviendra que très lentement et provoquera une forte pression pour combler le vide. En extérieur, le vide sera rapidement comblé par un vent violent qui déséquilibre et fait chuter les créatures à l'intérieur de la zone (jet sous Vivacité physique -6 pour ne pas tomber). Ce sort peut ainsi avoir des effets très différents suivant les conditions et le lieu où il est lancé.",
+                prerequisites: "Nuage létal"
+            },
+            "Contrôle climatique": {
+                level: 15,
+                portée: "-",
+                incantation: "2 min",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "boule de 10 km *",
+                description: "Ce sortilège est une version beaucoup plus puissante du sort de niveau 5 Contrôle des vents et du sort de niveau 6 de la liste de l'Eau, Invocation de l'orage. Il permet au magicien de décider du climat et de la météorologie qui règne dans la zone d'effets, tant en termes de vent, de précipitations que de température. Le magicien décide de la force, de la direction et de la régularité du vent à l'intérieur de la zone d'effet dans la limite de bourrasques de 100 km/h. La force et la direction du vent peuvent varier au sein de la zone d'effets, mais d'une façon progressive, sans rupture nette. Le magicien peut décider à volonté de les modifier pendant toute la durée du sort, la transition vers les nouvelles force et direction du vent dans chaque partie de la zone d'effets prenant toutefois quelques instants (typiquement de l'ordre d'une minute). Aucun sort de contrôle des vents ou d'influence climatique ne peuvent prendre effet (ou continuer) dans la zone soumise à la volonté du magicien. Seul un sort de niveau supérieur ou égal à 15 peut se superposer à lui ou le remplacer. En matière de précipitations, le magicien est en partie dépendant des conditions climatiques régnant \"naturellement\" dans la zone d'effets. Il peut au maximum modifier les conditions initiales de l'équivalent de deux crans sur l'échelle suivante, chaque passage de cran exigeant environ 2 minutes pour prendre effet : - ciel bleu/grand soleil/nuages de beau temps ; - ciel couvert/nuages menaçants/brume légère ; - pluie faible à forte/ciel noir/neige/brouillard épais ; - orage moyen/grêle ; - orage très violent. En matière de température, le magicien est également dépendant des conditions naturelles régnant dans la zone. Il peut modifier ces conditions initiales de l'équivalent de trois crans sur l'échelle suivant, chaque passage de cran exigeant environ 2 minutes pour prendre effet : - chaleur caniculaire : 45° Celsius ; - temps chaud : 35° Celsius ; - temps estival : 25° Celsius ; - temps doux : 15° Celsius ; - temps frais : 5° Celsius ; - temps froid : -5° Celsius ; - temps glacial : -15° Celsius. Les précipitations comme la température peuvent légèrement varier au sein de la zone d'effet, mais sans contrastes trop brutaux. Par exemple, à partir d'une situation de chaleur estival mais avec un ciel couvert, le magicien pourra aller jusqu'à un temps froid et des orages par endroit. Le temps pourra ailleurs être seulement frais et pluvieux, voire doux et nuageux en bordure de zone d'effets. Mais le magicien ne pourra aller jusqu'à invoquer grand ciel bleu et un temps chaud ou caniculaire dans une partie de la zone d'effets. Le magicien peut décider à volonté de modifier les conditions de précipitations et de température pendant toute la durée du sort, la transition prenant toutefois chaque fois quelques minutes pour prendre effet. Le magicien doit veiller à invoquer des conditions climatiques cohérentes entre elles : il ne peut par exemple à la fois ordonner un temps estival et de la neige, ni un temps caniculaire avec un très fort vent et de l'orage. Le magicien peut augmenter le coût de lancement du sort pour en augmenter à proportion les effets. Par exemple, un doublement du coût (30 points de concentration et de fatigue au lieu de 15) permet de provoquer des vents allant jusqu'à 150 km/h et de modifier de 4 crans dans un sens ou l'autre les précipitations et de de 6 crans dans un sens ou l'autre la température.",
+                prerequisites: "Globe anti-vent"
+            },
+            "Vaporisation des êtres": {
+                level: 20,
+                portée: "20 m",
+                incantation: "7 s",
+                durée: "3 h",
+                sauvegarde: "(Mag-4)",
+                zone: "un être vivant",
+                description: "Ce sort rend gazeux un être vivant, quel qu'il soit et pourvu que son poids n'excède pas 10 tonnes. L'être gazéifié reste vivant et conscient mais perd toute perception de son environnement. Son corps se reforme lorsque le sortilège prend fin. Si son corps gazéifié est placé dans plusieurs endroit hermétiquement séparé, son corps se reformera cependant en autant de morceaux (le tronc et la tête restant indivisibles). Il lui faudra par la suite les rassembler, soit par un nouveau sort de Vaporisation des êtres, soit par un sort de Ressouder les membres. Il faut toutefois souligner qu'un magicien si avancé dans la liste des Métamorphoses a un respect certain pour la vie et la liberté et qu'il sera toujours réticent à mutiler ainsi un être vivant. Les créatures intelligentes qui ne sont pas consentantes bénéficient d'un jet de sauvegarde pour résister aux effets du sort. Les animaux ou les végétaux en revanche (ou les créatures intelligentes volontaires) sont affectés sans possibilité de sauvegarde.",
+                prerequisites: "Vaporisation de la matière"
+            },
+            "Cyclone": {
+                level: 20,
+                portée: "2 km",
+                incantation: "2 min",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "spéciale",
+                description: "Le magicien crée un cyclone, auquel il indique sa direction générale de mouvement au début du sort. La forme du cyclone approche celle d'un cylindre d'environ 1 kilomètre de haut pour 200 mètres de rayon. En son cœur se trouve une zone de calme d'une vingtaine de mètres de rayon. Les vents du cyclone suivent une direction tourbillonnante : ils tournent (tous dans le même sens) autour du cœur du cyclone en s'élevant progressivement (à l'inverse, les vents proches du cœur du cyclone descendent). Ils atteignent une force de plus de 200 km/h.",
+                prerequisites: "Élémental d'air"
+            },
+            "Ouragan dévastateur": {
+                level: 25,
+                portée: "15 km",
+                incantation: "5 min",
+                durée: "spéciale",
+                sauvegarde: "-",
+                zone: "spéciale",
+                description: "Le magicien crée un ouragan qui dévaste tout sur son passage. Le vent y atteint 180 à 200 km/h, avec des points pouvant atteindre 250 km/h. L'ouragan couvre une surface au sol d'une dizaine de kilomètres carrés, soit l'équivalent d'un disque de 1,5 à 2 kilomètres de rayon. Le vent se lève progressivement au cours de l'incantation. Une fois créé, l'ouragan devient naturel. Il se dirige au gré des conditions climatiques (allant des zones de pression élevée (beau temps) vers les zones de basses pressions) et dure jusqu'à ce que sa force s'épuise. Cela exigera un temps variable : en bordure de mer et sous un climat tropical agité, il diminuera progressivement d'intensité avant de s'éteindre après 3 ou 4 jours. À l'inverse, éloigné de l'océan et sous un climat tempéré, sa force diminuera très rapidement et il disparaîtra en une dizaine d'heures. Dans tous les cas, il aura laissé avant de s'éteindre une traînée catastrophique de destruction derrière lui.",
+                prerequisites: "Contrôle climatique, Cyclone"
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme
+                const connections = [
+                    ['Brise', 'Chute de plumes'],
+                    ['Brise', 'Rafale de vent'],
+                    ['Brise', 'Influence climatique'],
+                    ['Murmure porté', 'Influence climatique'],
+                    ['Bulle d\'air', 'Globe anti-vent'],
+                    ['Bulle d\'air', 'Nuage suffocant'],
+                    ['Bulle d\'air', 'Respiration universelle'],
+                    ['Chute de plumes', 'Lévitation'],
+                    ['Lévitation', 'Vol'],
+                    ['Rafale de vent', 'Contrôle du vent'],
+                    ['Rafale de vent', 'Vents tourbillonnants'],
+                    ['Contrôle du vent', 'Armure d\'air'],
+                    ['Vents tourbillonnants', 'Mur d\'air'],
+                    ['Influence climatique', 'Globe anti-vent'],
+                    ['Nuage suffocant', 'Nuage létal'],
+                    ['Armure d\'air', 'Élémental d\'air'],
+                    ['Mur d\'air', 'Élémental d\'air'],
+                    ['Globe anti-vent', 'Contrôle climatique'],
+                    ['Élémental d\'air', 'Vaporisation de la matière'],
+                    ['Élémental d\'air', 'Cyclone'],
+                    ['Nuage létal', 'Vide'],
+                    ['Vol', 'Vaporisation de la matière'],
+                    ['Vaporisation de la matière', 'Vaporisation des êtres'],
+                    ['Contrôle climatique', 'Ouragan dévastateur'],
+                    ['Cyclone', 'Ouragan dévastateur']
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
