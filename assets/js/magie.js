@@ -1,35 +1,40 @@
-// Récupération des éléments
-const btn = document.getElementById("btn");
-const modal = document.getElementById("modal");
-const closeBtn = document.getElementsByClassName("close")[0];
+// Initialisation quand le DOM est prêt
+document.addEventListener("DOMContentLoaded", function () {
+  // Récupération des éléments (si présents sur la page)
+  const btn = document.getElementById("btn");
+  const modal = document.getElementById("modal");
+  const closeBtn = document.querySelector("#modal .close");
 
-// Fonction pour ouvrir la modale
-function openModal() {
-  modal.style.display = "flex";
-}
-
-// Fonction pour fermer la modale
-function closeModal() {
-  modal.style.display = "none";
-}
-
-// Événement au clic sur le bouton
-btn.addEventListener("click", openModal);
-
-// Événement au clic sur la croix pour fermer
-closeBtn.addEventListener("click", closeModal);
-
-// Événement au clic à l'extérieur de la modale pour fermer
-window.addEventListener("click", function (event) {
-  if (event.target === modal) {
-    closeModal();
+  // Fonctions protégées
+  function openModal() {
+    if (modal) modal.style.display = "flex";
   }
-});
 
-// Événement pour fermer avec la touche Échap
-document.addEventListener("keydown", function (event) {
-  if (event.key === "Escape" && modal.style.display === "flex") {
-    closeModal();
+  function closeModal() {
+    if (modal) modal.style.display = "none";
+  }
+
+  // Lier les événements seulement si les éléments existent
+  if (btn && modal) {
+    btn.addEventListener("click", openModal);
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeModal);
+  }
+
+  if (modal) {
+    window.addEventListener("click", function (event) {
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && modal.style.display === "flex") {
+        closeModal();
+      }
+    });
   }
 });
 
@@ -61,6 +66,16 @@ document.addEventListener("click", function (event) {
     // Ouvrir la liste des créatures surnaturelles si le bouton "Créatures surnaturelles" est cliqué
     if (magicType === "Créatures surnaturelles") {
       openCreatureSurnaturelleModal();
+    }
+
+    // Ouvrir la liste de magie pure si le bouton "Magie pure" est cliqué
+    if (magicType === "Magie pure") {
+      openMagiePureModal();
+    }
+
+    // Ouvrir la liste des Métamorphoses si le bouton "Métamorphoses" est cliqué
+    if (magicType === "Métamorphoses") {
+      openMetamorphosesModal();
     }
   }
 });
@@ -185,6 +200,74 @@ function openCreatureSurnaturelleModal() {
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && creatureSurnaturelleModal.parentNode) {
       document.body.removeChild(creatureSurnaturelleModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste de Magie pure
+function openMagiePureModal() {
+  const magiePureModal = document.createElement("div");
+  magiePureModal.id = "magiePureModal";
+  magiePureModal.className = "modal";
+  magiePureModal.style.display = "flex";
+
+  magiePureModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeMagiePureModal">&times;</span>
+      <iframe src="Liste_magiePure.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(magiePureModal);
+
+  const closeMagiePureModal = document.getElementById("closeMagiePureModal");
+  closeMagiePureModal.addEventListener("click", function () {
+    document.body.removeChild(magiePureModal);
+  });
+
+  magiePureModal.addEventListener("click", function (event) {
+    if (event.target === magiePureModal) {
+      document.body.removeChild(magiePureModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && magiePureModal.parentNode) {
+      document.body.removeChild(magiePureModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste des Métamorphoses
+function openMetamorphosesModal() {
+  const metaModal = document.createElement("div");
+  metaModal.id = "metamorphosesModal";
+  metaModal.className = "modal";
+  metaModal.style.display = "flex";
+
+  metaModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeMetamorphosesModal">&times;</span>
+      <iframe src="Liste_metamorphoses.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(metaModal);
+
+  const closeBtn = document.getElementById("closeMetamorphosesModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(metaModal);
+  });
+
+  metaModal.addEventListener("click", function (event) {
+    if (event.target === metaModal) {
+      document.body.removeChild(metaModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && metaModal.parentNode) {
+      document.body.removeChild(metaModal);
     }
   });
 }

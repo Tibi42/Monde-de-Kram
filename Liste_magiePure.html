@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de Magie pure</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DE MAGIE PURE</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-3" data-spell="Disque flottant">Disque flottant</div>
+            <div class="spell-node col-4" data-spell="Aura magique">Aura magique</div>
+            <div class="spell-node col-5" data-spell="Identification">Identification</div>
+            <div class="spell-node col-6" data-spell="Serviteur invisible">Serviteur invisible</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-3" data-spell="Chute de plumes">Chute de plumes</div>
+            <div class="spell-node col-4" data-spell="Corde enchantée">Corde enchantée</div>
+            <div class="spell-node col-7" data-spell="Verrou magique">Verrou magique</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-3" data-spell="Lévitation">Lévitation</div>
+            <div class="spell-node col-7" data-spell="Fracassement">Fracassement</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-3" data-spell="Télékinésie">Télékinésie</div>
+            <div class="spell-node col-4" data-spell="Annulation du poids">Annulation du poids</div>
+            <div class="spell-node col-5" data-spell="Affaiblissement">Affaiblissement</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-3" data-spell="Vol">Vol</div>
+            <div class="spell-node col-7" data-spell="Mur de force">Mur de force</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-7" data-spell="Main d'interposition">Main d'interposition</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-5" data-spell="Epée enchantée">Epée enchantée</div>
+            <div class="spell-node col-7" data-spell="Globe de protection magique">Globe de protection magique</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-4" data-spell="Perception de l’aura magique">Perception de l’aura magique</div>
+            <div class="spell-node col-5" data-spell="Dissipation de la magie">Dissipation de la magie</div>
+            <div class="spell-node col-6" data-spell="Chasseur invisible">Chasseur invisible</div>
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-3" data-spell="Inversion de la gravité">Inversion de la gravité</div>
+            <div class="spell-node col-5" data-spell="Invocation d'un objet">Invocation d'un objet</div>
+            <div class="spell-node col-7" data-spell="Protection mentale">Protection mentale</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-5" data-spell="Clone">Clone</div>
+            <div class="spell-node col-6" data-spell="Sphère de force">Sphère de force</div>
+
+            <div class="spell-node col-7" data-spell="Main broyante">Main broyante</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-5" data-spell="Symbole">Symbole</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-3" data-spell="Téléportation">Téléportation</div>
+        </div>
+
+        <!-- Niveau 20 -->
+        <div class="level">
+            <div class="level-number">20</div>
+            <div class="spell-node col-5" data-spell="Désintégration">Désintégration</div>
+            <div class="spell-node col-7" data-spell="Sphère prismatique">Sphère prismatique</div>
+        </div>
+
+        <!-- Niveau 30 -->
+        <div class="level">
+            <div class="level-number">30</div>
+            <div class="spell-node col-5" data-spell="Atomisation massive">Atomisation massive</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de Magie pure 
+        const spellsData = {
+            // Niveau 1
+            "Disque flottant": {
+                level: 1,
+                portée: "15 m",
+                incantation: "3 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "disque de 1m",
+                description: "Quand ce sortilège est lancé, un disque translucide bleuté de 1 mètre de rayon apparaît à l'emplacement souhaité par le magicien. Ce disque se maintient en l'air magiquement, sans avoir besoin de reposer sur une base solide.\nIl peut supporter jusqu'à un poids de 200 kg, pourvu que celui-ci ne tombe pas de plus de 3 mètres. Au-delà, les ondes magiques le constituant se rompent et le disque s'évanouit."
+            },
+            "Aura magique": {
+                level: 1,
+                portée: "40 m",
+                incantation: "2 s",
+                durée: "20 min",
+                sauvegarde: "Mag",
+                zone: "1 créature",
+                description: "Ce sort entoure la créature cible d'un halo de lumière bleutée. Ce halo peut impressionner et effrayer les animaux, et les tenir à distance. Mais il permet essentiellement, lancé sur un ennemi, de le repérer facilement, surtout de nuit ou s'il est invisible."
+            },
+            "Identification": {
+                level: 1,
+                portée: "1 m",
+                incantation: "15 min",
+                durée: "-",
+                sauvegarde: "-",
+                zone: "un objet",
+                description: "Ce sort très particulier a pour effet de dévoiler l'histoire et les pouvoirs d'un objet magique.\nLe magicien n'a droit qu'à un essai par an sur un même objet. Le lancement du sort consiste en un jet de Sentir la magie, avec un malus dépendant du pouvoir de l'objet. Plus il est puissant, et mieux il gardera ses secrets. Typiquement, le malus est de -5. Un jet réussi indique que le magicien a pu déterminer les principaux pouvoirs de l'objets, ainsi que les grandes lignes de son histoire. Mieux le jet est réussi, et plus le magicien connaît de détails."
+            },
+            "Serviteur invisible": {
+                level: 1,
+                portée: "1 m",
+                incantation: "2 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Lorsque le magicien lance ce sort, il crée un amas d'ondes magiques prenant une forme vaguement humanoïde. Cet amas le suit à 1 mètre de distance, où qu'il aille, même s'il chute dans un gouffre ou s'élève dans les airs. Il est bien sûr invisible, puisqu'il est constitué uniquement d'ondes magiques.\nCet amas sert en fait de serviteur au magicien, car il peut transporter jusqu'à 30 kg de matériel (le surplus de poids tombe au sol). Il ne peut en revanche ni ouvrir de porte, par exemple, ni reconnaître la personne récupérant le matériel qu'il porte."
+            },
+
+            // Niveau 2
+            "Chute de plumes": {
+                level: 2,
+                portée: "50 m",
+                incantation: "1/10 s",
+                durée: "5 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature ciblée est soudain entourée d'une enveloppe d'ondes magiques à l'intérieur de laquelle la gravité est contrôlée, de façon à réduire sa vitesse de chute à 50 cm/s. Elle tombe lentement et peut donc atterrir délicatement sur le sol. De même, elle peut marcher sur un sol spongieux (y compris sables mouvants) sans s’y s'enfoncer.\nNotez que ce sortilège affecte la vitesse du déplacement vertical par rapport au sol, mais ne change pas une éventuelle vitesse horizontale."
+            },
+            "Corde enchantée": {
+                level: 2,
+                portée: "3 m",
+                incantation: "5 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Ce sort crée une corde de 20 mètres qui apparaît là où le magicien le désire. Il peut ensuite, mentalement, la faire seule et à volonté se dérouler dans n’importe quelle direction. La corde est très résistante, épaisse, et il est facile de la monter. Elle tient magiquement droite et peut supporter un poids de 2 tonnes."
+            },
+            "Verrou magique": {
+                level: 2,
+                portée: "2 m",
+                incantation: "3 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "1 fermeture",
+                description: "Grâce à ce sortilège, le magicien peut bloquer l'ouverture d'une porte, d’une trappe ou autre. La serrure, le loquet ou tout autre système bloquant habituellement l’ouverture se coince et ne peut être actionné jusqu'à la fin du sort.\nSi aucun crochetage n'est possible, on peut en revanche enfoncer la porte, puisque seul son système d'ouverture est bloqué."
+            },
+
+            // Niveau 3
+            "Lévitation": {
+                level: 3,
+                portée: "-",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Une enveloppe magique entoure le magicien, de sorte qu’il ne ressent plus les effets de l'attraction terrestre et peut se déplacer librement vers le haut et vers le bas. Le sort ne fonctionne que dans un milieu de faible densité, comme l'air ou le vide, mais pas dans l'eau. Le magicien peut emmener avec lui son équipement jusqu’à un poids de 20 kilos.\nLe déplacement vertical peut atteindre une vitesse maximale de 1 mètre par seconde. Cette enveloppe magique est cependant fragile, de sorte que le magicien ne peut lancer de sortilèges d’un niveau supérieur à 3 sans la briser.\nLorsqu’il est en lévitation, le magicien peut être propulsé horizontalement par une créature en vol. Leur mouvement commun sera cependant ralenti (vitesse de vol divisée par 2).\nLes compétences physiques du magicien qui lévite sont bridées, du fait qu’il ne dispose plus du sol sur lequel s’appuyer."
+            },
+            "Fracassement": {
+                level: 3,
+                portée: "10 m",
+                incantation: "1 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "un objet (< 3 kg)",
+                description: "L'objet visé subit une brusque pression, capable de le faire éclater en morceaux s'il est fragile. Le maître du jeu décide si le matériau est suffisamment cassant et la forme de l'objet suffisamment déployée pour que celui-ci se brise.\nA titre de référence, le sort a un effet comparable à celui d'une chute de 2 mètres sur un sol dur. Un verre, une fiole, un bibelot ou une vitre éclateront, mais pas un objet en métal, en bois ou en matière organique."
+            },
+
+            // Niveau 4
+            "Télékinésie": {
+                level: 4,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "un objet (<10 kg)",
+                description: "Ce sort permet au magicien de déplacer un objet par la pensée. Celui-ci doit se trouver à portée du sort et y demeurer sinon le magicien perd son contrôle sur lui. La vitesse de déplacement de l'objet est réduite, de l'ordre de 1 mètre par seconde. Il est donc impossible de l'utiliser pour combattre à distance efficacement.\nN'importe quel objet peut virtuellement être affecté par ce sort, pourvu qu'il pèse moins de 10 kg. La seule limitation est que l'objet visé ne peut se trouver à moins de 5 cm d'une créature vivante, car les ondes magiques qu'émet celle-ci empêchent alors le sort de prendre effet. Ainsi, il est impossible de contrôler l'épée d'un adversaire, qu'il la tienne en main ou qu'elle se trouve dans son fourreau.\nPendant toute la durée du sort, le magicien peut autant qu’il le souhaite changer d’objet contrôlé."
+            },
+            "Annulation du poids": {
+                level: 4,
+                portée: "toucher",
+                incantation: "4 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "un objet (<200 kg)",
+                description: "Ce sort permet au magicien d’annuler le poids de l’objet qu’il touche. Seul le poids de celui-ci est une limite ; sa matière ou sa forme en revanche n’importent pas.\nLe poids de l’objet est annulé, c’est à dire qu’il n’est plus attiré vers le sol. Il conserve en revanche sa masse et son inertie, notamment lorsqu’on le met en mouvement. Pas question ainsi de faire brusquement changer de direction un bloc de pierre de 300 kilos ou de lui conférer soudain une vitesse de 30 km/h.\nLe magicien doit constamment rester en contact (toucher) avec l’objet, sinon le sort se brise."
+            },
+            "Affaiblissement": {
+                level: 4,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "2 min",
+                sauvegarde: "V-1",
+                zone: "1 créature",
+                description: "La créature ciblée perd temporairement le tiers de son score de force. Cela affecte ses ajustements aux dommages, les armes qu’elle peut utiliser sans malus, ses jets sous la force et lui inflige d'éventuels malus d'encombrement s’il est trop chargé.\n(Rappelons ici la règle de l’encombrement : une créature peut porter un dixième de son propre poids plus 5 kg par point d'ajustement de force. Une créature de 90 kg ayant un score de 17 en force pourra donc porter jusqu'à 9+3x5 = 24 kg sans malus. Si elle subit le sort Affaiblissement, sa force passe à 11 donc son ajustement de force à 0. Elle peut donc désormais porter à peine 9 kg sans malus. La surcharge éventuelle lui occasionne à toutes ses actions physiques un malus de -1 par tranche de 5 kg supplémentaires.)\nPar souci de simplicité, la modification du score de force ne change pas les scores de compétences de la créature."
+            },
+
+            // Niveau 5
+            "Vol": {
+                level: 5,
+                portée: "-",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort confère au magicien la capacité de voler. Une bulle d'ondes magiques annulant la gravité l'entoure, et il peut se déplacer dans la direction choisie en créant une sorte de gravité horizontale locale. Le sort ne fonctionne que dans un milieu de faible densité, comme l'air ou le vide, mais pas dans l'eau. Le magicien peut emmener avec lui son équipement jusqu’à un poids de 20 kilos.\nLa vitesse horizontale maximale pouvant être atteinte est d'environ 40 km/h, soit la vitesse de course maximale d'un homme. Atteindre une telle vitesse exige 3 ou 4 secondes. A cette vitesse, il faut au moins 10 m pour s'arrêter. La vitesse maximale en montée verticale est de 25 km/h, tandis qu’en descente elle peut atteindre 200 km/h.\nIl est difficile de connaître avec précision l’écoulement du temps, c’est pourquoi il est en général plus prudent de s'arrêter de voler avant l’expiration du sort. Celle-ci est en effet brutale, et la chute peut être rude...\nNotez par ailleurs que le champ magique qui entoure le magicien et lui permet de voler est fragile. Le magicien ne peut lancer un sortilège de niveau supérieur à 3 sans le briser.\nEnfin, Les compétences physiques du magicien qui lévite sont bridées, du fait qu’il ne dispose plus du sol sur lequel s’appuyer."
+            },
+            "Mur de force": {
+                level: 5,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "5m x 3m x 0,5m",
+                description: "Ce sort crée un mur translucide bleuté vertical ou horizontal dont les dimensions sont données ci-dessus. Il doit nécessairement reposer sur une base stable, c'est à dire ne pas être dans une position où son poids l'amènerait à bouger. Il est donc impossible de le faire tomber sur des adversaires.\nUne fois en place, il est impossible de le déplacer ou de le franchir (y compris les sortilèges à réalité physique). Il est par ailleurs impossible de le briser autrement que par des moyens magiques ; il peut subir 40 points de vie de dégâts magiques avant d’être détruit et compte comme ayant une protection de 2 points (les sortilèges infligeant 2 points de dégâts ou moins sont donc sans effet sur lui)."
+            },
+
+            // Niveau 6
+            "Main d'interposition": {
+                level: 6,
+                portée: "-",
+                incantation: "2 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Ce sort crée une main translucide bleutée d’environ 50 cm qui s'interpose entre le magicien et ses adversaires, un mètre devant son créateur. Le magicien peut choisir à tout moment de quel adversaire se protéger (la main met environ 1 s à changer de cible). La main se place automatiquement entre eux et protège le magicien.\nLe magicien ne peut pas attaquer en mêlée la créature dont il choisit de se protéger, car la main se trouve entre eux.\nIl est impossible de contourner la main. Elle est aussi rapide que la lumière et peut se déformer pour passer à travers un espace grand comme un trou de souris si on cherche à lui bloquer le passage.\nElle peut endurer la perte de 60 points de vie avant de disparaître. Jusque-là, elle protège son maître. Elle ne se défend pas et n’a aucune feinte de corps. Les jets d’attaque contre elle se font toutefois avec un malus de -2 car la main est petite et translucide. Les dommages qui lui sont infligés sont réduits de 6 points, comme si elle était équipée d’une armure de cette valeur.\nSi elle se trouve sur le chemin de sorts tels qu'un éclair, on considère qu'elle offre le même abri qu'un homme normal derrière lequel se protégerait le magicien. On considère que la main échoue à toutes ses sauvegardes (elle n'essaie pas d'éviter les effets des sorts).\nElle intercepte des sorts tels que Boule de feu visant le magicien, provoquant leur explosion à l’endroit où se trouve la main. Si le magicien se trouve quand même dans cette nouvelle zone d’effets, il ne reçoit que la moitié des dommages normaux (avant sauvegarde éventuelle)."
+            },
+
+            // Niveau 7
+            "Epée enchantée": {
+                level: 7,
+                portée: "spéciale",
+                incantation: "5 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Le magicien façonne des ondes magiques pour leur donner la forme d'une épée bleutée. Celle-ci apparaît floue et translucide et il est donc difficile de distinguer avec précision son mouvement. Tous les jets de parade ou d'esquive la concernant subissent un malus de -1.\nLe magicien dirige mentalement cette épée comme si elle était un prolongement de son propre corps. Il n’a d’ailleurs le pouvoir de la déplacer que lorsqu’il la touche et que ses ondes magiques peuvent circuler par le point de contact : s’il cesse de toucher l’épée, le contact magique n’est pas rompu mais n’est plus suffisant pour la diriger.\nQuand il attaque ou se défend avec l’épée, il utilise comme score de compétence la moyenne entre sa compétence de lancement de sort (Maîtriser la magie ou Théognosie) et Epée à 1 main. Exemple : un magicien avec un score de +7 en Maîtriser la magie et +3 en Epée à une main combattra avec un score de compétence de +5.\nL’épée a un facteur de parade de 80 % et une solidité de 40 ; les dommages qu’elle inflige sont les mêmes que s'il s'agissait d'une épée longue (2 x marge + 1), sauf que les ajustements aux dommages liés à la force ne s’appliquent pas (l’épée est dirigée mentalement, non physiquement). En outre, elle n’inflige pas formellement de plaie ou de blessures mais anesthésie pour 12 heures : la victime perd des points de vie dans la zone touchée mais seulement de manière temporaire ; si les dommages cumulés sont suffisants pour rendre une zone inutilisable, celle-ci est considérée comme totalement anesthésiée et la victime ne peut s’en servir pendant les 12 heures suivantes (s’il s’agit de la tête, elle est inconsciente pendant 12 heures). De même, la victime perd connaissance si les dommages cumulés au total général dépassent son nombre de points de vie restant."
+            },
+            "Globe de protection magique": {
+                level: 7,
+                portée: "-",
+                incantation: "15 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "sphère de 3m *",
+                description: "Une bulle d'ondes magiques se forme autour du magicien et se déplace ensuite avec lui. Cette bulle est constituée d'un maillage très serré interdisant le passage d'ondes magiques.\nUn sortilège n'a qu'un pourcentage de chance égal à 4 fois son niveau de franchir cette barrière : 4 % pour un sort de niveau 1, 8 % pour un sort de niveau 2, 12 % pour un sort de niveau 3, etc. Il fonctionnera normalement du côté du globe où il aura été lancé, mais n'affectera en rien l'autre côté. Seuls les sorts de Magie pure ou de Nature lancés par le magicien lui-même ne sont pas affectés.\nExemple : un magicien lance une boule de feu dont la zone d’effet est à cheval sur la sphère. Etant de niveau 6, ce sort a 24 % de chance de franchir le globe de protection magique. S’il y parvient, il prend effet normalement. Sinon, la boule ne prend effet que du côté depuis lequel elle a été lancée, et ressemble alors à une boule tronquée.\nCe globe de protection affecte la totalité des sortilèges, y compris les sortilèges mentaux. En revanche, il ne gêne en rien les mouvements ou les actions des personnes. De même, il n'empêche pas une créature invoquée magiquement ou un objet magique de le franchir.\nLe globe disparaît à la fin du sort ou lorsque la somme des niveaux de tous les sorts qu'elle a effectivement arrêtés dépasse 40. Cela traduit le fait que la coque d'ondes magiques finit par se déchirer sous la pression."
+            },
+            // Niveau 8
+            "Perception de l’aura magique": {
+                level: 8,
+                portée: "-",
+                incantation: "10 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 30m *",
+                description: "Le magicien acquiert grâce à ce sortilège la capacité à percevoir l’aura magique des créatures qu’il distingue autour de lui. En se concentrant sur une créature, il peut deviner sa capacité ou non à pratiquer la magie et le cas échéant les principales branches de magie qu’elle maîtrise. Le magicien est en outre capable de déterminer si sa pratique de la magie est classique ou religieuse.\nEn raison de la nature de la magie, qui est profondément liée à la philosophie de vie de celui qui la pratique (voir le chapitre « La nature de la magie »), ce sort confère également au magicien la capacité de percevoir superficiellement la vision du monde et le caractère de la créature sur laquelle il se concentre. Cette perception reste toutefois fragmentaire et inévitablement lacunaire, et dépend des qualités de psychologie du magicien (valeur de la compétence « Relations avec les autres »)."
+            },
+            "Dissipation de la magie": {
+                level: 8,
+                portée: "20 m",
+                incantation: "1 min",
+                durée: "définitif",
+                sauvegarde: "spécial",
+                zone: "un sortilège",
+                description: "Ce sortilège permet au magicien d’annuler définitivement l’action d’un autre sortilège. Il s’agit d’un sort potentiellement très puissant, mais dont la réussite n’est pas assurée et dépend largement des différents paramètres de sa réalisation. Le magicien doit lancer un jet de pourcentage pour déterminer si le sortilège visé est ou non effectivement dissipé. La base des chances de succès est de 100 %. Elle est affectée de la façon suivante par les différents facteurs : - moins 10% par niveau du sortilège visé. Par exemple, tenter de dissiper un sortilège de niveau 6 réduira de 60 % la probabilité de réussite de la dissipation ; - bonus de +0% à +50%, suivant la connaissance qu’a le magicien du sort qu’il tente de dissiper : +0% s’il lance son sort sur une personne ou un lieu sans savoir si de la magie est à l’oeuvre, +10% s’il a senti intuitivement de la magie, +20% si en plus il a deviné quelle branche de la magie était à l’oeuvre, +30% s’il a deviné par la réflexion quel sort était à l’oeuvre, +40% si en plus lui-même le maîtrise, enfin +50% si le magicien peut « voir » le sort à l’oeuvre grâce à un sortilège de Détection de la magie, de Vision réelle ou si le sort présente une réalité physique qui permette au magicien de le voir à l’oeuvre et de l’identifier sans le moindre doute ; - bonus de +20 % par modulation du sort utilisée (voir chapitre « Jouer la magie »), jusqu’à un maximum de +100% ; - malus de 1 % par seconde de réduction du temps d’incantation. Le magicien peut ainsi réduire le temps d’incantation jusqu’à un minimum de 5 secondes d’incantation (correspondant à une réduction de 55 secondes du temps d’incantation donc de 55 % des probabilités de réussite). Exemple : un magicien tente de dissiper un sortilège de mur de pierre (liste de la Terre, niveau 6). Sa probabilité de base de réussite est de 100 % - 6x10 % = 40 %. Le sortilège a une réalité physique que le magicien constate et qui lui permet de « voir » exactement ce qu’il faut dissiper, ce qui lui donne un bonus de 50 %, faisant remonter la probabilité de réussite à 90 %. Le magicien est pressé, car il souhaite poursuivre des créatures qui se sont enfuies de l’autre côté du mur. Il réduit par conséquent le temps d’incantation à 10 secondes, soit 50 secondes de moins que le temps normal, soit un malus de 50 % à la probabilité de réussite de la dissipation, ramenant celle-ci à 40 %. Enfin, son niveau en magie lui permet de bénéficier de 2 modulations pour son sort. Cela lui octroie un bonus de 2x20 = +40 %. Finalement, le magicien a donc une chance de 80 % de dissiper le mur de pierre. Il lance les dés et obtient 54 : la dissipation est réussie."
+            },
+            "Chasseur invisible": {
+                level: 8,
+                portée: "5 m",
+                incantation: "1 min",
+                durée: "1 jour",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Par ce sort le magicien invoque pour l’aider une créature venant d’un autre plan d’existence. Cette créature a besoin qu’un pentacle soit dessiné sur le sol pour se matérialiser.\nIl s’agit d’un chasseur invisible, dont les caractéristiques sont décrites en annexe du présent livre de magie et plus en détail dans le chapitre « Les créatures surnaturelles » du livre du monde. Il a un score de +6 en attaque, +5 en feinte de corps, +3 en esquive et inflige des dommages incapacitants égaux à 1,5 x marge +1. Les attaques et défenses contre lui s’effectuent en difficulté « Malaisé » (malus de -2).\nAu moment où il arrive, le magicien a la possibilité de lui ordonner de remplir une mission. La créature est d’une grande intelligence (autour de 14 en vivacité mentale et en abstraction) et s’acquittera de son mieux de sa tâche, pour peu que celle-ci ne soit pas en opposition avec sa philosophie (voir la philosophie associée à la liste de Magie Pure dans le chapitre La nature de la magie).\nIl n’est possible de donner qu’une mission au chasseur invisible, comme « Ramène-moi tel objet qui se trouve à tel endroit » ou « Suis-moi et protège-moi ». Il refusera les missions à tiroirs ou trop complexes.\nLe chasseur invisible disparaît après un jour ou une fois qu’il a accompli sa mission.\nLe magicien peut utiliser ce sort pour contrôler un chasseur invisible qui a été invoqué ou le renvoyer dans son plan d’existence. Dans ce cas, l’incantation est réduite à seulement 5 secondes. Le chasseur invisible a droit à une sauvegarde sous respectivement PM+2 pour le contrôler et PM-2 pour le renvoyer dans son propre plan."
+            },
+            // Niveau 9
+            "Inversion de la gravité": {
+                level: 9,
+                portée: "30 m",
+                incantation: "5 s",
+                durée: "1 min",
+                sauvegarde: "-",
+                zone: "cylindre de 10m de rayon et 15m de hauteur",
+                description: "Ce sortilège inverse la gravité à l’intérieur de sa zone d’effets, de sorte que les corps soient désormais repoussés et non attirés par la gravitation. La conséquence directe est qu’objets et créatures tombent vers le haut, jusqu’à ce qu’ils atteignent la limite de la zone d’effets et soient à nouveau soumis à la gravité normale. Ils demeurent alors à la frontière de la zone d’effets, à l’endroit où ces deux poussées contradictoires s’annulent.\nLe sort prend effet et s’arrête suffisamment progressivement pour que les chutes vers le haut au début du sort et vers le bas à sa fin n’infligent pas de dommages (elles s’opèrent lentement).\nIl est difficile d’attaquer avec une arme à distance les créatures prises dans la zone d’inversion de la gravité, car celle-ci dévie les projectiles d’une manière inhabituelle (vers le haut et non vers le bas). Les attaques subissent par conséquent un malus compris de -2 à -6 selon la longueur de la zone d’inversion de gravité à traverser. A contrario, les créatures soumises à l’inversion de gravité, si elles sont en l’air sans surface solide sur laquelle s’appuyer, sont gênées pour se défendre. Leur feinte de corps est divisée par 2 et leurs esquives subissent un malus de -2.\nUne créature prise dans la zone d’inversion de la gravité peut parvenir à sortir de celle-ci en prenant appui sur quelque chose afin de se propulser vers l’extérieur par une poussée. Cela peut être le cas échéant une autre créature, celle-ci se trouvant alors symétriquement propulsée en sens contraire. En limite de zone d’effets, le changement de gravité est progressif, de sorte qu’une créature en sortant, ne tombe pas brutalement au sol mais a le temps de descendre lentement et d’éviter de se blesser, si du moins sa sortie n’est pas trop rapide."
+            },
+            "Invocation d'un objet": {
+                level: 9,
+                portée: "illimitée",
+                incantation: "10 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "un objet (< 50 kg)",
+                description: "Ce sort permet au magicien d’ouvrir un couloir magique à travers l’espace afin d’aller chercher un objet qu’il a déjà touché. La distance n’est pas un problème, mais le magicien doit savoir précisément où se trouve l’objet. De plus, l’objet doit être effectivement accessible, c’est à dire séparé du magicien par moins de 50 centimètres de pierre (ou l’équivalent en densité, par exemple 2 mètres de bois ou 30 cm de métal) (la densité de l’air n’est pas suffisante pour gêner le sort).\nL’objet pourra ainsi se trouver dans une maison (notamment celle du magicien, c’est là une des principales utilisations du sort ; par exemple invoquer un sac rempli de certains matériels), mais pas enfoui trois mètres sous le sol."
+            },
+            "Protection mentale": {
+                level: 9,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature bénéficiant de ce sortilège voit sa résistance aux sorts mentaux très fortement augmentée. Tous ses jets de sauvegarde concernant ce type de sorts bénéficient d'un bonus de +8."
+            },
+            // Niveau 10
+            "Clone": {
+                level: 10,
+                portée: "2 m",
+                incantation: "1 min",
+                durée: "1 jour",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Ce sort crée un sosie presque parfait d’une créature (humanoïde) consentante. Presque parfait seulement, car, si extérieurement la créature et son double sont absolument identiques (y compris dans la façon d’accomplir différents gestes), si ce double a la même psychologie que son modèle (les mêmes buts, les mêmes conceptions de la vie, etc.) et les mêmes souvenirs, il n’acquiert en revanche que partiellement ses capacités. En termes de jeu, tous les scores d’attributs, de dons et de compétences du clone sont les ¾ des scores de la créature qu’il copie. Par exemple, si celle-ci a 15 en vivacité physique, le clone aura 12. Si elle a +5 en feinte de corps, le clone n’aura que +4. Les points de vie et de fatigue du clone sont calculés sur ces nouvelles bases. Le système est le même pour la magie classique (la magie religieuse étant régie par le score en Théognosie) : le clone connaîtra les mêmes sorts que la créature copiée, mais dans chaque liste seulement jusqu’aux trois quarts du niveau maximum de sort connu par la créature. Si le sort le plus puissant que celle-ci connait dans une certaine liste est de niveau 7, par exemple, le clone possédera dans cette liste tous les sorts de la créature jusqu’au niveau 5 (les ¾ de 7). Le clone se réveille en sachant qu’il n’est qu’un clone et qu’il n’a qu’une durée limitée à vivre. Cela influence bien sûr grandement les réactions qu’il est susceptible d’avoir (il pourra vouloir en profiter au maximum). Il n’a aucune animosité contre la créature qu’il copie ou contre le magicien qui a lancé le sort ; il éprouve même naturellement à leur égard une certaine sympathie. En revanche, ceux-ci devront le convaincre s’ils veulent obtenir son aide, car le sort ne leur donne aucun moyen de le contraindre."
+            },
+            "Sphère de force": {
+                level: 10,
+                portée: "-",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "sphère de 3m *",
+                description: "Ce sort crée autour du magicien une sphère ou un hémisphère translucide bleuté pouvant faire jusqu’à 3 mètres de rayon. Il est impossible de franchir cette barrière, tant pour des créatures, des projectiles que des sorts à réalité physique. Il est par ailleurs impossible de la briser autrement que par des moyens magiques ; elle peut subir 60 points de dégâts magiques avant d’être détruite. Les sorts immatériels (mentaux, illusions, etc.) peuvent en revanche librement la traverser.\nLa sphère suit le magicien dans ses déplacements. Cela peut le conduire à repousser une personne ou un objet : la pression exercée correspond alors à celle de sa propre force divisée par 2. Inversement, le magicien peut être empêché dans ses mouvements si la sphère est bloquée (par exemple par un couloir trop petit). Il peut même se trouver repoussé contre son gré par une pression adéquate exercée sur la sphère (la force de ses adversaires est divisée par deux car ils doivent faire également bouger la sphère)."
+            },
+            "Main broyante": {
+                level: 10,
+                portée: "20 m",
+                incantation: "7 s",
+                durée: "30 s",
+                sauvegarde: "Mag-3",
+                zone: "1 créature",
+                description: "La créature visée par le sort est soudain prisonnière d’une main translucide bleutée un peu plus grande qu’elle et formée d’ondes magiques. La main se referme sur sa victime et la tient immobile jusqu’à ce qu’elle soit détruite, que sa victime s’échappe ou que le sort s’achève. Une réussite à la sauvegarde signifie que la main n’est pas parvenue à se former correctement, en raison de l'interaction avec les ondes magiques émises par la cible.\nLa créature prisonnière ne peut entreprendre aucune autre action physique qu’essayer de desserrer l’étau de la main. Trois jets sous la force réussis avec une marge de 10 ou plus indiquent que la créature s’est libérée, brisant du même coup le sort. La créature prisonnière peut parler ou lancer des sorts, mais le lancement de ceux-ci s’effectue avec un malus de -4 puisque la créature ne peut faire de gestes. Cela diminue par conséquent l’efficacité de ses sorts et les modulations dont elle bénéficie.\nPendant tout le temps où elle reste prisonnière, la créature perd 2 points de fatigue par tour. Cela traduit la compression très forte appliquée par la main, qui absorbe magiquement l’énergie de sa victime.\nLa main peut être physiquement détruite de l’extérieur. Elle n’a aucune feinte de corps et les jets d’attaque pour la toucher bénéficient d’un bonus de +4. Elle échoue en outre automatiquement à toute sauvegarde contre des sorts physiques (elle ne cherche pas à se sauvegarder). Elle a une armure de 6 points et peut encaisser jusqu’à 100 points de vie avant d’être détruite.\nEn revanche, tant que la main tient la créature, celle-ci ne peut être attaquée physiquement de l’extérieur : la main fait barrière aux coups. Les sortilèges physiques de zone affectent la créature (qui n’a pas de sauvegarde puisqu’elle ne peut bouger), mais elle ne reçoit que le cinquième des dommages normaux."
+            },
+            // Niveau 12
+            "Symbole": {
+                level: 12,
+                portée: "-",
+                incantation: "1 min",
+                durée: "1 semaine",
+                sauvegarde: "spéciale",
+                zone: "spéciale",
+                description: "Le magicien dessine sur le sol ou dans l’air un symbole invisible et magique qui fixe en un lieu un effet magique, effet qui se déclenchera lorsque la condition choisie par le magicien sera remplie (le symbole prend alors fin).\nLe magicien peut fixer la condition de son choix, pour peu qu’elle soit simple, générale (par exemple le passage d’un orc, mais pas le passage de tel orc) et attachée au lieu du symbole (par exemple le passage d’un orc au-dessus du symbole, mais pas le passage d’un orc à 100 mètres du symbole).\nTrois types d’effets magiques sont spécifiquement possibles :\n- peur : toutes les créatures dans un rayon de 5 mètres autour du centre du symbole lancent une sauvegarde sous leur attribut volonté ou s’enfuient, terrorisées par le lieu. L’effet dure 5 minutes ;\n- fatigue : toutes les créatures dans un rayon de 5 mètres autour du centre du symbole effectuent une sauvegarde sous leur don magie ou perdent 5d4 points de fatigue ;\n- pacifisme : toutes les créatures dans un rayon de 5 mètres autour du centre du symbole effectuent une sauvegarde sous leur attribut vivacité mentale ou acquièrent pour 1 heure le désavantage Pacifisme (stade mineur).\nEn dehors de ces effets, le magicien peut également implanter tout sortilège de zone qu’il connaît. Cela implique néanmoins qu’il lance le sortilège en question de manière additionnelle, ce qui peut rendre le coût total très élevé.\nLes modulations du sort peuvent être utilisées pour renforcer les effets magiques implantés ou pour conférer un malus à la sauvegarde contre eux. Elles peuvent également être utilisées pour allonger la durée du symbole au-delà d’une semaine ; dans ce cas, par exception à la règle habituelle, chaque modulation utilisée pour augmenter la durée multiplie celle-ci par 10 (soit une durée de 10 semaines / 2 ans / 20 ans / 200 ans pour respectivement 1 / 2 / 3 / 4 modulations)."
+            },
+            // Niveau 15
+            "Téléportation": {
+                level: 15,
+                portée: "-",
+                incantation: "1 s",
+                durée: "-",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort permet au magicien de se transporter instantanément dans le lieu de son choix (connu). Il peut emmener jusqu’à 25 kg. Dématérialisation/rematérialisation en tourbillon de lumière bleutée ; 1 seconde pour retrouver ses repères, de sorte qu’il ne peut par exemple pas enchaîner dans un même mouvement une téléportation dans le dos d’un adversaire et un coup d’épée."
+            },
+            // Niveau 20
+            "Désintégration": {
+                level: 20,
+                portée: "20 m",
+                incantation: "10 s",
+                durée: "-",
+                sauvegarde: "Mag-3",
+                zone: "1 créature",
+                description: "La créature victime de ce sort est désintégrée en de multiples particules, sans rémission possible.\nIl faut noter cependant que le lancement d’un sortilège de niveau 20 exige une parfaite adéquation avec la philosophie de la liste dont il est issu. La liste de Magie pure ayant un très grand respect pour la vie, le magicien ne pourra employer ce sortilège strictement que pour sauver (directement ou indirectement) d’autres vies. Il ne peut en outre l’employer que si aucun autre moyen à sa disposition n’a de chances raisonnables de succès et sur une créature qu’il sait (ou au moins croit savoir) malfaisante."
+            },
+            "Sphère prismatique": {
+                level: 20,
+                portée: "-",
+                incantation: "10 s",
+                durée: "1 h",
+                sauvegarde: "spéciale",
+                zone: "boule de 3m *",
+                description: "Par ce sort le magicien s’entoure d’une sphère multicolore qui le protège de dangers très divers. La sphère est composée de 7 couches correspondant chacune à une couleur de l’arc-en-ciel et possédant un pouvoir différent.\nLa vision de cette sphère est impressionnante et dissuadera tous les animaux et la plupart des créatures intelligentes de tenter de la franchir. Seules les créatures particulièrement déterminées pourront s’y résoudre, et encore devront-elles réussir un jet sous leur volonté pour y parvenir (le maître du jeu peut choisir d’appliquer à ce jet un malus correspondant à l’ajustement d’attribut du score d’abstraction de la créature concernée).\nLes effets de chaque couche sont les suivants :\nRouge : protège du froid magique : absorbe 12 niveaux de sortilèges de la liste du Froid avant d’être détruite. Inflige 1d4+3 points de dommages par brûlures à toute créature la traversant.\nOrange : protège des sorts mentaux : confère +6 à la sauvegarde contre les sorts mentaux la franchissant en direction du magicien ; détruite après avoir été traversée par 20 niveaux de sorts mentaux. Entoure d’une Aura magique toute créature la traversant.\nJaune : infranchissable par des sorts des listes des Détection ou des Illusions d’un niveau 10 ou moins. Inflige l’équivalent d’un Flash lumineux à toute créature la traversant.\nVert : protège de la lumière et de l’électricité magiques : absorbe 12 niveaux de sortilèges de la liste de la Lumière/électricité avant d’être détruite. Toute créature la traversant doit réussir une sauvegarde sous vivacité mentale, à défaut de quoi elle acquiert pour 1 heure le désavantage Pacifisme (stade mineur).\nBleu : protège du feu magique : absorbe 12 niveaux de sortilèges de la liste du Feu avant d’être détruite. Inflige 1d4+3 points de dommages par brûlures dues au froid à toute créature la traversant.\nIndigo : protège des projectiles : arrête 20 projectiles (comme le sort Immobilité de la liste de la Terre) avant d’être détruite. Toute créature la traversant doit réussir une sauvegarde sous son don magie, à défaut de quoi elle perd 4d4 points de fatigue.\nViolet : protège de l’air magique : absorbe 12 niveaux de sortilèges de la liste de l’Air avant d’être détruite. Inflige l’équivalent du sort d’Effroi à toute créature la traversant.\nLe fait qu’une créature franchisse la sphère en perturbe momentanément la magie et a pour conséquence que la sphère reste immobile pendant 1 tour. Le magicien doit attendre que cette perturbation ait pris fin avant de pouvoir le cas échéant reprendre sa route (sauf à choisir de laisser la sphère derrière lui). En outre, la sphère se dissipe dès lors que 10 créatures l’ont traversée."
+            },
+            // Niveau 30
+            "Atomisation massive": {
+                level: 30,
+                portée: "30 m",
+                incantation: "10 s",
+                durée: "-",
+                sauvegarde: "Mag-5",
+                zone: "boule de 5m",
+                description: "Ce sortilège désintègre en milliards d’atomes séparés la totalité de la matière, vivante ou inerte, présente dans la zone d’effets, laissant à la place un trou parfaitement vide. Il est toutefois important de souligner, comme pour le sortilège de Désintégration, que le lancement d’un sortilège d’un tel niveau exige une parfaite adéquation avec la philosophie de la liste dont il est issu.Le magicien veillera donc à n’atomiser des êtres vivants(notamment évolués) que si cela permet de sauvegarder d’autres vies et uniquement si aucun autre moyen moins destructeur n’a de chance raisonnable de réussite."
+            }
+        };
+
+
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Connexions (indicatives) pour Magie pure
+                const connections = [
+                    ['Disque flottant', 'Chute de plumes'],
+                    ['Serviteur invisible', 'Chasseur invisible'],
+                    ['Chasseur invisible', 'Protection mentale'],
+                    ['Serviteur invisible', 'Verrou magique'],
+                    ['Aura magique', 'Corde enchantée'],
+                    ['Identification', 'Affaiblissement'],
+                    ['Chute de plumes', 'Lévitation'],
+                    ['Lévitation', 'Vol'],
+                    ['Lévitation', 'Annulation du poids'],
+                    ['Corde enchantée', 'Epée enchantée'],
+                    ['Verrou magique', 'Fracassement'],
+                    ['Fracassement', 'Mur de force'],
+                    ['Annulation du poids', 'Invertion de la gravité'],
+                    ['Annulation du poids', 'Perception de l’aura magique'],
+                    ['Affaiblissement', 'Epée enchantée'],
+                    ['Vol', 'Inversion de la gravité'],
+                    ['Mur de force', 'Main d\'interposition'],
+                    ['Main d\'interposition', 'Globe de protection magique'],
+                    ['Epée enchantée', 'Dissipation de la magie'],
+                    ['Globe de protection magique', 'Protection mentale'],
+                    ['Protection mentale', 'Sphère de force'],
+                    ['Sphère de force', 'Sphère prismatique'],
+                    ['Protection mentale', 'Main broyante'],
+                    ['Main broyante', 'Sphère prismatique'],
+                    ['Perception de l’aura magique', 'Clone'],
+                    ['Clone', 'Symbole'],
+                    ['Symbole', 'Désintégration'],
+                    ['Dissipation de la magie', 'Perception de l’aura magique'],
+                    ['Dissipation de la magie', 'Invocation d\'un objet'],
+                    ['Inversion de la gravité', 'Téléportation'],
+                    ['Invocation d\'un objet', 'Clone'],
+                    ['Protection mentale', 'Sphère d\'isolement physique'],
+                    ['Téléportation', 'Désintégration'],
+                    ['Désintégration', 'Atomisation massive'],
+                    ['Sphère prismatique', 'Atomisation massive'],
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
