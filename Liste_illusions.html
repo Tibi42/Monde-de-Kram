@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Illusions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DES ILLUSIONS</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-6" data-spell="Bouche magique">Bouche magique</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-3" data-spell="Mirage sonore">Mirage sonore</div>
+            <div class="spell-node col-5" data-spell="Ventriloquie">Ventriloquie</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-3" data-spell="Illusion visuelle">Illusion visuelle</div>
+            <div class="spell-node col-6" data-spell="Image multiple">Image multiple</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-5" data-spell="Changement d'apparence">Changement d'apparence</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-3" data-spell="Illusion sensorielle">Illusion sensorielle</div>
+            <div class="spell-node col-6" data-spell="Hypnotisme">Hypnotisme</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-4" data-spell="Invisibilité">Invisibilité</div>
+            <div class="spell-node col-5" data-spell="Sosie">Sosie</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-6" data-spell="Dessin hypnotisant">Dessin hypnotisant</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-2" data-spell="Image holographique">Image holographique</div>
+            <div class="spell-node col-3" data-spell="Illusion parfaite">Illusion parfaite</div>
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-4" data-spell="Zone d'invisibilité">Zone d'invisibilité</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-3" data-spell="Terrain hallucinatoire">Terrain hallucinatoire</div>
+            <div class="spell-node col-6" data-spell="Tueur illusoire">Tueur illusoire</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-2" data-spell="Illusion autonome">Illusion autonome</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-4" data-spell="Vision réelle">Vision réelle</div>
+        </div>
+
+        <!-- Niveau 25 -->
+        <div class="level">
+            <div class="level-number">25</div>
+            <div class="spell-node col-4" data-spell="Contrôle sensoriel">Contrôle sensoriel</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de la Liste des Illusions
+        const spellsData = {
+            // Niveau 1
+            "Bouche magique": {
+                level: 1,
+                portée: "2 m",
+                incantation: "var",
+                durée: "1 semaine",
+                sauvegarde: "-",
+                zone: "un passage",
+                description: "Ce sort peut être posé sur une porte, dans un couloir, un escalier ou sur tout lieu de passage de 3 mètres ou moins de large. Au moment où une créature intelligente franchit ce passage, il se déclenche.\nUne voix se fait alors entendre, répétant les mots exacts prononcés par le magicien lors de la pose du sortilège. La longueur de la phrase ne peut excéder 15 mots. L'intonation de la voix est identique à celle utilisée par le magicien quand il lance le sort, mais son timbre est neutre, et ne permet pas de reconnaître la voix de ce dernier. Le magicien choisit la force avec laquelle la « Bouche magique » répètera ses paroles, dans la limite de l'intensité d'une voix humaine.\nLe temps d'incantation est égal au temps pris par le magicien pour prononcer la phrase qu'il veut « enregistrer »."
+            },
+
+            // Niveau 2
+            "Mirage sonore": {
+                level: 2,
+                portée: "30 m",
+                incantation: "2 s",
+                durée: "quelques secondes",
+                sauvegarde: "-",
+                zone: "spécial",
+                description: "Ce sort reproduit le son voulu par le magicien. Celui-ci doit être relativement simple. Il peut s'agir de paroles (dans une lague que maîtrise le magicien). Celles-ci sont toutefois prononcée avec un timbre relativement anonyme : il est possible par exemple de choisir une voix grave ou aigue, mais pas d'imiter la voix d'une personne en particulier. (Cet aspect peut toutefois être amélioré par une modulation des effets du sort, voir chapitre « Jouer la magie »).\nPlus le son est faible, plus le magicien pourra le faire durer. Ainsi le tonnerre éclatera une demi-seconde, tandis qu'un gémissement pourra résonner durant une dizaine de secondes."
+            },
+            "Ventriloquie": {
+                level: 2,
+                portée: "10 m",
+                incantation: "2 s",
+                durée: "1 min",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Les mots murmurés par le magicien se font entendre avec la force qu'il souhaite et semblent provenir d'un point qu'il a choisi."
+            },
+
+            // Niveau 3
+            "Illusion visuelle": {
+                level: 3,
+                portée: "20 m",
+                incantation: "4 s",
+                durée: "20 min",
+                sauvegarde: "P-4",
+                zone: "boule de 2m",
+                description: "Les rayons lumineux traversant la zone d'effets de ce sortilège sont modifiés et en donnent une image fausse. Le magicien peut virtuellement créer n'importe quelle illusion visuelle, à condition de respecter 2 contraintes :\n- l'illusion est immobile. Ainsi il est facile de faire croire à la présence d'un mur ou d'une statue, mais pas d'un être vivant (ou seulement interne) ;\n- l'illusion ne rend pas la matière invisible. Il est possible de masquer un objet en le recouvrant d'autre chose, mais pas en l'occultant ;\nL'illusion n'a aucune réalité physique. Un doigt appliqué contre un mur illusoire passera au travers, sans rencontrer la moindre résistance.\nUne sauvegarde réussie permet de déceler de légères incohérences dans l'illusion, révélant son caractère factice. Cela ne permet pas en revanche de déceler la réalité masquée par l'illusion."
+            },
+            "Image multiple": {
+                level: 3,
+                portée: "-",
+                incantation: "2 s",
+                durée: "10 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien crée 1d3+1 sosies illusoires de lui-même. Ces sosies apparaissent à ses côtés, et reproduisent exactement ses gestes, si bien qu'il est impossible de déceler le bon. Ils le suivent (ou le précèdent) dans ses mouvements et s'adaptent au terrain. A tout instant le magicien peut changer la conformation du groupe qu'il forme avec eux ; la seule limite est que celui-ci reste dans une boule de 3 mètres de rayon.\nL'apparition des sosies provoque un flou momentané de la zone du lanceur de sort. Ce flou empêche une personne le regardant de deviner quelles images sont fausses.\nLes images illusoires du magicien sont très fragiles : le moindre coup ou choc heurtant une image la dissipe aussitôt.\nLe principal intérêt de ce sort réside dans la défense lors d'un combat : une attaque portée contre le magicien n'a qu'une chance sur le nombre total de sosies (magicien compris) de cibler celui-ci ; à défaut, l'attaquant a ciblé l'une des images illusoires (et la dissipe s'il la touche).\nExemple : le magicien a créé 3 sosies illusoires de lui-même. Un archer lui tire dessus. Comme il doit choisir entre 4 versions identiques du magicien (celui-ci plus trois sosies), il n'a qu'1 chance sur 4 de cibler effectivement le magicien et 3 chances sur 4 de cibler en fait l'un de ses sosies.\nDisposer de sosies ne confère en revanche pas d'avantage pour attaquer lors d'un combat. Les images en effet imitent simplement les gestes du magicien, mais ne tirent pas réellement de flèche ou ne portent pas réellement de coup d'épée sur l'adversaire du magicien (ils portent un coup d'épée virtuel dans le vide à proximité de lui). Le maître du jeu peut toutefois appliquer un malus de -1 ou - 2 à la feinte de corps de l'adversaire du magicien pour refléter qu'il ne sait pas, au début du geste du magicien, de quel sosie va en pratique venir l'attaque. A contrario, le fait d'attaquer révèle à ses adversaires quel sosie est en fait le magicien. Celui-ci devra profiter d'un nouveau moment hors de la vue de ses adversaires pour rétablir une incertitude sur lequel des sosies il est."
+            },
+
+            // Niveau 4
+            "Changement d'apparence": {
+                level: 4,
+                portée: "10 m",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "spécial",
+                zone: "1 créature",
+                description: "Ce sort permet au magicien de modifier totalement l'apparence du visage et du corps d'une créature consentante (y compris lui-même le cas échéant). Le changement n'est pas réel, il s'agit simplement d'une illusion qui recouvre le corps de la créature concernée et crée des creux d'invisibilité là où le nouveau corps prend moins de place que le corps d'origine. La créature affectée pèse par exemple toujours le même poids.\nIl est nécessaire de respecter une certaine proportionnalité entre les deux corps : le volume du nouveau corps doit être compris entre la moitié et le double de celui du corps d'origine (ce facteur peut toutefois faire l'objet d'une modulation des effets du sort, voir chapitre « Jouer la magie »).\nLe magicien peut virtuellement choisir n'importe quel visage ou corps dans la limite ci-dessus. La qualité de l'imitation dépend de la connaissance que le magicien a de la race à imiter et de son talent artistique (lequel dépend de la moyenne don adaptation / don télépathie du magicien).\nLes créatures voyant l'illusion à l'œuvre peuvent effectuer un jet de sauvegarde sous la Perception afin de déceler de légères incohérences ou imperfections, avec un malus dépendant de la qualité de l'imitation : par exemple un malus de 8 au jet de sauvegarde pour une race de créature que le magicien connaît très bien et une imitation de très bonne qualité (moyenne don adaptation / don télépathie de 16 ou plus) ; un malus de 4 pour une race que le magicien rencontre parfois et une imitation de bonne qualité (moyenne don adaptation / don télépathie de 14 ou 15) ; pas de malus pour une race que le magicien a rarement croisée et une imitation à peine supérieure à la moyenne (moyenne don adaptation / don télépathie de 12 ou 13)."
+            },
+
+            // Niveau 5
+            "Illusion sensorielle": {
+                level: 5,
+                portée: "30 m",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "P-8",
+                zone: "boule de 2m",
+                description: "Ce sort est une version améliorée du sort « Illusion visuelle », en ce que les cinq sens sont désormais affectés par l'illusion. De plus, celle-ci peut être animée d'un mouvement répétitif simple, comme une porte s'ouvrant et se refermant, ou une personne levant et baissant le bras ou marchant en ligne droite et à vitesse constante.\nIl est beaucoup plus dur de déceler cette illusion. En effet, dans le cas d'un mur, par exemple, un simple toucher laissera croire à sa présence. On sentira les pierres sous ses doigts. C'est uniquement en appliquant une forte poussée qu'on le traversera. Cela implique en général qu'on soupçonne le mur d'être une illusion, car sinon il est rare d'essayer de traverser un mur..."
+            },
+            "Hypnotisme": {
+                level: 5,
+                portée: "5 m",
+                incantation: "5 s",
+                durée: "5 min",
+                sauvegarde: "V",
+                zone: "1 créature",
+                description: "Par ce sort, le magicien tente d'annihiler la volonté de sa victime. Celle-ci doit être en train de l'écouter ou de le regarder pendant l'incantation du sort. Cela est rendu possible par le fait que l'incantation est très simple et ne nécessite ni grands gestes ni paroles ésotériques. C'est simplement le ton de la voix du magicien qui change.\nSi la créature visée rate son jet de sauvegarde, elle obéit aux demandes du magicien, comme s'il s'agissait d'un rêve que lui dicterait son subconscient. Elle reste consciente de ce qu'elle fait, mais laisse le magicien la guider. Celui-ci doit dans ce cadre accompagner ses suggestions hypnotiques avec un minimum d'explications et de récit.\nIl n'est cependant pas possible d'obliger une créature hypnotisée à aller à l'encontre de sa nature. Par exemple, lui demander de se suicider ou d'attaquer des amis chers provoquera chez elle une réaction de rejet suffisamment forte pour rompre le sort. De même il sera difficile de forcer une personne attachée à un objet de s'en séparer.\nA la fin du sort, la créature affectée se réveille de son hypnose, parfaitement consciente de ce qu'elle a accompli sous la commande du magicien."
+            },
+
+            // Niveau 6
+            "Invisibilité": {
+                level: 6,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "20 min",
+                sauvegarde: "6e sens-6",
+                zone: "1 créature",
+                description: "Ce sort entoure la créature ciblée (y compris vêtements et objets personnels) d'un voile fragile d'ondes magiques. Ce voile a la propriété optique de faire contourner à tout rayon lumineux ce qui se trouve en son sein. Le personnage entouré par le voile devient ainsi comme transparent, et donc virtuellement invisible.\nCe sort a cependant 3 limitations majeures. La première concerne la fragilité du voile. En effet, tout objet rentrant durement en contact avec lui le déchirera, et donc le dissipera. Le personnage invisible pourra donc ouvrir une porte, mais pas la défoncer ; il pourra saisir un objet ou poser la main sur l'épaule d'un compagnon, mais pas donner ni recevoir de coup ; une chute de 2 mètres suffira même à briser le sort.\nLa seconde limitation est l'impossibilité de lancer un sort sans rompre le voile. Tout sortilège nécessite un apport d'ondes magiques par le magicien (dépense de points de concentration). En traversant le voile ténu qui entoure celui-ci, ces nouvelles ondes le perturbent et brisent sa cohérence.\nEnfin, un personnage invisible n'est pas pour autant indécelable. Un animal sentira son odeur, un garde entendra le bruit de ses pas. De plus, de légères distorsions apparaissent dans le voile quand le personnage se déplace. Immobile, son invisibilité visuelle est en effet presque parfaite, mais celle-ci se trouble d'autant plus que son mouvement est rapide. D'où la possibilité d'un jet de sauvegarde, qui traduit que celui qui le réussit a repéré le personnage invisible (il ne le voit pas parfaitement mais repère sa position). Le maître du jeu peut moduler la difficulté de la sauvegarde en fonction des circonstances et de l'activité de la créature invisible."
+            },
+            "Sosie": {
+                level: 6,
+                portée: "10 m",
+                incantation: "5 s",
+                durée: "20 min",
+                sauvegarde: "spécial",
+                zone: "1 créature",
+                description: "Ce sort permet au magicien de transformer l'apparence d'une créature (y compris lui-même le cas échéant) de manière à la rendre identique à une autre. Le changement n'est pas réel, il s'agit simplement d'une illusion qui recouvre le corps de la créature concernée et crée des creux d'invisibilité là où le nouveau corps prend moins de place que le corps d'origine. La créature affectée pèse par exemple toujours le même poids.\nIl est nécessaire de respecter une certaine proportionnalité entre les deux corps : le volume du nouveau corps doit être compris entre la moitié et le double de celui du corps d'origine (ce facteur peut toutefois faire l'objet d'une modulation des effets du sort, voir chapitre « Jouer la magie »).\nExceptionnellement, ce sort peut être lancé sur une créature intelligente ou sur un animal (par exemple transformer un âne pour le rendre pareil à un certain cheval). Si la cible est une créature intelligente, celle-ci doit être consentante.\nLe magicien peut imiter n'importe quelle autre créature (ou animal). Il est souhaitable que la créature à imiter soit présente à proximité, auquel cas l'illusion est parfaite.\nSi ce n'est pas le cas, la qualité de l'imitation dépend de la connaissance que le magicien a de la créature à imiter et de son talent artistique. En outre, cela offrira aux créatures intelligentes observant la créature affectée un jet de sauvegarde pour déceler l'existence d'une différence. Ce jet de sauvegarde est effectué sous la Perception, avec un malus dépendant de la qualité de l'imitation (laquelle dépend de la moyenne don adaptation / don télépathie du magicien) : par exemple -8 pour une créature que connaît très bien le magicien ou qu'il a en vue et une imitation de très bonne qualité (moyenne don adaptation / don télépathie de 16 ou plus) ; ou -4 pour une créature que le magicien a croisée et a eu l'occasion d'observer et une imitation de bonne qualité (moyenne don adaptation / don télépathie de 14 ou 15)."
+            },
+
+            // Niveau 7
+            "Dessin hypnotisant": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "1 min",
+                sauvegarde: "V",
+                zone: "spéciale",
+                description: "Le magicien dessine dans l'air devant lui des motifs colorés. Ces motifs sont susceptibles d'hypnotiser toute créature qui se trouve à moins de 20 mètres et qui regarde dans la direction du magicien sans être concentrée sur autre chose (par exemple une créature en combat est focalisée sur celui-ci et n'est pas affectée).\nLes créatures affectées et ratant leur sauvegarde tombent dans une apathie totale et observent le mouvement charmeur des motifs. Cependant, si une personne les attaque, elles recouvrent leurs esprits et font face au danger. Sinon, elles restent sans aucune réaction à ce qui se passe autour d'elles, et ce jusqu'à la fin du sort."
+            },
+
+            // Niveau 8
+            "Image holographique": {
+                level: 8,
+                portée: "100 m",
+                incantation: "10 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort permet au magicien de créer un parfait double illusoire de lui-même. Ce double reproduit exactement le magicien au niveau visuel, auditif et même olfactif. Seul le toucher (le double n'a aucune matérialité) ou une action volontaire réussie de sentir la magie (voir chapitre « Jouer la magie ») permet de déceler la supercherie.\nLe magicien contrôle son double à distance avec un minimum de concentration. Il peut alors le faire se déplacer, parler, etc., comme s'il s'agissait de lui-même. Même ses propres amis auraient bien du mal à soupçonner l'imposture.\nLe double illusoire du magicien n'a aucune consistance physique et ne peut exercer aucune influence sur son environnement. Il n'est pas capable de se battre, de lancer un sort ou même d'ouvrir une porte. Bien sûr, il peut faire semblant. Mais au premier coup d'épée le traversant (ou traversant son épée illusoire), la supercherie sera découverte.\nInversement, seule la magie spécialement dirigée contre les sortilèges d'illusions a un effet sur ce double illusoire. Les attaques physiques se contentent de le traverser sans l'affecter.\nLe magicien perçoit exactement ce que perçoit son double et peut le contrôler s'il se concentre. Il n'est alors capable que de marcher normalement. S'il cesse quelques instants sa concentration (pour combattre ou lancer un sort, par exemple), son double illusoire se fige. Il reprend vie dès que le magicien reprend sa concentration. Il se produit la même chose si à un moment plus de 100 mètres séparent le magicien de son double.\nNotez enfin que le magicien ne peut faire avancer son double que dans un endroit qu'il voit bien (notamment par l'intermédiaire de son double). Bien que son sosie n'ait aucune matérialité, le magicien ne peut donc pas par exemple lui faire traverser les portes ou les murs, car il ne voit pas ce qu'il y a derrière."
+            },
+            "Illusion parfaite": {
+                level: 8,
+                portée: "40 m",
+                incantation: "10 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "boule de 3m",
+                description: "Le magicien peut créer n'importe quelle illusion, dans la limite qu'elle tienne dans une boule de 3 mètres de rayon. Cette illusion est parfaite, dans le sens où elle n'a pas de défaut et où aucun moyen autre que le raisonnement ou des sortilèges spécifiques de détection des illusions ne peut permettre de la déceler.\nLe sort reproduit exactement l'image, les sons, les odeurs, la sensation au toucher et même le cas échéant le goût produits par l'objet ou la personne qu'elle imite. Bien qu'elle n'ait aucune matérialité et qu'un coup la traverse, l'illusion donnera au toucher l'illusion d'avoir une consistance normale.\nLe magicien peut programmer son illusion pour se modifier au cours du temps. Cependant, cette modification est fixée à l'avance (par exemple « passer du rouge au vert après 5 minutes ») et ne peut se fonder sur une réponse de l'illusion aux circonstances, contrairement au sort de niveau 12 « Illusion autonome ».\nLe magicien peut à tout moment se reconcentrer sur son illusion et la modifier. Il a cependant besoin chaque fois de 5 secondes pleines pour « reprendre contact » avec son illusion."
+            },
+
+            // Niveau 9
+            "Zone d'invisibilité": {
+                level: 9,
+                portée: "-",
+                incantation: "10 s",
+                durée: "15 min",
+                sauvegarde: "6e sens-6",
+                zone: "boule de 3m *",
+                description: "Ce sortilège entoure le magicien et toutes les créatures qu'il souhaite – et qui se trouvent à moins de 3 mètres de lui au moment du lancement du sort – d'un voile d'ondes magiques qui les rend invisibles (avec une limitation à 10 créatures). Individuellement, les effets du sortilège sont les mêmes que ceux du sort de niveau 6 Invisibilité.\nCollectivement, le magicien demeure la source du voile magique qui recouvre les autres créatures. S'il cesse à un moment d'émettre les ondes magiques nécessaires, par exemple en lançant un autre sortilège, c'est l'ensemble du groupe qui redevient visible.\nEn revanche, si lui ou une autre créature reçoit ou donne un coup, c'est uniquement le voile entourant cette créature et son équipement qui se déchire. Les autres créatures affectées par le sort restent invisibles.\nEnfin, les créatures rendues invisibles par le sort ne peuvent s'éloigner du magicien sous peine de perdre leur invisibilité. A partir d'une distance de 3 mètres, le voile magique perd de son efficacité et la créature reste transparente mais devient floue et donc repérable. Elle peut encore redevenir invisible en se rapprochant du mage. Si cependant elle continue à s'éloigner, elle réapparaît de plus en plus. Quand la distance la séparant du magicien atteint 5 mètres, le sort se brise pour ce qui la concerne et il ne sert plus à rien de se rapprocher à nouveau du magicien pour essayer de le réactiver."
+            },
+
+            // Niveau 10
+            "Terrain hallucinatoire": {
+                level: 10,
+                portée: "20 m",
+                incantation: "15 s",
+                durée: "1 h",
+                sauvegarde: "P-var",
+                zone: "cube de 50m",
+                description: "Ce sort permet au magicien de complètement transformer la topographie d'un lieu. Il peut remplacer une crevasse par une belle prairie, une masure par une colline, faire apparaître un pont sur une rivière, etc. Il est même possible de rendre une partie du terrain invisible : masquer un arbre, un rocher, etc.\nBien sûr, cette transformation est purement illusoire. Elle joue sur les rayons lumineux. Une personne voulant s'avancer sur un pont illusoire verra ainsi son pied le traverser. Si elle s'avance gaillardement sur une prairie dissimulant un précipice, elle y tombera.\nCette illusion jouant sur la lumière, elle affecte toutes les créatures et animaux présents, y compris le magicien. Un jet de sauvegarde est autorisé, mais il sert uniquement à déceler des incohérences dans le paysage. Un jet très bien réussi permettra à la limite de deviner quels éléments du décor sont illusoires et quels éléments sont réels, mais pas à déceler la réalité derrière l'illusion.\nLa difficulté de jet de sauvegarde dépend de l'ampleur des modifications décidées par le magicien. Si le magicien a remplacé le terrain par un autre à la configuration improbable ou ne correspondant pas du tout au type de terrains habituels de la région, la sauvegarde sera sous P+6 ; s'il a totalement changé le décor et ajouté des éléments peu probables dans la région, le jet se fera à P+2. S'il l'a beaucoup modifié mais qu'un tel décor est plausible en ce lieu, la sauvegarde sera sous P-2 ; s'il a conservé une bonne partie de la réalité et simplement ajouté quelques éléments ne jurant pas avec l'ensemble, le jet se fera à P-6 ; enfin, si le magicien s'est contenté de modifier quelques détails, la sauvegarde sera à P-10."
+            },
+            "Tueur illusoire": {
+                level: 10,
+                portée: "40 m",
+                incantation: "10 s",
+                durée: "5 min",
+                sauvegarde: "Ab-1",
+                zone: "1 créature",
+                description: "La victime de ce sortilège (et elle seule) voit se matérialiser sous la forme d'une créature ses craintes les plus horribles et les plus enfouies. Elle panique et essaie à toute force de lui échapper.\nCela, bien sûr, est impossible, puisque cette créature n'existe que dans son propre esprit. Elle sera donc capable de franchir, d'une manière ou d'une autre, tous les obstacles que sa victime interposera entre eux.\nPour la même raison, cette créature est parfaitement insensible à toutes les attaques qu'elle pourrait subir. De plus, il est impossible à la victime du sortilège de se raisonner pour se dire que cette créature n'est qu'une illusion.\nLe but de la créature est de toucher sa victime. Elle attaque avec un score de +7 et se moque des parades (elle les traverse). Seule une esquive peut retarder l'échéance. Dès que la créature a touché sa victime, celle-ci tombe inconsciente (de peur) et le reste jusqu'à la fin des cinq minutes que dure le sort.\nLe jet de sauvegarde bénéficie d'un bonus de +1 par fois où la créature a déjà été la victime de ce sort"
+            },
+
+            // Niveau 12
+            "Illusion autonome": {
+                level: 12,
+                portée: "15 m",
+                incantation: "15 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 2m",
+                description: "Ce sort permet au magicien de créer un être virtuel parfaitement autonome. L'emploi du mot « être » ne doit pas induire en erreur : la création du magicien peut revêtir exactement la forme qu'il souhaite et en changer au cours du temps (pour peu qu'elle demeure toujours dans une boule de 2 mètres de rayon).\nLe magicien définit l'apparence, le toucher, les sons produits, l'odeur ou encore le « poids » virtuel (qui laissera par exemple des empreintes dans le sable mais n'infligera aucuns dommages à une créature sur laquelle l'illusion marcherait, bien que celle-ci ressente alors ce poids virtuel sur elle et puisse se croire incapable de le soulever) de l'illusion.\nIl peut en outre la « programmer » à l'avance et définir les actions et déplacements qu'elle accomplira, soit de manière absolue (faire ceci), soit en fonction des circonstances (si telle condition se produit, alors faire cela), soit les deux (faire ceci sauf si telle condition est remplie auquel cas faire plutôt cela). La programmation peut également concerner des transformations de l'illusion elle-même.\nIl est possible de programmer l'illusion à accomplir différentes actions ou à connaître différentes transformations successives au cours de la durée du sort. La complexité de la séquence programmée par le magicien doit toutefois rester raisonnable et correspondre à des consignes qu'il pourrait donner à une créature d'intelligence moyenne.\nL'illusion n'a aucune réalité physique autre qu'être une concentration d'ondes magiques. Elle sera donc traversée purement et simplement par les objets ou les personnes le tentant (un coup d'épée, une personne emportée par son élan, etc.). Cela sera la meilleure façon de comprendre qu'il ne s'agit en fait que d'une illusion, celle-ci étant par ailleurs en tout point parfaite."
+            },
+
+            // Niveau 15
+            "Vision réelle": {
+                level: 15,
+                portée: "-",
+                incantation: "30 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "portée des sens",
+                description: "Ce sortilège révèle au magicien le monde tel qu'il est réellement. Le magicien décèle naturellement toutes les illusions, tant la présence et la forme de ces illusions que la réalité qu'elles tentent de masquer ou transformer. Il perçoit également toutes les magies à l'œuvre, à quelle liste celles-ci correspondent et quelle est leur puissance (le niveau du sort correspondant). Il distingue à travers une sphère d'isolement sonore, visuel ou sensoriel. Il voit même par exemple la forme réelle d'une personne ayant modifié son apparence à l'aide d'un sortilège de la liste des Métamorphoses. Enfin, il « voit » naturellement l'aura des personnes, c'est-à-dire leur philosophie générale, en identifiant les différents types de magie qu'émet leur cerveau et la force relative de chacun d'eux. Il ne distingue cependant pas s'il s'agit ou non de magiciens.\nNotez que ce sortilège permettra bien sûr au magicien de voir parfaitement dans l'obscurité la plus totale, magique ou non, d'entendre malgré un sortilège d'Atténuation des sons ou une Sphère d'isolement sonore, etc. En revanche, il ne permettra ni de voir à travers les murs, ni d'entendre au-delà la portée normale de l'ouïe, ni de détecter le mensonge, ni de réaliser aucune détection se situant hors du champ normal des perceptions du magicien, à l'exception notable de la magie (et concomitamment de l'aura des personnes), mentionnée ci-dessus."
+            },
+
+            // Niveau 25
+            "Contrôle sensoriel": {
+                level: 25,
+                portée: "20 m",
+                incantation: "15 s",
+                durée: "30 min",
+                sauvegarde: "NM-3",
+                zone: "1 créature",
+                description: "Le magicien acquiert le complet contrôle des sens de la créature. Celle-ci n'a d'autre moyen pour s'en rendre compte que de déceler les incohérences de son nouvel environnement ou de réussir un jet volontaire de Sentir la magie (cette perception-ci n'est pas altérée).\nS'il veut faire évoluer sa victime dans un environnement crédible, le magicien ne pourra en pratique trop s'éloigner de la réalité : il n'a pas le temps d'imaginer tous les détails d'un nouveau cadre. En revanche, il peut facilement ajouter ou retrancher des éléments de son choix aux perceptions que recevrait normalement sa victime.\nLe magicien peut aussi bien sûr choisir de plonger sa victime dans un cadre complètement différent, mais celui-ci sera alors nécessairement schématique, un peu à l'image de l'environnement d'un rêve."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0;
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0;
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme de la Liste des Illusions
+                const connections = [
+                    // Chaîne de base : sons et voix
+                    ["Mirage sonore", "Illusion visuelle"],
+                    ["Illusion visuelle", "Illusion sensorielle"],
+                    ["Illusion visuelle", "Invisibilité"],
+                    ["Illusion visuelle", "Illusion parfaite"],
+                    ["Illusion visuelle", "Image holographique"],
+                    ["Illusion parfaite", "Terrain hallucinatoire"],
+                    ["Illusion parfaite", "Illusion autonome"],
+                    ["Terrain hallucinatoire", "Vision réelle"],
+                    ["Terrain hallucinatoire", "Tueur illusoire"],
+                    ["Tueur illusoire", "Vision réelle"],
+                    ["Vision réelle", "Contrôle sensoriel"],
+                    ["Invisibilité", "Zone d'invisibilité"],
+                    ["Bouche magique", "Ventriloquie"],
+                    ["Ventriloquie", "Changement d'apparence"],
+                    ["Changement d'apparence", "Sosie"],
+                    ["Bouche magique", "Image multiple"],
+                    ["Image multiple", "Hypnotisme"],
+                    ["Hypnotisme", "Dessin hypnotisant"],
+                    ["Dessin hypnotisant", "Tueur illusoire"],
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

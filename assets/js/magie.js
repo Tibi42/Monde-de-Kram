@@ -97,6 +97,11 @@ document.addEventListener("click", function (event) {
     if (magicType === "Détections") {
       openDetectionModal();
     }
+
+    // Ouvrir la liste des Illusions si le bouton "Illusions" est cliqué
+    if (magicType === "Illusions") {
+      openIllusionsModal();
+    }
   }
 });
 
@@ -424,6 +429,40 @@ function openDetectionModal() {
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && detectionModal.parentNode) {
       document.body.removeChild(detectionModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste des Illusions
+function openIllusionsModal() {
+  const illusionsModal = document.createElement("div");
+  illusionsModal.id = "illusionsModal";
+  illusionsModal.className = "modal";
+  illusionsModal.style.display = "flex";
+
+  illusionsModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeIllusionsModal">&times;</span>
+      <iframe src="Liste_illusions.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(illusionsModal);
+
+  const closeBtn = document.getElementById("closeIllusionsModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(illusionsModal);
+  });
+
+  illusionsModal.addEventListener("click", function (event) {
+    if (event.target === illusionsModal) {
+      document.body.removeChild(illusionsModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && illusionsModal.parentNode) {
+      document.body.removeChild(illusionsModal);
     }
   });
 }
