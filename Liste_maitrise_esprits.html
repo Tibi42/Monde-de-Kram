@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de Maîtrise des Esprits</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 350px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DE MAÎTRISE DES ESPRITS</h1>
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-1" data-spell="Insomnie">Insomnie</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-1" data-spell="Névrose">Névrose</div>
+            <div class="spell-node col-4" data-spell="Amitié">Amitié</div>
+            <div class="spell-node col-7" data-spell="Empathie">Empathie</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-1" data-spell="Culpabilité">Culpabilité</div>
+            <div class="spell-node col-3" data-spell="Charme">Charme</div>
+            <div class="spell-node col-5" data-spell="Sommeil">Sommeil</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-2" data-spell="Exacerbation des émotions">Exacerbation des émotions</div>
+            <div class="spell-node col-4" data-spell="Paralysie">Paralysie</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-1" data-spell="Kleptomanie">Kleptomanie</div>
+            <div class="spell-node col-3" data-spell="Effroi">Effroi</div>
+            <div class="spell-node col-5" data-spell="Confusion">Confusion</div>
+            <div class="spell-node col-7" data-spell="Oubli">Oubli</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-1" data-spell="Paranoïa">Paranoïa</div>
+            <div class="spell-node col-2" data-spell="Injonction">Injonction</div>
+            <div class="spell-node col-4" data-spell="Exacerbation du charisme">Exacerbation du charisme</div>
+            <div class="spell-node col-7" data-spell="Télépathie">Télépathie</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-3" data-spell="Danse irrésistible">Danse irrésistible</div>
+            <div class="spell-node col-5" data-spell="Maladresse">Maladresse</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-1" data-spell="Phobie">Phobie</div>
+            <div class="spell-node col-4" data-spell="Labyrinthe">Labyrinthe</div>
+            <div class="spell-node col-7" data-spell="Sonder les esprits">Sonder les esprits</div>
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-3" data-spell="Influence des masses">Influence des masses</div>
+            <div class="spell-node col-5" data-spell="Protection mentale">Protection mentale</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-1" data-spell="Schizophrénie">Schizophrénie</div>
+            <div class="spell-node col-4" data-spell="Quête">Quête</div>
+            <div class="spell-node col-7" data-spell="Modifier les souvenirs">Modifier les souvenirs</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-5" data-spell="Métempsycose">Métempsycose</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-1" data-spell="Folie">Folie</div>
+            <div class="spell-node col-3" data-spell="Domination des masses">Domination des masses</div>
+            <div class="spell-node col-7" data-spell="Emprisonnement de l'âme">Emprisonnement de l'âme</div>
+        </div>
+
+        <!-- Niveau 20 -->
+        <div class="level">
+            <div class="level-number">20</div>
+            <div class="spell-node col-4" data-spell="Esclave spirituel">Esclave spirituel</div>
+            <div class="spell-node col-7" data-spell="Vie végétative">Vie végétative</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de la Liste de Maîtrise des Esprits
+        const spellsData = {
+            // Niveau 1
+            "Insomnie": {
+                level: 1,
+                portée: "à vue",
+                incantation: "3 s",
+                durée: "1 jour",
+                sauvegarde: "V",
+                zone: "1 créature",
+                description: "La créature est incapable de trouver le sommeil. Même si elle est fatiguée, mais n'arrive pas à dormir. Elle ne peut récupérer la totalité de sa fatigue (elle culmine à son maximum moins 6 à la fin de l'insomnie)."
+            },
+
+            // Niveau 2
+            "Névrose": {
+                level: 2,
+                portée: "à vue",
+                incantation: "4 s",
+                durée: "8 h",
+                sauvegarde: "Ab-1",
+                zone: "1 créature",
+                description: "La créature victime de l'enchantement devient irascible et s'emporte plus facilement qu'à l'ordinaire. Elle est tendue et cherche constamment des responsables à sa nervosité, n'hésitant pas à se quereller, même avec ses amis."
+            },
+            "Amitié": {
+                level: 2,
+                portée: "10 m",
+                incantation: "2 s",
+                durée: "20 min",
+                sauvegarde: "VM",
+                zone: "1 créature",
+                description: "Si la créature ciblée rate son jet de protection, elle considère le magicien comme un bon ami. Elle sera prête à l'aider ou du moins à le renseigner, dans la mesure de ses moyens. Elle n'ira toutefois pas jusqu'à risquer sa sécurité ou son poste ou jusqu'à trahir la confiance d'un autre ami.\nDurant le sort, la victime n'a pas conscience d'être sous son emprise. En revanche, lorsque celui-ci expire, il est possible qu'elle se souvienne avoir remarqué les incantations du magicien et comprenne ce qui s'est passé."
+            },
+            "Empathie": {
+                level: 2,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "20 min",
+                sauvegarde: "Thp-4",
+                zone: "1 créature",
+                description: "Ce sortilège permet de ressentir les émotions d'une autre créature. Il ne donne aucune information sur leurs causes, en revanche il les décrit avec une certaine finesse.\nLe détail de perception des sentiments dépend des dons de psychologue du magicien (i.e. de son score dans la compétence « Relations avec les autres »). Il pourra ainsi le cas échéant distinguer colère, humiliation, admiration, trouble amoureux, mépris, reconnaissance ou tout autre sentiment similaire."
+            },
+
+            // Niveau 3
+            "Culpabilité": {
+                level: 3,
+                portée: "50 m",
+                incantation: "5 s",
+                durée: "4 h",
+                sauvegarde: "V-1",
+                zone: "1 créature",
+                description: "La créature visée se sent soudainement coupable d'égoïsme, de cruauté, de lâcheté ou de tout autre sentiment du même type que les circonstances peuvent lui inspirer.\nPar exemple, elle se reprochera très durement de n'avoir pas essayé d'assommer son adversaire, au lieu de le tuer. Si un de ses compagnons a été blessé, elle se reprochera de n'avoir pas fait en sorte que cela n'arrive pas (d'être arrivé trop tard ou de ne pas avoir su assez l'aider). Si elle a menti, elle souffrira de n'être qu'un moins que rien, un menteur sans morale."
+            },
+            "Charme": {
+                level: 3,
+                portée: "10 m",
+                incantation: "2 s",
+                durée: "20 min",
+                sauvegarde: "VM+1",
+                zone: "1 créature",
+                description: "Ce sort est une version plus puissante du sort Amitié.\nLa différence principale tient au fait que la victime a ici pour son « ami » un grand respect, qui confine presque à l'obéissance. Par exemple, le magicien pourra le convaincre de l'aider à se défendre ou de retenir ses compagnons dans un combat les opposant au groupe du magicien. Il répondra aux questions du magicien si cela ne comporte pas de risque visible pour lui ou ses amis.\nIl ne perd pas pour autant sa lucidité. Il n'ira pas jusqu'à risquer sa vie ou se battre pour son « ami » tandis que celui-ci le regarde faire."
+            },
+            "Sommeil": {
+                level: 3,
+                portée: "30 m",
+                incantation: "2 s",
+                durée: "jusqu'au réveil",
+                sauvegarde: "V+nbre",
+                zone: "1 à 4 créatures",
+                description: "Les créatures ciblées, qui doivent être distantes de moins de 2 m d'un point choisi, lancent un jet de sauvegarde sous la Volonté, avec un bonus de 1 par créature visée (donc un bonus allant de +1 à +4). Celles qui échouent tombent dans un sommeil naturel mais profond, duquel elles peuvent être tirées normalement (notamment par du bruit)."
+            },
+
+            // Niveau 4
+            "Paralysie": {
+                level: 4,
+                portée: "15 m",
+                incantation: "4 s",
+                durée: "20 s",
+                sauvegarde: "V+1",
+                zone: "1 créature",
+                description: "Si la créature visée par ce sort rate son jet de sauvegarde, elle ne parvient plus à faire le moindre mouvement, ni donc à parler. Cette paralysie n'est pas due à un mauvais fonctionnement de ses muscles, mais au fait que son cerveau ne parvient plus à leur donner des ordres. La créature reste cependant parfaitement consciente, entend et voit ce qui se passe autour d'elle."
+            },
+            "Exacerbation des émotions": {
+                level: 4,
+                portée: "30 m",
+                incantation: "2 s",
+                durée: "20 min",
+                sauvegarde: "Ab-2",
+                zone: "1 créature",
+                description: "Si la créature visée rate son jet de sauvegarde, les émotions qu'elle ressent sont soudain grandement amplifiées. Une légère appréhension se transformera en peur, la peur en effroi panique ; une pointe de jalousie se transformera en une brûlure dévorante ; un agacement en colère ; une inclinaison en un souffle amoureux ; une légère mélancolie en profonde tristesse.\nLe sortilège ne déclenche pas les émotions, il les porte simplement à un niveau beaucoup plus élevé. En outre, seules les émotions présentes à la conscience de la créature sont affectées. En conséquence, le magicien ou les autres créatures peuvent en partie influencer l'expression de ces émotions en soufflant sur les braises que le sortilège transformera alors en flammes. Par exemple, appeler l'attention de la créature sur un élément la rendant un peu jalouse engendrera soudain une jalousie intense, mais cela ne fonctionnera que si l'élément en question rend effectivement un peu jalouse la créature."
+            },
+
+            // Niveau 5
+            "Kleptomanie": {
+                level: 5,
+                portée: "50 m",
+                incantation: "6 s",
+                durée: "1 h",
+                sauvegarde: "V-2",
+                zone: "1 créature",
+                description: "La créature victime de cet enchantement est soudainement animée de pulsions kleptomanes irrésistibles. Si elle trouve un objet beau ou de valeur, elle désirera s'en emparer à tout prix, et notamment en le volant."
+            },
+            "Effroi": {
+                level: 5,
+                portée: "30 m",
+                incantation: "3 s",
+                durée: "3 min",
+                sauvegarde: "V+1",
+                zone: "1 à 4 créatures",
+                description: "Les créatures visées doivent être en groupe. Celles qui échouent à leur sauvegarde sont soudain prises de panique. Elles sont terrifiées par la vue du magicien et cherchent à tout prix à lui échapper. Elles sont persuadées que si elles restent, celui-ci va les exterminer sans pitié."
+            },
+            "Confusion": {
+                level: 5,
+                portée: "30 m",
+                incantation: "3 s",
+                durée: "1 min",
+                sauvegarde: "Ab-1",
+                zone: "1 créature",
+                description: "La victime de ce sortilège perd ses repères et ne parvient plus à réfléchir efficacement. Il lui semble soudain être spectatrice d'une situation dont la compréhension lui échappe.\nElle reste alors sur place à ne rien faire, cherchant à réaliser ce qui se passe, et se contente de se défendre si elle est attaquée.\nSes compagnons peuvent cependant essayer de lui faire réaliser des actions simples (comme s'enfuir par exemple) ; ils doivent pour cela réussir un jet sous leur Charisme avec un malus de -4 (1 seul compagnon par tour peut essayer)."
+            },
+            "Oubli": {
+                level: 5,
+                portée: "20 m",
+                incantation: "15 s",
+                durée: "permanent",
+                sauvegarde: "Mem-2",
+                zone: "1 créature",
+                description: "Ce sortilège puissant efface de la mémoire de la victime les événements des 3 dernières minutes. Celle-ci a simplement l'impression d'avoir rêvassé et de soudain reprendre conscience de ce qui l'entoure. Elle n'a qu'une très vague notion du temps qui s'est écoulé pendant qu'elle pensait à autre chose.\nSeul le sort « Restaurer la mémoire » (liste de l'Harmonie, niveau 9) peut annuler les effets de ce sortilège.\nOutre par l'utilisation de modulations du sort (voir chapitre « Jouer la magie »), il est possible d'augmenter la durée de la période oubliée en mobilisant davantage d'énergie : pour chaque couple de point de concentration et de fatigue supplémentaire dépensé, une minute supplémentaire est oubliée. Exemple : un magicien choisit de dépenser 15 points de concentration et 15 points de fatigue pour lancer son sortilège (5 en coût de base et 10 en coût supplémentaire). Cela lui permettra de faire oublier les 13 dernières minutes (3 de base et 10 supplémentaires)."
+            },
+
+            // Niveau 6
+            "Paranoïa": {
+                level: 6,
+                portée: "50 m",
+                incantation: "7 s",
+                durée: "40 min",
+                sauvegarde: "Ab-3",
+                zone: "1 créature",
+                description: "Si elle rate son jet de sauvegarde, la créature ciblée devient subitement soupçonneuse, même envers ses amis les plus proches. Elle pense que les gens lui mentent ou du moins lui cachent certaines choses.\nDès lors, son imagination prend le pouvoir, et elle interprète chaque mot, chaque phrase suivant le monde imaginaire qu'elle s'est construit. Un geste lui semblera être une menace ou un signe codé destiné à ne pas être compris par elle. Constamment aux aguets, elle ne fait plus confiance à personne."
+            },
+            "Exacerbation du charisme": {
+                level: 6,
+                portée: "-",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège entoure le magicien d'ondes magiques renforçant l'impression qu'il laisse sur les créatures qui l'entourent. En termes de jeu, il bénéficie de ce fait d'un bonus de +4 à tous ses jets de Charisme ou de compétences Relation avec les autres ou Feindre/Abuser les autres impliquant un effet produit sur les autres (par exemple un jet d'éloquence ou de mensonge, mais pas un jet de détection du mensonge)."
+            },
+            "Injonction": {
+                level: 6,
+                portée: "30 m",
+                incantation: "spécial",
+                durée: "spécial",
+                sauvegarde: "NM-1",
+                zone: "1 créature",
+                description: "Ce sortilège soutient par sa magie un ordre que le magicien donne à la créature ciblée. L'ordre doit être énoncé à haute voix et la créature doit être en mesure de le comprendre. La durée d'incantation est simplement celle que prend l'ordre à être énoncé. Il doit s'agir d'un ordre simple et non d'un ordre multiple impliquant la succession de plusieurs actions.\nL'ordre peut être de toute nature, mais le maître du jeu accordera un bonus important au jet de sauvegarde s'il met en jeu des éléments particulièrement importants pour la créature visée. (Par exemple, un ordre de se suicider ou d'assassiner un de ses amis bénéficiera d'un bonus de +8 à la sauvegarde ; un ordre conduisant à enfreindre des principes éthiques importants pour la créature, comme briser un serment, ou à la mettre sérieusement en danger conduira à un bonus de +4).\nSi la créature visée échoue à sa sauvegarde, elle appliquera de son mieux l'ordre concerné.\nIl est possible de choisir un ordre s'exerçant sur une certaine durée (par exemple garder un passage, ou marcher dans une certaine direction) ; les effets durent alors jusqu'à une dizaine de minutes (davantage si la créature a beaucoup échoué à sa sauvegarde), après quoi la créature reprend ses esprits et remet l'ordre en cause. La durée est ainsi variable, dépendant à la fois de l'ordre reçu, de la réticence psychologique à l'exécuter et de l'existence ou non d'éléments rappelant à la créature son comportement naturel. Par exemple, un ordre de cesser le combat conduira la créature concernée à immédiatement arrêter de se battre ; ensuite, si personne ne menace elle ou ses amis et qu'elle n'a pas de raison forte de reprendre le combat, elle est susceptible de demeurer dans cette attitude apaisée (sans pour autant que cela conduise à réduire son hostilité éventuelle) ; mais si ses amis continuent de se battre autour d'elle ou si le combat qu'elle conduisait revêtait une importance particulière pour elle, suite à un ordre, un engagement ou un besoin majeur, elle retrouvera ses esprits et reprendra le combat après quelques tours ; et, si elle est attaquée, c'est immédiatement qu'elle répliquera."
+            },
+            "Télépathie": {
+                level: 6,
+                portée: "vue puis illimitée",
+                incantation: "15 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Grâce à ce sort, le magicien acquiert la capacité de parler mentalement à la créature ciblée. S'il se concentre, il peut également « entendre » les réponses mentales que celle-ci formule ou toute autre pensée qu'elle désire qu'il perçoive.\nUne fois établi, ce mode de communication ne subit aucune perturbation due à la distance ou à des obstacles placés entre la créature affectée et le magicien. Il ne fonctionne toutefois que pendant que le magicien se concentre sur ce lien : si son attention est attirée ailleurs, pendant tout ce laps de temps il ne sera pas en mesure d'entendre ce que la créature avec laquelle il a un lien souhaitera le cas échéant lui communiquer."
+            },
+
+            // Niveau 7
+            "Danse irrésistible": {
+                level: 7,
+                portée: "30 m",
+                incantation: "3 s",
+                durée: "30 s",
+                sauvegarde: "V-2",
+                zone: "1 créature",
+                description: "La victime de ce sortilège se met soudainement à danser de façon effrénée. Quelles que soient les circonstances, elle continue à danser frénétiquement jusqu'à l'expiration du sort. Elle peut alors de nouveau agir normalement, mais a perdu 3 points de fatigue.\nSi elle est attaquée tandis qu'elle danse, elle peut se défendre, mais pas répliquer. Sa Feinte de corps reste inchangée, mais ses jets de parade ou d'esquive subissent un malus de -2. En outre, cette fatigue supplémentaire s'ajoute à celle due à la danse."
+            },
+            "Maladresse": {
+                level: 7,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "30 s",
+                sauvegarde: "Co-1",
+                zone: "1 créature",
+                description: "La créature ciblée devient subitement très maladroite. Elle a une chance sur deux de faire tomber l'objet qu'elle tenait au moment où le sortilège est lancé.\nDe plus, elle subit pendant toute la durée du sort un malus de -4 à tous ses jets sous la Coordination et à toutes ses actions physiques et un malus de -2 à sa Feinte de corps."
+            },
+
+            // Niveau 8
+            "Phobie": {
+                level: 8,
+                portée: "50 m",
+                incantation: "8 s",
+                durée: "30 min",
+                sauvegarde: "NM-4",
+                zone: "1 créature",
+                description: "Le magicien peut conférer à la victime de ce sort une phobie de son choix, c'est-à-dire une peur panique et incontrôlable d'un certain type d'animaux (les serpents, les insectes, les araignées, etc.) ou d'un certain type de situation ou de circonstance (l'obscurité, un espace clos, une foule dense de personnes, une quantité importante de vide en contrebas, nager dans la mer, etc.). Certaines sont décrites dans le désavantage Phobie.\nLa phobie est irrationnelle et ne s'appuie pas nécessairement sur un danger réel. L'objet de la phobie doit en revanche rester générique (par exemple un certain type d'animal et pas un certain animal en particulier).\nLa peur de la victime est irraisonnée et irrépressible, plus forte que n'importe quelle autre peur, promesse ou loyauté. La créature panique complètement et cherche à fuir à tout prix la source de sa terreur, même au prix de sa propre mise en danger. Ses capacités de réflexion étant paralysées, il est peu probable qu'elle s'y prenne de la meilleure façon."
+            },
+            "Labyrinthe": {
+                level: 8,
+                portée: "15 m",
+                incantation: "5 s",
+                durée: "spéciale",
+                sauvegarde: "VM-3",
+                zone: "1 créature",
+                description: "Ce sortilège puissant bloque l'esprit de sa victime, empêchant les ordres du cerveau de parvenir aux muscles. La pensée de la victime se trouve en fait prisonnière dans un labyrinthe mental dont elle doit parvenir à sortir. Tant qu'elle n'y arrive pas, elle se trouve incapable de communiquer avec l'extérieur, c'est à dire avec le corps.\nLe résultat est une absence quasi totale d'activité. La victime du sortilège n'ébauche que quelques mouvements de l'ordre du réflexe et elle est incapable de se défendre réellement. Si on l'attaque, le jet de toucher se fait sans Feinte de corps et avec un bonus de +6 pour tenir compte de sa quasi-immobilité.\nLa marge d'échec du jet de sauvegarde indique le nombre de tours pendant lesquels la créature est prisonnière de ce labyrinthe mental."
+            },
+            "Sonder les esprits": {
+                level: 8,
+                portée: "15 m",
+                incantation: "10 s",
+                durée: "5 min",
+                sauvegarde: "Thp-5",
+                zone: "spécial",
+                description: "Ce sort affecte potentiellement toutes les créatures à portée de vue du magicien et distantes de moins de 15 mètres au moment où il lance le sort. Chacune de ces créatures, tant qu'elle reste visible et à moins de 15 mètres du magicien, peut être ensuite prise pour cible à un moment avant l'expiration du sortilège.\nCelui-ci permet au magicien de percevoir les pensées de la créature qu'il sonde. Il ne peut sonder qu'une créature à la fois, mais il a chaque tour la possibilité de changer de cible. Chaque cible a droit à un jet de sauvegarde la première fois où elle est visée. Si elle réussit, elle ne peut plus être visée par le sort jusqu'à son expiration.\nLa profondeur des pensées des créatures visées est représentée par 7 niveaux successifs, du plus superficiel au plus profond :\n1. émotions superficielles (équivalent du sort Empathie) ;\n2. pensées superficielles et intentions ;\n3. émotions profondes et durables ;\n4. opinions sur des choses ou événements concrets ;\n5. pensées profondes sur les personnes ;\n6. idéaux et principes fondamentaux ;\n7. façon de voir la vie et le monde.\nLa profondeur de pensées que perçoit le magicien pour chaque créature est égale à sa marge d'échec du jet de sauvegarde (par exemple jusqu'au niveau 4 de pensées pour une sauvegarde ratée de 4). Le magicien commence par percevoir le niveau le plus superficiel et a besoin chaque fois de 15 secondes pour accéder au niveau suivant (soit par exemple 1 minute pour accéder au niveau 4).\nLa connaissance d'un nouveau palier se cumule avec celle des paliers précédents. Il s'agit toujours d'une connaissance intuitive, mais un bon niveau dans la compétence Relations avec les autres peut permettre de la rationaliser.\nChaque fois que le magicien revient à une ancienne cible, il doit parcourir à nouveau la totalité des paliers. La cible n'effectue cependant pas à nouveau de jet de sauvegarde.\nLe magicien doit se concentrer pour percevoir les pensées de la cible. Il effectue toute autre action avec un malus de -4."
+            },
+
+            // Niveau 9
+            "Influence des masses": {
+                level: 9,
+                portée: "-",
+                incantation: "7 s",
+                durée: "20 min",
+                sauvegarde: "Foi",
+                zone: "spécial",
+                description: "Ce sortilège confère à la voix du magicien un fort pouvoir d'influence sur tous ceux qui l'écoutent. Ceux-ci sont charmés par son rythme et son phrasé et sont enclins à l'écouter.\nToute créature intelligente entendant le magicien parler alors qu'il est sous l'effet de ce sort doit effectuer un jet de sauvegarde. Si elle échoue, elle est intéressée par ce que dit le magicien et cherchera à l'écouter et à le comprendre. Si elle le comprend, elle aura tendance à trouver pertinent et raisonnable ce qu'il dit, tant que cela ne heurte pas le bon sens ou ses intérêts majeurs.\nCe sort a ainsi pour effet de renforcer considérablement le pouvoir d'influence et de persuasion du magicien, mais il n'engendre pas pour autant une adhésion aveugle à ce que celui-ci dit ou demande. L'efficacité du sort dépend par conséquent grandement d'une part des circonstances et d'autre part des propos du magicien."
+            },
+            "Protection mentale": {
+                level: 9,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature bénéficiant de ce sortilège voit sa résistance aux sorts mentaux très fortement augmentée. Tous ses jets de sauvegarde concernant ce type de sorts bénéficient d'un bonus de +8."
+            },
+
+            // Niveau 10
+            "Schizophrénie": {
+                level: 10,
+                portée: "50 m",
+                incantation: "10 s",
+                durée: "15 min",
+                sauvegarde: "NM-2",
+                zone: "1 créature",
+                description: "La victime de ce sortilège contracte subitement et temporairement le désavantage Schizophrénie (voir). Elle perd complètement le sens de la réalité. Ses sentiments habituels vis à vis de cette réalité sont bouleversés. Elle pourra par exemple rire de quelque chose qui normalement la révolterait et inversement.\nSes buts, ses liens avec ses amis ou ses ennemis, tout est remis en cause. En un sens, la créature devient folle, même si elle veillera quand même à peu près à sa propre sécurité."
+            },
+            "Quête": {
+                level: 10,
+                portée: "10 m",
+                incantation: "variable",
+                durée: "1 semaine",
+                sauvegarde: "NM-var",
+                zone: "1 créature",
+                description: "Ce sort lie la créature ciblée au magicien et l'oblige à accomplir une quête dont celui-ci la charge. L'incantation prend le temps que le magicien formule sa demande.\nIl peut virtuellement être tout demandé à la créature, mais la difficulté de la sauvegarde dépendra fortement des réticences qu'aura la créature à accomplir la quête en question et du danger qu'elle comporte. La sauvegarde s'effectue sous le niveau mental (NM) de la créature, avec un ajustement décidé par le maître de jeu.\nA titre d'exemple, une quête acceptée volontairement entraîne un malus de -8 à la sauvegarde. Sinon, elle occasionne un malus de -4 si elle apparaît sans danger, -2 si elle présente un danger significatif, pas de bonus ou de malus si elle présente un grand danger et un bonus de +4 si la créature a toutes les chances d'y laisser la vie. Si en sus la créature répugne à accomplir la quête (car elle a autre chose d'important à accomplir ou car l'objectif ou les moyens de la quête lui déplaisent), elle bénéficie d'un bonus supplémentaire de +2 à la sauvegarde, soit au total de -2 à +6 en fonction du danger de la quête. Si la quête va totalement à l'encontre de ses convictions profondes ou fait obstacle à l'accomplissement d'autres objectifs urgents et très importants pour la créature, ce bonus passe à +4, soit au total de 0 à +8 en fonction du danger de la quête.\nLa quête entraîne pour la cible une obligation de moyens : elle fera tout son possible pour l'accomplir. Elle porte typiquement sur un lieu, une personne, un objet ou un groupe défini et réduit de personnes. Il sera par exemple possible de demander de protéger un lieu, de tuer une personne, de l'empêcher de se rendre en tel lieu ou d'aller voler tel objet et de le ramener. Une quête trop complexe dans sa formulation ou dans les actions à entreprendre occasionnera un bonus à la sauvegarde.\nIl n'est pas possible de se soustraire à une quête lancée avec succès. La créature affectée y reste soumise jusqu'à la fin du sort ou jusqu'à l'accomplissement avec succès de la quête.\nIl s'agit d'un sort mental qui donne réellement à sa victime l'envie d'accomplir cette quête. C'est pourquoi celle-ci ne cherchera pas à la retarder et elle l'accomplira jusqu'au bout, quitte à se venger du magicien après avoir accompli sa mission. Ses autres objectifs passeront au second plan jusqu'à l'accomplissement de sa quête (ils entraineront toutefois le cas échéant un bonus à la sauvegarde en raison de la réticence de la cible à accomplir la quête, cf. ci-dessus, par exemple un bonus de +4 s'ils sont urgents et très importants)."
+            },
+            "Modifier les souvenirs": {
+                level: 10,
+                portée: "15 m",
+                incantation: "10 s",
+                durée: "permanent",
+                sauvegarde: "Mem-var",
+                zone: "1 créature",
+                description: "Ce sortilège permet au magicien de modifier définitivement les souvenirs qu'une créature a d'un événement. La difficulté de la sauvegarde dépend grandement de la quantité de souvenirs que souhaite modifier le magicien. C'est au maître du jeu d'estimer ce paramètre.\nTrès souvent, pour une modification assez fine, le magicien aura besoin de connaître avec précision les souvenirs qu'il entend modifier (soit les avoir vécus, soit qu'on les lui ait racontés). Ces souvenirs doivent en tout état de cause constituer ce qu'on peut appeler un événement, c'est à dire avoir une logique et une cohérence spatiale et temporelle qui en fixent des frontières claires.\nOn juge de l'importance de la transformation des souvenirs d'après principalement 2 critères : l'ampleur ponctuelle de la modification et la durée de l'événement dont le souvenir est altéré.\nL'ampleur ponctuelle peut varier de la modification d'un simple détail à une totale réécriture. Si seul un détail est modifié, la sauvegarde a un malus de -4. Il doit s'agir d'un élément auquel la créature n'accorde aucune importance ou signification, comme la couleur des cheveux d'une personne peu fréquentée, l'étage de sa chambre à l'auberge ou la présence d'un borgne assis à l'entrée de celle-ci (sauf si cette présence a éveillé des soupçons…). Si la réécriture est totale, la sauvegarde a un bonus de +4, du moins pour ce qui concerne l'ampleur de la modification.\nEntre ces deux extrêmes, il est possible d'identifier d'autres stades. Modifier tout l'environnement de la créature dans son souvenir, y compris par exemple le nombre de personnes présentes, entraîne simplement un malus de -2 si le magicien ne modifie pas les éléments importants aux yeux de la créature (par exemple la présence de ses compagnons ou les paroles d'un orateur écouté). Si en revanche le magicien transforme quelques éléments importants et leur donne une autre signification qui soit différente mais plausible (par exemple changer la teneur d'une conversation, changer l'identité des personnes présentes, etc.), le jet sera sans malus ni bonus. Si le nombre d'éléments importants modifiés est grand ou si le magicien donne à certains de ces éléments un sens peu vraisemblable ou à l'opposé de l'histoire réelle (une personne calme et posée qui s'énerve violemment, un magicien du Feu lançant un sortilège puissant de la liste de l'Eau, un ami fidèle abandonnant ses compagnons, etc.), le jet se fera avec un bonus de +2.\nLa seconde dimension est plus facile à estimer. Il s'agit de la durée de l'événement que souhaite modifier le magicien. Si cette durée est de 1 minute ou moins, la sauvegarde a un malus de -2. Si l'événement s'étale sur une durée comprise entre 1 minute et 1 heure, le jet n'a ni bonus ni malus. S'il a duré entre 1 heure et 1 jour, la sauvegarde a un bonus de +2. entre 1 jour et 1 mois, le bonus passe à +4. Entre 1 mois et 2 ans, il devient de +6. Enfin pour un événement étalé sur plus de 2 ans (par exemple concernant un lieu habité longtemps par la créature), le bonus est de +8.\nPour avoir la modification totale du jet de sauvegarde (sous le don Mémoire de la créature), on ajoute simplement les modifications dues à l'ampleur du souvenir et celles dues à la durée de l'événement à modifier."
+            },
+
+            // Niveau 12
+            "Métempsycose": {
+                level: 12,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "5 min",
+                sauvegarde: "NM-2",
+                zone: "1 créature",
+                description: "Le magicien échange son esprit avec celui de la victime. Celle-ci se retrouve dans le corps du magicien comme sous l'effet d'un sort de confusion qui dure jusqu'à la fin de la métempsycose.\nLe magicien peut librement agir dans son nouveau corps temporaire. Ses attributs physiques, et pour partie ses attributs mentaux, sont ceux de son nouveau corps. Ses apprentissages (son nombre de degrés dans les différentes compétences) demeurent en revanche les siens d'origine. Ses talents magiques en particulier restent inchangés. Ses compétences physiques peuvent être ajustées en fonction de son nouveau corps (exemple : le magicien possédait un score de +2 en déplacement dans la nature. Son nouveau corps étant plus agile et rapide que son corps habituel, le maître du jeu considère que son score de compétence passe temporairement à +4).\nLe magicien peut à tout moment mettre fin au sort et revenir dans son propre corps. Néanmoins le transfert retour prend 1d6 secondes durant lesquelles les deux corps restent immobiles. De plus, si un des deux corps subit une blessure suffisante pour « détruire » l'une des zones de son anatomie, le choc empêche le transfert d'esprits pendant 2d6 secondes. Enfin, si un des deux corps succombe, l'esprit qui l'habitait à ce moment-là meurt en même temps et l'autre reste bloqué à jamais dans son nouveau corps, subissant du même coup la perte définitive de 2 points à l'attribut Volonté.\nLe magicien ne peut chercher volontairement à rester bloqué dans un corps autre que le sien. Un magicien qui dans des circonstances exceptionnelles recourrait à une telle mutilation acquerrait immédiatement un désavantage psychologique majeur du type Mégalomanie, Epilepsie, Paranoïa ou Schizophrénie."
+            },
+
+            // Niveau 15
+            "Folie": {
+                level: 15,
+                portée: "30 m",
+                incantation: "10 s",
+                durée: "10 min",
+                sauvegarde: "V-4",
+                zone: "1 créature",
+                description: "La victime de ce sort devient subitement folle, comme atteinte d'une crise de démence. Elle imaginera voir des dragons dans le ciel, prendra tel humain pour l'empereur, se roulera dans la boue avec une visible délectation, etc. Le maître du jeu peut s'il le juge nécessaire lancer un d100 pour déterminer la nature dominante de sa folie : 01-15 : apathie contemplative ; 16 à 30 : hilarité compulsive ; 31 à 45 : renfermement paranoïaque, attaquant le premier qui cherche à la toucher ; 46 à 60 : fureur destructrice ; 61 à 75 : sentiment d'être invulnérable/invisible/immatériel lui permettant de faire tout ce qu'elle a jusqu'à présent dû s'empêcher de faire ; 76 à 90 : s'allonge et se met à raconter son enfance ; enfin 91 à 100 : se met à courir droit devant elle car elle sait qu'elle doit s'y rendre (mais ignore où se trouve ce « y »).\nMême folle, la victime du sort ne se laissera pas assassiner sans se défendre : elle conserve un minimum de lucidité d'autodéfense."
+            },
+            "Domination des masses": {
+                level: 15,
+                portée: "-",
+                incantation: "10 s",
+                durée: "30 min",
+                sauvegarde: "spécial",
+                zone: "spécial",
+                description: "Ce sortilège constitue une version plus puissante du sort « Influence des masses ». Comme celui-ci, il a pour effet de renforcer considérablement l'impact et l'ascendant que le magicien exerce sur ceux qui l'entourent et l'écoutent.\nLa sauvegarde contre ce sort est réalisée avec le score le plus faible entre la volonté et l'abstraction de chaque créature.\nLes créatures échouant à cette sauvegarde vouent un grand respect au magicien et à ce qu'il dit. Elles sont enclines à le croire voire à lui obéir, si cela est crédible et ne va pas à l'encontre de leurs convictions profondes ou de leurs intérêts majeurs. En tout état de cause, elles ne lui nuiront pas et chercheront à éviter que d'autres lui nuisent (sans aller toutefois jusqu'à risquer leur vie pour lui, à moins d'une sauvegarde ratée avec une grande marge d'échec).\nLes créatures réussissant leur sauvegarde ne subissent pas cette emprise du magicien, mais elles demeurent toutefois impressionnées par lui. Tous les jets de charisme ou de relations avec les autres du magicien avec ces créatures s'effectuent avec un bonus de +2."
+            },
+            "Emprisonnement de l'âme": {
+                level: 15,
+                portée: "15 m",
+                incantation: "spécial + 5 s",
+                durée: "spéciale",
+                sauvegarde: "NM-2",
+                zone: "1 créature",
+                description: "Ce sort très particulier implique de la part du magicien une préparation minutieuse. Il doit tout d'abord se procurer une pierre précieuse (car ce sont les minéraux les plus résistants) de la taille environ d'un œuf de poule (prix moyen : 200 po). Il doit ensuite la faire travailler par un artisan spécialiste afin de creuser une cavité en son cœur, reliée à l'extérieur uniquement par le petit trou qui aura servi à la réaliser (coût moyen : 10 po). Il peut alors préparer son sortilège.\nCette préparation exige du temps (1 heure) et surtout de disposer d'un morceau du corps de la future victime du sort (un cheveu, une chute d'ongle, une goutte de sang, etc.). La préparation magique disperse les atomes de ce morceau de corps dans la pierre afin de la marquer de l'empreinte de la personne à ensorceler.\nPar la suite (avant qu'un an ne se soit écoulé), si le magicien rencontre cette personne, il peut achever le sortilège. Si la victime rate sa sauvegarde, son âme quitte son corps pour venir se loger dans la pierre préparée à cet effet. Tant qu'elle y reste, le corps est complètement rigide (comme avec une armure de 10). Le sang ne coule plus. Les dommages éventuels qui lui sont faits ne sont résolus qu'à sa réintégration par l'âme de la victime.\nEmprisonnées dans la pierre, les ondes magiques constituant l'âme et la conscience de la victime sont incapables de s'évader par leurs propres moyens, ni de lancer le moindre sortilège. La victime conserve uniquement l'ouïe et la parole (la puissance de la voix est très réduite et incapable de franchir les parois d'une solide boite hermétiquement fermée). Elle reste enfermée jusqu'à ce que la pierre précieuse soit brisée physiquement (le trou en son cœur la fragilise et rend cela relativement aisé). Le magicien possédant la pierre peut bien sûr chercher à monnayer le fait de la casser. Si la victime est libérée, elle regagne son corps en quelques secondes, même si celui-ci se trouve à des milliers de kilomètres."
+            },
+
+            // Niveau 20
+            "Esclave spirituel": {
+                level: 20,
+                portée: "15 m",
+                incantation: "7 s",
+                durée: "1 jour",
+                sauvegarde: "V-3",
+                zone: "1 créature",
+                description: "La victime de ce sort devient complètement soumise à la volonté du magicien. Elle obéira de son mieux à tous ses ordres. Elle conserve toutefois son instinct de survie et refusera d'obéir à un ordre la conduisant à une mort presque certaine ou plus exactement obéira à cet ordre autant que sa propre survie lui permet de le faire."
+            },
+            "Vie végétative": {
+                level: 20,
+                portée: "15 m",
+                incantation: "7 s",
+                durée: "1 an",
+                sauvegarde: "Ab-3",
+                zone: "1 créature",
+                description: "Ce sort annihile l'état de conscience chez sa victime. Celle-ci devient un « légume » réagissant par réflexe."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0;
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0;
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme de la Liste de Maîtrise des Esprits
+                const connections = [
+                    // Chaînes de base : émotions et relations
+                    ["Insomnie", "Névrose"],
+                    ["Névrose", "Culpabilité"],
+                    ["Culpabilité", "Kleptomanie"],
+                    ["Culpabilité", "Exacerbation des émotions"],
+                    ["Exacerbation des émotions", "Kleptomanie"],
+                    ["Exacerbation des émotions", "Effroi"],
+                    ["Kleptomanie", "Paranoïa"],
+                    ["Kleptomanie", "Injonction"],
+                    ["Paranoïa", "Phobie"],
+                    ["Phobie", "Schizophrénie"],
+                    ["Schizophrénie", "Folie"],
+                    ["Injonction", "Danse irrésistible"],
+                    ["Danse irrésistible", "Influence des masses"],
+                    ["Influence des masses", "Domination des masses"],
+                    ["Domination des masses", "Esclave spirituel"],
+                    ["Charme", "Exacerbation des émotions"],
+                    ["Charme", "Paralysie"],
+                    ["Amitié", "Charme"],
+                    ["Amitié", "Sommeil"],
+                    ["Sommeil", "Paralysie"],
+                    ["Paralysie", "Confusion"],
+                    ["Paralysie", "Effroi"],
+                    ["Effroi", "Injonction"],
+                    ["Confusion", "Exacerbation du charisme"],
+                    ["Confusion", "Maladresse"],
+                    ["Exacerbation du charisme", "Danse irrésistible"],
+                    ["Danse irrésistible", "Labyrinthe"],
+                    ["Maladresse", "Labyrinthe"],
+                    ["Labyrinthe", "Quête"],
+                    ["Labyrinthe", "Protection mentale"],
+                    ["Quête", "Domination des masses"],
+                    ["Quête", "Métempsycose"],
+                    ["Métempsycose", "Esclave spirituel"],
+                    ["Métempsycose", "Emprisonnement de l'âme"],
+                    ["Empathie", "Oubli"],
+                    ["Oubli", "Télépathie"],
+                    ["Télépathie", "Sonder les esprits"],
+                    ["Sonder les esprits", "Protection mentale"],
+                    ["Sonder les esprits", "Modifier les souvenirs"],
+                    ["Modifier les souvenirs", "Métempsycose"],
+                    ["Modifier les souvenirs", "Emprisonnement de l'âme"],
+                    ["Emprisonnement de l'âme", "Vie végétative"],
+
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

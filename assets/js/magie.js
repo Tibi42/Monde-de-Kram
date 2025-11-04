@@ -102,6 +102,11 @@ document.addEventListener("click", function (event) {
     if (magicType === "Illusions") {
       openIllusionsModal();
     }
+
+    // Ouvrir la liste de Maîtrise des esprits si le bouton "Maîtrise des esprits" est cliqué
+    if (magicType === "Maîtrise des esprits") {
+      openMaitriseEspritsModal();
+    }
   }
 });
 
@@ -463,6 +468,40 @@ function openIllusionsModal() {
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && illusionsModal.parentNode) {
       document.body.removeChild(illusionsModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste de Maîtrise des esprits
+function openMaitriseEspritsModal() {
+  const maitriseEspritsModal = document.createElement("div");
+  maitriseEspritsModal.id = "maitriseEspritsModal";
+  maitriseEspritsModal.className = "modal";
+  maitriseEspritsModal.style.display = "flex";
+
+  maitriseEspritsModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeMaitriseEspritsModal">&times;</span>
+      <iframe src="Liste_maitrise_esprits.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(maitriseEspritsModal);
+
+  const closeBtn = document.getElementById("closeMaitriseEspritsModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(maitriseEspritsModal);
+  });
+
+  maitriseEspritsModal.addEventListener("click", function (event) {
+    if (event.target === maitriseEspritsModal) {
+      document.body.removeChild(maitriseEspritsModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && maitriseEspritsModal.parentNode) {
+      document.body.removeChild(maitriseEspritsModal);
     }
   });
 }
