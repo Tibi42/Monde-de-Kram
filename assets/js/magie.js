@@ -92,6 +92,11 @@ document.addEventListener("click", function (event) {
     if (magicType === "Lumière - Electricité") {
       openLumiereElectriciteModal();
     }
+
+    // Ouvrir la liste des Détections si le bouton "Détections" est cliqué
+    if (magicType === "Détections") {
+      openDetectionModal();
+    }
   }
 });
 
@@ -385,6 +390,40 @@ function openLumiereElectriciteModal() {
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && lumElModal.parentNode) {
       document.body.removeChild(lumElModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste des Détections
+function openDetectionModal() {
+  const detectionModal = document.createElement("div");
+  detectionModal.id = "detectionModal";
+  detectionModal.className = "modal";
+  detectionModal.style.display = "flex";
+
+  detectionModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeDetectionModal">&times;</span>
+      <iframe src="Liste_detection.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(detectionModal);
+
+  const closeBtn = document.getElementById("closeDetectionModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(detectionModal);
+  });
+
+  detectionModal.addEventListener("click", function (event) {
+    if (event.target === detectionModal) {
+      document.body.removeChild(detectionModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && detectionModal.parentNode) {
+      document.body.removeChild(detectionModal);
     }
   });
 }

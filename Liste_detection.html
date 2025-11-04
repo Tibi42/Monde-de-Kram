@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Détections</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DES DETECTIONS</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 2 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">2</div>
+            <div class="spell-node col-2" data-spell="Audition">Audition</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-6" data-spell="Infravision">Infravision</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-2" data-spell="Clairaudience">Clairaudience</div>
+            <div class="spell-node col-4" data-spell="Localisation des êtres vivants">Localisation des êtres vivants
+            </div>
+            <div class="spell-node col-6" data-spell="Vision nocturne">Vision nocturne</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-4" data-spell="Détection des traces">Détection des traces</div>
+            <div class="spell-node col-6" data-spell="Clairvoyance">Clairvoyance</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-2" data-spell="Détection du mensonge">Détection du mensonge</div>
+            <div class="spell-node col-4" data-spell="Détection du danger">Détection du danger</div>
+            <div class="spell-node col-6" data-spell="Détection de l'invisible">Détection de l'invisible</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-6" data-spell="Détection des illusions">Détection des illusions</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-2" data-spell="Localisation d'objet">Localisation d'objet</div>
+            <div class="spell-node col-4" data-spell="Perception de l'aura magique">Perception de l'aura magique</div>
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-5" data-spell="Détection de la magie">Détection de la magie</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-5" data-spell="Vision réelle">Vision réelle</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-5" data-spell="Recherche">Recherche</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de la Liste des Détections
+        const spellsData = {
+            // Niveau 2
+            "Audition": {
+                level: 2,
+                portée: "toucher",
+                incantation: "2 s",
+                durée: "25 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La portée de l'ouïe de la créature bénéficiant du sort est triplée. Elle parvient par exemple à comprendre un chuchotement derrière une porte.\nEn termes de jeu, on considère qu'elle entend bien (et peut donc comprendre) ce qu'elle entendrait à peine (un chuchotement, un bruit de pas), et qu'elle entend confusément ce que seule une oreille exercée et attentive percevrait.\nTous les jets de perception fondés sur l'ouïe s'effectuent en outre avec un bonus de +6."
+            },
+
+            // Niveau 3
+            "Infravision": {
+                level: 3,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Ce sort permet à la créature ciblée de distinguer les variations de chaleur. De jour, ou à la lumière d'une torche proche, cette capacité est brouillée par les ondes lumineuses qui arrivent en quantité bien plus importante. Mais de nuit, ou dans un endroit éclairé seulement de loin en loin, la créature discerne les contours des objets et des êtres vivants (actions en Malaisé).\nElle voit le relief du sol, une tour qui s'élève, une porte qui s'ouvre un peu plus loin, et surtout elle voit très distinctement les créatures à sang chaud. Elle a du mal à reconnaître leur visage, mais voit bien leurs gestes et la façon dont elles sont habillées. C'est d'ailleurs sur ce dernier critère qu'elle se fonde pour reconnaître ses propres compagnons."
+            },
+
+            // Niveau 4
+            "Clairaudience": {
+                level: 4,
+                portée: "-",
+                incantation: "4 s",
+                durée: "15 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort permet au magicien de déplacer le lieu depuis lequel il écoute. En se concentrant sur un endroit qu'il a effectivement en vue (jusqu'à une limite de 1 km), il peut entendre les sons comme s'il s'y trouvait. Cela peut notamment lui permettre de saisir une conversation distante, même si elle se tient à voix basse. Les obstacles matériels importants gênent le passage des ondes magiques du sortilège, et c'est pourquoi il est nécessaire au magicien de voir l'endroit depuis lequel il veut écouter."
+            },
+            "Localisation des êtres vivants": {
+                level: 4,
+                portée: "-",
+                incantation: "5 s",
+                durée: "5 min",
+                sauvegarde: "-",
+                zone: "boule de 50 m *",
+                description: "Par ce sort, le magicien obtient la possibilité de déterminer la position et la nature de tout animal et de toute créature intelligente dans la zone d'effet. Cette zone se déplace avec lui par la suite.\nCe sort utilise une lecture des ondes magiques qu'émet tout être vivant et qui suivent un motif dépendant de sa nature. Il permet ainsi au magicien d'identifier précisément l'espèce ou la race des êtres détectés. S'il s'agit de compagnons du magicien ou d'êtres dont le magicien a déjà pu observer attentivement la présence à travers ce sort, le magicien est capable de les identifier et de les reconnaître à leur « aura ». Ce sort fonctionne également sur les créatures surnaturelles.\nLa présence d'obstacles (porte fermée, mur, etc.) réduit fortement la zone d'effet."
+            },
+            "Vision nocturne": {
+                level: 4,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature ciblée acquiert la capacité de voir très bien dans la nuit, et de voir à peu près dans le noir total des mines ou des souterrains (actions en Malaisé).\nCette capacité est due à la fois à une amplification contrôlée et variable de la lumière et à l'envoi d'ondes magiques se réfléchissant sur les obstacles, à la manière des chauves-souris. Cette vision n'est donc troublée ni par une forte source de chaleur ni par une lumière soudaine."
+            },
+
+            // Niveau 5
+            "Détection des traces": {
+                level: 5,
+                portée: "-",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien acquiert par ce sort la capacité de déceler l'ensemble des indices qui révèlent le passage d'une ou plusieurs créatures. Il gagne ainsi +6 à tous ses jets de compétence « Survie dans la nature » pour réaliser une action de pistage.\nEn outre, le magicien acquiert une sensibilité aux traces magiques laissées derrière lui par tout être vivant. Ainsi, même en l'absence de toute trace physique, le magicien peut déceler la direction qu'a suivie une certaine créature dont il a repéré la trace magique. Les traces magiques laissées par une créature dépendent de sa nature et de sa puissance (un animal laissera une trace faible, une créature intelligente une trace plus importante, a fortiori s'il s'agit d'un magicien) et s'estompent rapidement avec le temps : pister ainsi un animal sera possible quelques heures après son passage, une créature intelligente un jour ou deux. Ce pistage est par ailleurs délicat et ne permet pas d'avancer à une vitesse importante."
+            },
+            "Clairvoyance": {
+                level: 5,
+                portée: "-",
+                incantation: "5 s",
+                durée: "15 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien acquiert par ce sort la capacité de voir à travers une épaisseur raisonnable de matière. En se concentrant sur la direction d'un obstacle, il peut voir en surimpression ce qui se trouve derrière. Cette vision est un peu floue et il a du mal à distinguer les détails ou les visages. Il peut néanmoins reconnaître une figure ou une démarche bien connue.\nPlus il y a de matière à traverser, et moins le magicien discerne nettement ce qui se trouve derrière. Typiquement ce sort permet de voir à travers un mur de pierre d'une cinquantaine de centimètres ou à travers 15 cm de métal."
+            },
+
+            // Niveau 6
+            "Détection du mensonge": {
+                level: 6,
+                portée: "-",
+                incantation: "3 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien lançant ce sortilège devient capable de sonder superficiellement l'esprit d'une créature afin d'y sentir les marques de nervosité caractéristiques d'une personne en train de mentir. Il sait alors avec certitude si la personne pense dire la vérité, ment franchement, ne dit pas tout ou si elle présente les faits d'une façon qu'elle sait trompeuse.\nLe magicien ne peut se concentrer que sur une seule cible à la fois, mais a la possibilité changer de créature au cours des 20 minutes que dure le sortilège. Celui-ci lui demande très peu de concentration et le magicien peut donc parler ou agir comme si le sort n'était pas actif."
+            },
+            "Détection du danger": {
+                level: 6,
+                portée: "-",
+                incantation: "3 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Grâce à ce sortilège le magicien devient instinctivement sensible aux signes avant-coureurs d'en danger imminent : l'éclair dans un regard, un bruit imperceptible, un mouvement d'air, une configuration de lieu particulière, etc.\nCe sort agit en pratique de manière similaire à l'avantage « Sens du danger ». En cas de danger imminent pour le magicien ou son groupe, le maître du jeu effectue un jet sous le 6ème sens du magicien, en ajustant la difficulté en fonction de l'évidence des signes. En cas de réussite, le magicien ressent l'imminence du danger ; une bonne marge dans cette réussite lui permet de deviner la direction d'où provient ce danger, voire de déterminer de façon précise la nature du danger.\nSi le magicien dispose déjà naturellement de l'avantage « Sens du danger », ce sortilège a pour effet de renforcer cet avantage : pendant toute la durée du sort, le magicien obtient un bonus de +6 pour les jets de 6ème sens lui permettant de deviner l'imminence d'un danger."
+            },
+            "Détection de l'invisible": {
+                level: 6,
+                portée: "-",
+                incantation: "3 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien émet des ondes magiques qui détectent les moindres perturbations magiques des rayons lumineux. Il devient ainsi capable de déceler infailliblement la présence d'une créature invisible ou masquée ; il peut la localiser avec précision et discerner les gestes qu'elle exécute. Il peut également percevoir la présence d'un sortilège d'isolement tel que Sphère d'isolement visuel ou Sphère d'isolement sensoriel, mais sans parvenir à voir à l'intérieur de cette sphère. Il décèlera de même une créature sous une forme gazeuse (cf. liste des métamorphoses)."
+            },
+
+            // Niveau 7
+            "Détection des illusions": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "boule de 50m *",
+                description: "Ce sort permet au magicien de ressentir parfaitement la présence des ondes magiques qui suivent les motifs propres à la magie des illusions. Pendant toute la durée du sort, sans même avoir besoin de se concentrer, il discerne alors parfaitement les illusions à l'œuvre dans un rayon de 50 mètres autour de lui. Lui-même ne ressent plus leurs effets, qu'elles agissent sur son environnement ou sur son esprit.\nLes illusions ayant une matérialité propre (par exemple modifiant effectivement le déplacement des ondes visuelles ou sonores) lui apparaissent dans tous leurs contours, comme en surbrillance. Un personnage invisible deviendra ainsi parfaitement visible pour le magicien. Son voile d'illusion apparaîtra simplement comme un vêtement transparent et brillant.\nEn revanche, le magicien n'est pas capable de percevoir les détails des illusions affectant l'esprit d'une créature. Il distingue simplement que le cerveau de la créature est la proie d'un sortilège d'illusion, mais ne peut rien dire de plus."
+            },
+
+            // Niveau 8
+            "Localisation d'objet": {
+                level: 8,
+                portée: "spéciale",
+                incantation: "1 min",
+                durée: "5 min",
+                sauvegarde: "-",
+                zone: "un objet",
+                description: "Par ce sortilège, le magicien devient capable de ressentir la présence d'un objet auquel il pense. Si l'objet est effectivement présent, le magicien est sûr de le localiser (sauf si un sortilège a été lancé pour protéger l'objet). Il en connaît alors parfaitement la direction et la distance. Seul l'éloignement limite les possibilités de détection.\nLa distance à laquelle le magicien est capable de repérer un objet dépend grandement de sa connaissance de cet objet :\n- s'il s'agit d'un objet personnel qu'il a possédé plusieurs années, il peut ressentir sa présence jusqu'à 30 km.\n- s'il ne l'a possédé que quelques jours, il en ressent la présence jusqu'à 5 km.\n- s'il l'a déjà vu longuement et touché, il peut le localiser jusqu'à une distance de 1 km.\n- s'il l'a simplement aperçu et observé rapidement, la distance maximale passe à 200 m.\n- si on le lui a longuement décrit mais qu'il ne l'a jamais vu, il ne peut le détecter à plus de 100 m.\n- enfin, si la description qu'on lui en a faite était trop brève ou que l'objet ne présente pas de signe caractéristique marquant, le magicien n'est simplement pas capable de déceler sa présence. Inutile cependant de lui faire lancer le sort : il sait auparavant qu'il ne pourra réussir.\nNotez enfin que la nature de la matière séparant le magicien de l'objet peut gêner la détection. Typiquement, si plusieurs murs épais séparent le magicien et l'objet (par exemple si celui-ci est dissimulé dans les oubliettes d'un château), la portée maximale sera réduite de 30 à 40 %."
+            },
+            "Perception de l'aura magique": {
+                level: 8,
+                portée: "-",
+                incantation: "10 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 30m *",
+                description: "Le magicien acquiert grâce à ce sortilège la capacité à percevoir l'aura magique des créatures qu'il distingue autour de lui. En se concentrant sur une créature, il peut deviner sa capacité ou non à pratiquer la magie et le cas échéant les principales branches de magie qu'elle maîtrise. Le magicien est en outre capable de déterminer si sa pratique de la magie est classique ou religieuse.\nEn raison de la nature de la magie, qui est profondément liée à la philosophie de vie de celui qui la pratique (voir le chapitre « La nature de la magie »), ce sort confère également au magicien la capacité de percevoir superficiellement la vision du monde et le caractère de la créature sur laquelle il se concentre. Cette perception reste toutefois fragmentaire et inévitablement lacunaire, et dépend des qualités de psychologie du magicien (valeur de la compétence « Relations avec les autres »)."
+            },
+
+            // Niveau 9
+            "Détection de la magie": {
+                level: 9,
+                portée: "-",
+                incantation: "10 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "boule de 50m *",
+                description: "Ce sort permet au magicien de ressentir la présence d'ondes magiques autour de lui, de les localiser avec précision et d'en estimer la nature et l'intensité.\nConcrètement, il devient pendant toute la durée du sort capable de détecter toute magie en action dans un rayon de 50 mètres autour de lui. Il sait de quel type de magie il s'agit (quelle liste), son intensité (le niveau du sortilège) et la localisation exacte de son action.\nA part s'il connaît lui-même le sortilège en question, il n'est en revanche pas capable de mettre un nom de sort sur cette magie qu'il sent à l'œuvre."
+            },
+
+            // Niveau 12
+            "Vision réelle": {
+                level: 12,
+                portée: "-",
+                incantation: "30 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "portée des sens",
+                description: "Ce sortilège révèle au magicien le monde tel qu'il est réellement. Le magicien décèle naturellement toutes les illusions, tant la présence et la forme de ces illusions que la réalité qu'elles tentent de masquer ou transformer. Il perçoit également toutes les magies à l'œuvre, à quelle liste celles-ci correspondent et quelle est leur puissance (le niveau du sort correspondant). Il distingue à travers une sphère d'isolement sonore, visuel ou sensoriel. Il voit même par exemple la forme réelle d'une personne ayant modifié son apparence à l'aide d'un sortilège de la liste des Métamorphoses. Enfin, il « voit » naturellement l'aura des personnes, c'est-à-dire leur philosophie générale, en identifiant les différents types de magie qu'émet leur cerveau et la force relative de chacun d'eux. Il ne distingue cependant pas s'il s'agit ou non de magiciens.\nNotez que ce sortilège permettra bien sûr au magicien de voir parfaitement dans l'obscurité la plus totale, magique ou non, d'entendre malgré un sortilège d'Atténuation des sons ou une Sphère d'isolement sonore, etc. En revanche, il ne permettra ni de voir à travers les murs, ni d'entendre au-delà la portée normale de l'ouïe, ni de détecter le mensonge, ni de réaliser aucune détection se situant hors du champ normal des perceptions du magicien, à l'exception notable de la magie (et concomitamment de l'aura des personnes), mentionnée ci-dessus."
+            },
+
+            // Niveau 15
+            "Recherche": {
+                level: 15,
+                portée: "-",
+                incantation: "10 minutes",
+                durée: "spéciale",
+                sauvegarde: "-",
+                zone: "spéciale",
+                description: "Ce sortilège puissant présente une très grande variété d'utilisation et peut s'avérer de ce fait délicat à gérer pour le maître du jeu. Grossièrement, ce sort permet au magicien de rechercher n'importe quoi, ou n'importe qui, n'importe où : une personne précise que connaît le magicien, un objet qu'il recherche, une grotte pour lui servir d'abri dans les montagnes, un elfe avec un doigt coupé dans une certaine ville, etc.\nL'énergie magique que le magicien doit consacrer à sa recherche dépend de la taille de sa zone de recherche et de la distance de celle-ci, avec un coût minimal de 15 points de fatigue et 15 points de concentration.\nCe coût minimal permet au magicien de fouiller magiquement une zone de quelques kilomètres de côté autour de là où il se trouve. Si la zone est très dense, la recherche est plus difficile ; a contrario, moins la zone est complexe, plus la recherche est aisée. Le coût de base permet ainsi d'effectuer une recherche dans une petite ville (1 à 2 kilomètres de côté), une petite forêt (4 ou 5 kilomètres de côtés) ou une large zone de désert ou de montagne (20 ou 30 kilomètres de côté).\nSi la zone à fouiller est plus étendue ou si elle se trouve à distance du magicien, alors celui-ci doit augmenter l'énergie magique consacrer à son sort :\n- +5 points de fatigue et de concentration pour une zone de recherche située à plus de 10 kilomètres de lui ; +10 points pour une zone située à plus de 100 kilomètres ; +15 points pour une zone située à plus de 1000 kilomètres ;\n- +5 points de fatigue et de concentration pour une multiplication par 2 de la taille des côtés de la zone ; +10 points pour une multiplication par 4 ; +15 points pour une multiplication par 10 ; etc. Une augmentation de 15 points permet ainsi par exemple d'effectuer une recherche dans une métropole de plusieurs millions d'habitants ou dans un massif forestier de plusieurs dizaines de kilomètres de côté.\nPendant toute la durée de l'incantation, le magicien projette son énergie magique dans toute la zone. A la fin de son incantation, si la chose cherchée est présente dans la zone, le magicien devient parfaitement conscient de l'endroit précis où elle se trouve et en garde le souvenir exact pendant un mois. Il connaît également l'état de ce qu'il cherchait au moment du sort (son environnement immédiat, son état physique, ce qu'elle est en train de faire s'il s'agit d'une créature).\nIl est possible toutefois que la chose cherchée soit présente en plusieurs exemplaires dans la zone, notamment parce que le magicien n'a pas été suffisamment spécifique dans sa description, volontairement ou non. Dans cette situation, à la fin de son incantation le magicien acquiert la conscience de la localisation d'un des exemplaires de la chose cherchée (déterminé aléatoirement) et du fait qu'il ne s'agit que d'un parmi d'autres (sans connaître le nombre exact, le magicien a une connaissance de l'ordre de grandeur de la fréquence de ce qu'il recherche dans la zone).\nIl est très difficile de résister à la magie de ce sortilège. Certains moyens magiques très puissants permettent toutefois de s'y soustraire. De même, le maître du jeu peut jouer une probabilité d'échec dans le cas où la chose cherchée est particulièrement bien dissimulée (par exemple un objet enterré profondément sous terre, sauf si le magicien a précisément concentré sous terre sa zone de recherche)."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme de la Liste des Détections
+                const connections = [
+                    // Chaîne de base : audition et vision
+                    ["Audition", 'Clairaudience'],
+                    ['Clairaudience', 'Détection du mensonge'],
+                    ['Clairaudience', 'Détection du danger'],
+                    ['Détection du mensonge', "Localisation d'objet"],
+                    ["Localisation d'objet", "Recherche"],
+                    ["Localisation des êtres vivants", "Détection des traces"],
+                    ["Détection des traces", "Détection du danger"],
+                    ["Détection du danger", "Perception de l'aura magique"],
+                    ["Détection du danger", "Détection des illusions"],
+                    ["Détection des illusions", "Détection de la magie"],
+                    ["Perception de l'aura magique", "Détection de la magie"],
+                    ["Détection de la magie", "Vision réelle"],
+                    ["Vision réelle", "Recherche"],
+                    ["Infravision", "Vision nocturne"],
+                    ["Vision nocturne", "Clairvoyance"],
+                    ["Clairvoyance", "Détection de l'invisible"],
+                    ["Détection de l'invisible", "Détection des illusions"],
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
