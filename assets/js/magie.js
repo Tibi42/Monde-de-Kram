@@ -87,6 +87,11 @@ document.addEventListener("click", function (event) {
     if (magicType === "Terre") {
       openTerreModal();
     }
+
+    // Ouvrir la liste Lumière - Electricité
+    if (magicType === "Lumière - Electricité") {
+      openLumiereElectriciteModal();
+    }
   }
 });
 
@@ -346,6 +351,40 @@ function openTerreModal() {
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && terreModal.parentNode) {
       document.body.removeChild(terreModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste Lumière - Electricité
+function openLumiereElectriciteModal() {
+  const lumElModal = document.createElement("div");
+  lumElModal.id = "lumElModal";
+  lumElModal.className = "modal";
+  lumElModal.style.display = "flex";
+
+  lumElModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeLumElModal">&times;</span>
+      <iframe src="Liste_lumiereElectricite.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(lumElModal);
+
+  const closeLumEl = document.getElementById("closeLumElModal");
+  closeLumEl.addEventListener("click", function () {
+    document.body.removeChild(lumElModal);
+  });
+
+  lumElModal.addEventListener("click", function (event) {
+    if (event.target === lumElModal) {
+      document.body.removeChild(lumElModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && lumElModal.parentNode) {
+      document.body.removeChild(lumElModal);
     }
   });
 }

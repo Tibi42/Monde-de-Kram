@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de la Lumière et de l'Électricité</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DE LA LUMIERE ET DE L' ELECTRICITE</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-4" data-spell="Moduler la lumière">Moduler la lumière</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-2" data-spell="Créer la lumière / l'obscurité">Créer la lumière / l'obscurité
+            </div>
+            <div class="spell-node col-3" data-spell="Paume lumineuse">Paume lumineuse</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-3" data-spell="Boule de lumière">Boule de lumière</div>
+            <div class="spell-node col-5" data-spell="Poigne électrique">Poigne électrique</div>
+            <div class="spell-node col-6" data-spell="Barrière électrique">Barrière électrique</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-2" data-spell="Flash lumineux">Flash lumineux</div>
+            <div class="spell-node col-4" data-spell="Projectile magique">Projectile magique</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-2" data-spell="Lumière / ténèbres éternelles">Lumière / ténèbres éternelles</div>
+            <div class="spell-node col-5" data-spell="Runes explosives">Runes explosives</div>
+            <div class="spell-node col-6" data-spell="Electrification d'un objet">Electrification d'un objet</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-4" data-spell="Nuage électrique">Nuage électrique</div>
+            <div class="spell-node col-6" data-spell="Runes de garde">Runes de garde</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-2" data-spell="Explosion de lumière">Explosion de lumière</div>
+            <div class="spell-node col-4" data-spell="Eclair">Eclair</div>
+            <div class="spell-node col-6" data-spell="Sphère mouvante électrique">Sphère mouvante électrique</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-6" data-spell="Résistance à la lumière et l'électricité">Résistance à la lumière
+                et l'électricité</div>
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-4" data-spell="Eclair chercheur">Eclair chercheur</div>
+            <div class="spell-node col-6" data-spell="Être électrique régénérable">Être électrique régénérable</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-2" data-spell="Soleil/Eclipse">Soleil/Eclipse</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-4" data-spell="Invocation de la foudre">Invocation de la foudre</div>
+        </div>
+
+        <!-- Niveau 25 -->
+        <div class="level">
+            <div class="level-number">25</div>
+            <div class="spell-node col-4" data-spell="Déchaînement de Zeus">Déchaînement de Zeus</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de la Liste de la Lumière et de l'Électricité
+        const spellsData = {
+            // Niveau 1
+            "Moduler la lumière": {
+                level: 1,
+                portée: "-",
+                incantation: "1 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "boule de 5m *",
+                description: "Ce sort permet au magicien de faire varier l'intensité de la lumière à l'intérieur de la zone d'effet. Il peut au maximum la multiplier ou la diviser par 5 par rapport à ce qu'elle serait normalement. Ce facteur est fixé pour toute la durée du sort et il faut le cas échéant un nouveau sortilège pour changer l'intensité de la lumière (le sort le plus récemment lancé domine).\nLa zone d'effets se déplace avec le magicien."
+            },
+
+            // Niveau 2
+            "Créer la lumière / l'obscurité": {
+                level: 2,
+                portée: "10 m",
+                incantation: "3 s",
+                durée: "10 min",
+                sauvegarde: "-",
+                zone: "boule de 3m",
+                description: "Le magicien choisit un point fixe comme centre du sort. Autour de ce point se crée alors une zone de lumière (intensité faible à vive) ou de ténèbres (similaires aux nuits les plus noires). Dans ce dernier cas, les moyens naturels ou magiques de vision nocturne restent efficaces mais les ténèbres sont suffisamment profondes pour que la vision soit vague et donc que les actions physiques soient résolues en Malaisé (i.e. avec un malus de -2).\nCe sortilège s'annule avec son inverse."
+            },
+            "Paume lumineuse": {
+                level: 2,
+                portée: "-",
+                incantation: "1 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "La paume du magicien émet un rayon lumineux comparable à celui d'une lampe de poche électrique de puissance moyenne. Il lui suffit d'orienter sa main pour déplacer le point éclairé par ce rayon. Il peut également interrompre momentanément cette lumière simplement en refermant sa main ou en serrant un objet avec elle."
+            },
+
+            // Niveau 3
+            "Boule de lumière": {
+                level: 3,
+                portée: "1 m",
+                incantation: "2 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Quand ce sort est lancé, une petite boule de lumière immatérielle apparaît près du magicien. Elle éclaire comme l'équivalent de 2 torches mais ne produit aucune chaleur.\nLe magicien peut à volonté déplacer la boule de lumière, comme si elle flottait en l'air et suivait ses injonctions mentales. Elle peut aller au maximum à une vitesse de 5 mètres par seconde. Elle ne peut s'éloigner à plus de 30 mètres du magicien.\nDéplacer la boule ne demande qu'une concentration très limitée au magicien. Il peut entreprendre une autre action sans subir le moindre malus. Quand il se déplace, c'est même presque inconsciemment qu'il se fait suivre ou précéder par sa boule lumineuse."
+            },
+            "Poigne électrique": {
+                level: 3,
+                portée: "-",
+                incantation: "2 s",
+                durée: "1 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort rend les mains du magicien électrifiées, ce qui lui permet de transmettre une forte décharge, uniquement s'il le désire, en touchant un objet ou une personne avec la paume.\nLa décharge inflige 1d4+2 points de vie sans sauvegarde à la créature que le magicien touche. Notez que ce sort peut être utilisé en combat : en combat mains nues, cela ajoute 3 aux dégâts infligés ; en combat avec une arme, cela ajoute 2 aux dégâts infligés (la poignée de l'arme gêne un peu la diffusion de l'électricité)."
+            },
+            "Barrière électrique": {
+                level: 3,
+                portée: "3 m",
+                incantation: "2 s",
+                durée: "5 min",
+                sauvegarde: "-",
+                zone: "8m x 3m",
+                description: "Ce sort crée un mur transparent fixe composé de particules électrifiées en suspension dans l'air. Il est large de 30 cm, et se remarque aux crépitements en son sein. Ces crépitements sont susceptibles de dissuader des animaux de le traverser. Le magicien peut lui donner au choix une forme plate (mur) ou circulaire (cylindre) s'il le place autour de lui-même.\nToute créature franchissant ce mur se voit infliger une forte décharge électrique. Elle perd 1d4+2 points de vie, sans sauvegarde."
+            },
+
+            // Niveau 4
+            "Flash lumineux": {
+                level: 4,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "-",
+                sauvegarde: "6e sens",
+                zone: "boule de 3m",
+                description: "Ce sort déclenche un brusque flash de lumière dans la zone d'effets. Les créatures dans la zone doivent réussir un jet de sauvegarde, sinon elles sont aveuglées pour un nombre de tours égal à leur marge d'échec. Durant tout ce temps, elles sont considérées comme aveugles (malus de -8 aux actions physiques nécessitant la vue, malus de -2 à la feinte de corps, etc. Voir le sort de Cécité dans la liste de la Terre).\nLe maître du jeu peut moduler la difficulté de la sauvegarde en fonction des circonstances, par exemple en accordant un bonus si le sort est lancé en plein jour et a contrario un malus s'il est lancé dans un lieu obscur. Les créatures qui s'attendaient au sort et ont fermé les yeux bénéficient d'un bonus de +6 à leur sauvegarde mais l'effectuent quand même. (Le magicien rentre dans cette catégorie s'il se trouvait dans la zone d'effets du sort.) Celles qui se sont en plus protégé les yeux avec leurs mains ou un bandeau n'ont en revanche pas de jet à faire."
+            },
+            "Projectile magique": {
+                level: 4,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "-",
+                sauvegarde: "Co-1",
+                zone: "une cible",
+                description: "Une petite boule lumineuse et électrifiée part des mains du magicien pour aller frapper l'ennemi qu'il a désigné. Cette boule est très rapide, donc très difficile à éviter. Elle provoque des brûlures électriques causant 1d4+3 points de dommages, moins la marge de réussite de la sauvegarde. Le projectile magique atteint sa cible en un point précis et les dégâts qu'il cause sont par conséquent localisés suivant le tableau utilisé pour les attaques par projectiles.\nIl est possible d'utiliser les effets de modulation des sorts (voir chapitre « Jouer la magie ») pour viser certaines zones particulières, ou plus exactement pour retirer certaines zones du tableau de localisation : pour 1 point de modulation le magicien peut retirer 2 zones de localisation, et pour 2 points de modulation le magicien peut en retirer 4. Dans ce second cas, cela lui permettra par exemple de cibler son projectile magique sur les zones « Tête », « Poitrine » et « Abdomen » d'un humanoïde.\nLe maître du jeu peut accorder un bonus de +2 à la sauvegarde d'un personnage s'attendant à une attaque de ce type (sort à réalité physique) et qui n'a pas entrepris d'autre action que cette sauvegarde dans le tour."
+            },
+
+            // Niveau 5
+            "Lumière / ténèbres éternelles": {
+                level: 5,
+                portée: "30 m",
+                incantation: "5 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "boule de 5m",
+                description: "Ce sort crée autour du point choisi par le magicien une zone de vive lumière ou de ténèbres impénétrables. Seul son inverse peut briser cette zone.\nSi le magicien a choisi de créer une zone de lumière, les créatures souterraines ou vivant la nuit ont beaucoup de mal à supporter la clarté du sort. Elles voient très mal et effectuent toutes leurs actions physiques en « Difficile » (donc avec un malus de -4 à leurs les jets).\nS'il a créé une zone de ténèbres, aucune créature ne peut voir à l'intérieur de celle-ci. Les moyens de vision nocturne ou d'infravision, même magiques, sont impuissants à la percer, à l'exception du sortilège de Vision réelle."
+            },
+            "Runes explosives": {
+                level: 5,
+                portée: "toucher",
+                incantation: "30 s",
+                durée: "1 an",
+                sauvegarde: "-",
+                zone: "1 écrit",
+                description: "Grâce à ce sort le magicien est capable de protéger tout document écrit contre une lecture indésirable. Il repasse avec son doigt l'ensemble des écritures et les rend ainsi explosives. Seul un mot de son choix peut dénouer la toile d'ondes magiques qu'il a tissée sur le parchemin.\nToute personne tentant de lire celui-ci sans avoir auparavant prononcé ce mot déclenchera le piège. Le parchemin et les écritures exploseront dans une gerbe d'étincelles, occasionnant la perte de 8 points de vie à l'infortuné lecteur.\nEn revanche, si le mot clé est prononcé à moins de 3 mètres du parchemin, le piège est définitivement dissipé, sans dommage aucun au parchemin ou au livre. D'où la nécessité de ne pas choisir un mot du langage courant."
+            },
+            "Electrification d'un objet": {
+                level: 5,
+                portée: "10 m",
+                incantation: "4 s",
+                durée: "2 min",
+                sauvegarde: "-",
+                zone: "un objet (< 15 kg)",
+                description: "L'objet ciblé par le magicien se charge d'électricité et crépite légèrement. Toute créature le touchant reçoit une décharge lui occasionnant la perte de 3 points de vie localisés. Si le contact se prolonge, la créature continue à perdre 3 points de vie par tour.\nCe sort peut être lancé sur la lame d'une épée ; celle-ci inflige alors 3 points de dégâts supplémentaires chaque fois qu'elle touche.\nEn revanche, il est impossible de prendre comme cible un objet déjà en contact avec une créature vivante, car les ondes magiques qu'émet celle-ci perturbent le sort. Le magicien ne peut notamment pas viser les vêtements, l'armure ou la garde de l'épée d'un adversaire."
+            },
+
+            // Niveau 6
+            "Nuage électrique": {
+                level: 6,
+                portée: "30 m",
+                incantation: "5 s",
+                durée: "1 min",
+                sauvegarde: "-",
+                zone: "10m x 10m x 5m",
+                description: "Ce sortilège charge l'air de la zone d'effets de particules électrifiées en suspension. Celles-ci crépitent et brûlent par leur contact.\nToute créature demeurant dans le nuage perd 1 point de vie par tour. Elle est de plus incapable de se concentrer. De ce fait, elle ne peut pas lancer de sortilège et subit un malus de -2 à toutes ses actions (hormis esquives et sauvegardes).\nUn animal pris dans le nuage sera paniqué et fera tout pour s'en échapper et s'en éloigner rapidement."
+            },
+            "Runes de garde": {
+                level: 6,
+                portée: "toucher",
+                incantation: "30 s",
+                durée: "1 mois",
+                sauvegarde: "-",
+                zone: "un passage",
+                description: "Ce sort permet au magicien de piéger un passage. Il peut s'agir d'une porte, d'un couloir, d'un escalier ou de tout autre point de passage relativement étroit.\nLe magicien trace sur le sol des runes enchantées emmagasinant de l'énergie magique. Elles deviennent invisibles dès l'incantation du sort achevée. Si une créature passe au-dessus de ces runes sans prononcer le mot de code implanté par le magicien, l'énergie magique qu'elles contiennent se libère brutalement. L'infortunée créature se trouve alors prise au milieu d'un tourbillon de lumière et de crépitements électriques. En plus de sa terreur, elle souffre de la perte de 2d4+3 points de vie, sans sauvegarde.\nUn jet réussi de sentir la magie (voir chapitre « Jouer la magie » est susceptible de permettre de déceler la présence des runes de garde. Il ne confère pas en revanche la connaissance du mot de code."
+            },
+
+            // Niveau 7
+            "Explosion de lumière": {
+                level: 7,
+                portée: "20 m",
+                incantation: "4 s",
+                durée: "-",
+                sauvegarde: "6e sens -2",
+                zone: "boule de 5m",
+                description: "Un flash de lumière extrêmement intense se déclenche soudain dans la zone d'effet. Toutes les créatures s'y trouvant doivent réussir un jet de sauvegarde, sinon elles sont aveuglées pour un nombre de tour égal au double de leur marge d'échec. Durant tout ce temps, elles sont considérées comme complètement aveugles (malus de -8 aux actions physiques nécessitant la vue, malus de -2 à la feinte de corps, etc. Voir le sort de Cécité dans la liste de la Terre).\nLe maître du jeu peut moduler la difficulté de la sauvegarde en fonction des circonstances, par exemple en accordant un bonus si le sort est lancé en plein jour et a contrario un malus s'il est lancé dans un lieu obscur. Les créatures qui s'attendaient au sort et ont fermé les yeux bénéficient d'un bonus de +6 à leur sauvegarde mais l'effectuent quand même. (Le magicien rentre dans cette catégorie s'il se trouvait dans la zone d'effets du sort.) Celles qui se sont en plus protégé les yeux avec leurs mains ou un bandeau n'ont en revanche pas de jet à faire.\nEnfin, les créatures se trouvant à moins de 5 mètres de la zone d'effets effectuent elles aussi un jet de sauvegarde, mais bénéficient d'un bonus de +6 pour le réussir. Si elles fermaient ou se protégeaient les yeux, leur sauvegarde est automatiquement considérée comme réussie."
+            },
+            "Eclair": {
+                level: 7,
+                portée: "-",
+                incantation: "4 s",
+                durée: "-",
+                sauvegarde: "Co",
+                zone: "un éclair de 40m de long",
+                description: "La foudre jaillit des mains du magicien au moment où le sort prend effet ; elle se propage devant celui-ci, dévastant tout ce qu'elle rencontre sur son passage. Après une course de 40 mètres, elle se dissipe enfin. En termes de jeu, on considère qu'elle produit ses effets sur un cylindre de 1,5 mètre de rayon sur 40 mètres de long.\nLes objets fragiles qu'elle heurte éclatent en mille morceaux, et les créatures subissent de graves brûlures. Elles perdent 2d4+4 points de vie, moins la marge de réussite de leur sauvegarde. L'éclair rebondit sur les murs en perdant 2 points de dégâts de puissance et il peut ainsi dans certains cas frapper plusieurs fois la même créature.\nLes créatures situées sur les 20 premiers mètres du parcours de l'éclair subissent un malus de -2 à leur jet de sauvegarde. A contrario une créature partiellement protégée de l'éclair (par un muret, un compagnon plus grand, se jetant à terre à l'avance, etc.) bénéficiera d'un bonus de +2 à +8 à sa sauvegarde selon l'ampleur de la protection.\nLe fait de tenter une sauvegarde est équivalent à une esquive : la créature concernée se jette sur le côté pour tenter d'éviter l'explosion. Cela interrompt donc toute action en cours.\nEn outre, le choc de l'éclair crée un effet d'hébétude chez ceux qui le subissent, qui empêche d'agir pendant quelques secondes. Les créatures ayant réussi leur sauvegarde perdent 2 secondes à se remettre du choc, ce qui peut leur faire perdre l'initiative ou retarder leur attaque en combat. Les créatures ayant raté leur sauvegarde perdent un tour complet sans agir et subissent un malus de -2 à leurs actions éventuelles de défense (parades ou esquives) durant ce tour."
+            },
+            "Sphère mouvante électrique": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "sphère de 3m *",
+                description: "Ce sort crée une sphère de 3 mètres de rayon et de 50 cm d'épaisseur composée de particules électrifiées en suspension dans l'air centrée sur le magicien et qui le suit dans ses déplacements. La vitesse du magicien ne peut toutefois dépasser celle d'une marche normale, à défaut de quoi la sphère ne parvient plus avancer à sa vitesse et à le devancer.\nL'impressionnant crépitement de la sphère dissuadera tous les animaux et la plupart des créatures intelligentes de tenter de la franchir. Seules les créatures particulièrement déterminées pourront s'y résoudre, et encore devront-elles réussir un jet sous leur Volonté avec un malus de -2 pour y parvenir. Le franchissement de la sphère leur inflige alors de sévères blessures (1d4+4 points de vie généraux).\nLe fait qu'une créature franchisse la sphère en perturbe momentanément la magie et a pour conséquence que la sphère reste immobile pendant 1 tour. Le magicien doit attendre que cette perturbation ait pris fin avant de pouvoir le cas échéant reprendre sa route (sauf à choisir de laisser la sphère derrière lui). En outre, la sphère se dissipe dès lors que 10 créatures l'ont traversée.\nLe crépitement perturbe la vision et occasionne un malus de -2 pour tirer à travers elle avec une arme à projectile ou de lancer. Cela s'applique également aux créatures situées à l'intérieur de la sphère (le magicien et ceux qui l'entourent) lorsqu'elles tirent vers l'extérieur de celle-ci."
+            },
+
+            // Niveau 8
+            "Résistance à la lumière et l'électricité": {
+                level: 8,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature bénéficiant de ce sort se voit entourée d'une gaine d'ondes magiques qui la protège des sortilèges de lumière ou d'électricité.\nPendant toute la durée du sort, elle est insensible aux effets aveuglants fondés sur la lumière, elle bénéficie d'un bonus de +4 à toutes ses sauvegardes contre les sorts fondés sur la lumière ou l'électricité et les sortilèges fondés sur l'électricité ne lui infligent que le tiers des dégâts normaux, avant sauvegarde éventuelle (les sorts infligeant 1 point de vie par tour infligeront seulement 1 point de vie tous les 3 tours)."
+            },
+
+            // Niveau 9
+            "Eclair chercheur": {
+                level: 9,
+                portée: "-",
+                incantation: "8 s",
+                durée: "-",
+                sauvegarde: "Co",
+                zone: "un éclair de 40m de long",
+                description: "Ce sort est similaire au sortilège de niveau 7 « Eclair » : la foudre jaillit des mains du magicien et elle se propage devant lui sur 40 mètres, dévastant tout sur son passage.\nA la différence du sort d'éclair, toutefois, la course de l'éclair chercheur n'est pas obligatoirement droite. Elle peut opérer jusqu'à 4 changements de direction, avec la limite suivante : pas plus d'un changement de direction tous les 2 mètres et des changements de trajectoire n'excédant pas un angle droit (90 degrés). Cela peut permettre au magicien d'atteindre des endroits que lui-même ne voit pas, comme faire suivre à son éclair le coude d'un couloir.\nL'éclair chercheur est par ailleurs légèrement plus puissant que l'éclair et inflige 2d+5 points de dommages (moins la marge de réussite éventuelle de la sauvegarde) contre 2d4+4 pour un éclair.\nLes autres éléments sont identiques à ceux du sort « Eclair »."
+            },
+            "Être électrique régénérable": {
+                level: 9,
+                portée: "3 m",
+                incantation: "40 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Le magicien invoque pour l'aider un être surnaturel fait d'électricité venant d'un autre plan d'existence. Cet être est décrit dans le chapitre Les créatures surnaturelles du Livre du monde, et ses traits principaux sont rappelés en annexe du présent livre. Il a un score de +8 en attaque, +7 en feinte de corps et +5 en esquive. Il inflige des dommages égaux à 2 x marge +1. Il possède 21 points de vie et 36 points de fatigue.\nCet être est très autonome et n'aime pas que le magicien lui donne des ordres. Mais il cherchera de lui-même à protéger son créateur et le suivra partout pour s'acquitter au mieux de sa tâche.\nL'électricité recharge cet être surnaturel. Tout sortilège instantané suffisamment puissant lui redonne la moitié des points de vie qu'il aurait normalement dû lui enlever. Par exemple, un éclair de 10 points de vie lui en redonnera 5 (et autant de points de fatigue). Des sortilèges non instantanés tels que Poigne électrique, Nuage électrique ou Sphère mouvante électrique ne sont en revanche pas assez intenses pour recharger l'être électrique, mais bien sûr ne lui infligent aucuns dégâts.\nLe magicien peut utiliser ce sort pour contrôler un être électrique qui a été invoqué ou le renvoyer dans son plan d'existence. Dans ce cas, l'incantation est réduite à seulement 5 secondes. L'être a droit à une sauvegarde sous respectivement PM+4 pour la prise de contrôle et PM pour le renvoi dans son plan."
+            },
+
+            // Niveau 12
+            "Soleil/Eclipse": {
+                level: 12,
+                portée: "1 km",
+                incantation: "15 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 10m",
+                description: "Le magicien peut choisir de faire apparaître dans le ciel (à environ 1 km d'altitude) une source de lumière très intense qui éclaire sur plusieurs kilomètres carrés presque comme en plein jour. Cette lumière est suffisamment puissante pour qu'il soit difficile de la fixer sans cligner des yeux.\nIl peut à l'inverse choisir de masquer la lumière du soleil. Le sort a alors un effet comparable à celui d'une éclipse : la luminosité dans la zone d'effets devient équivalente à celle du crépuscule, la température diminue de 2 ou 3 degrés, les animaux sont nerveux, etc."
+            },
+
+            // Niveau 15
+            "Invocation de la foudre": {
+                level: 15,
+                portée: "5 km",
+                incantation: "1 min",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "boule de 5 km",
+                description: "Ce sortilège engendre des conditions météorologiques orageuses puis les exploite afin de libérer la foudre à plusieurs reprises.\nLe temps nécessaire pour faire advenir de lourds nuages chargés d'électricité dépend des conditions météo initiales : de l'ordre de 30 minutes si le temps est beau et sec (voire plus dans des conditions particulières telles qu'un désert), 15 minutes s'il est nuageux, immédiat si le temps est déjà à l'orage. Ce temps est pris sur la durée du sort. Il est possible également de recourir aux sorts Influence climatique ou Contrôle climatique de la liste de l'Air pour engendrer les conditions propices.\nUne fois les conditions d'un orage violent réunies, le sort permet au magicien d'exploiter la charge électrique élevée des nuages et d'en libérer l'énergie sous forme d'éclairs dont il contrôle approximativement l'apparition et l'impact.\nLe magicien peut libérer un éclair toutes les 30 secondes environ. La foudre tombe à proximité du point d'impact choisi par le magicien : le joueur lance un d100 et un d12, le premier lui donnant la distance en mètres par rapport au point qu'il avait choisi (de 1 à 100 mètres), et le second la direction (suivant le système des heures sur le cadran d'une horloge). La foudre ne peut toutefois en aucun cas tomber deux fois à moins de 10 mètres d'écart.\nUne créature frappée par un éclair ou se trouvant à moins d'un mètre de son impact meurt sur le coup. Une créature se trouvant à moins de 10 mètres du point d'impact subit des dommages qui peuvent être très importants. Néanmoins, la visée étant approximative, ce sort est plus efficace contre des bâtiments ou pour mettre le feu à une forêt que contre des individus isolés.\nLe magicien doit rester concentré sur l'orage s'il souhaite le contrôler : s'il perd sa concentration ou accomplit d'autres actions nécessitant une forte attention, il devra consacrer une nouvelle minute d'incantation avant de retrouver son lien avec l'orage et de pouvoir susciter et contrôler la chute de la foudre."
+            },
+
+            // Niveau 25
+            "Déchaînement de Zeus": {
+                level: 25,
+                portée: "40 m",
+                incantation: "10 s",
+                durée: "3 s",
+                sauvegarde: "spéciale",
+                zone: "boule de 10m",
+                description: "La charge électrique dans la zone d'effets monte soudain si fortement qu'une multitude d'éclairs s'y forment et la parcourent, frappant les infortunées créatures qu'elle abrite dans un déluge d'étincelles et le fracas du tonnerre.\nChaque créature dans la zone d'effets est frappée par 1d4 éclairs, chacun infligeant 3d4 points de dommages moins la marge de réussite éventuelle d'une sauvegarde sous Co-2.\nChaque créature dans la zone d'effets et chaque créature distante de moins de 10 mètres de celle-ci et la regardant au moment du sort doit réussir une sauvegarde sous P-2 ou être à moitié aveuglée (toutes les actions physiques subissent un malus de -4) pour un nombre de tour égal à la marge d'échec de leur sauvegarde."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme de la Liste de la Lumière et de l'Électricité
+                const connections = [
+                    // Chaîne de lumière de base
+                    ['Moduler la lumière', 'Créer la lumière / l\'obscurité'],
+                    ['Moduler la lumière', 'Paume lumineuse'],
+                    ['Moduler la lumière', 'Poigne électrique'],
+                    ['Moduler la lumière', 'Barrière électrique'],
+                    ['Créer la lumière / l\'obscurité', 'Flash lumineux'],
+                    ['Paume lumineuse', 'Boule de lumière'],
+                    ['Flash lumineux', 'Lumière / ténèbres éternelles'],
+                    ['Lumière / ténèbres éternelles', 'Explosion de lumière'],
+                    ['Explosion de lumière', 'Soleil/Eclipse'],
+                    ['Poigne électrique', 'Projectile magique'],
+                    ['Barrière électrique', 'Electrification d\'un objet'],
+                    ['Poigne électrique', 'Electrification d\'un objet'],
+                    ['Electrification d\'un objet', 'Runes de garde'],
+                    ['Runes de garde', 'Sphère mouvante électrique'],
+                    ['Projectile magique', 'Eclair'],
+                    ['Eclair', 'Eclair chercheur'],
+                    ['Eclair chercheur', 'Invocation de la foudre'],
+                    ['Invocation de la foudre', 'Déchaînement de Zeus'],
+                    ['Runes explosives', 'Runes de garde'],
+                    ['Runes explosives', 'Nuage électrique'],
+                    ['Sphère mouvante électrique', 'Résistance à la lumière et l\'électricité'],
+                    ['Résistance à la lumière et l\'électricité', 'Être électrique régénérable']
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
