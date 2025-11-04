@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de l'Eau</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DE L'EAU</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-1" data-spell="Purifier l'eau">Purifier l'eau</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-1" data-spell="Créer de l'eau">Créer de l'eau</div>
+            <div class="spell-node col-5" data-spell="Libérer la pluie">Libérer la pluie</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-3" data-spell="Respiration aquatique">Respiration aquatique</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-3" data-spell="Marcher sur l'eau">Marcher sur l'eau</div>
+            <div class="spell-node col-5" data-spell="Brouillard">Brouillard</div>
+            <div class="spell-node col-6" data-spell="Sables mouvants">Sables mouvants</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-2" data-spell="Mur d'eau">Mur d'eau</div>
+            <div class="spell-node col-3" data-spell="Nager">Nager</div>
+            <div class="spell-node col-6" data-spell="Contrôle des courants">Contrôle des courants</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-1" data-spell="Bouclier d'eau">Bouclier d'eau</div>
+            <div class="spell-node col-2" data-spell="Eau réparatrice">Eau réparatrice</div>
+            <div class="spell-node col-5" data-spell="Invocation de l'orage">Invocation de l'orage</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-3" data-spell="Eau respirable">Eau respirable</div>
+            <div class="spell-node col-6" data-spell="Ami des eaux">Ami des eaux</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-1" data-spell="Elémental d'eau">Elémental d'eau</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-1" data-spell="Globe anti-eau">Globe anti-eau</div>
+            <div class="spell-node col-3" data-spell="Liquéfaction des objets">Liquéfaction des objets</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-1" data-spell="Globe d'eau protecteur">Globe d'eau protecteur</div>
+        </div>
+
+        <!-- Niveau 20 -->
+        <div class="level">
+            <div class="level-number">20</div>
+            <div class="spell-node col-3" data-spell="Liquéfaction des êtres">Liquéfaction des êtres</div>
+            <div class="spell-node col-6" data-spell="Maître des eaux">Maître des eaux</div>
+        </div>
+
+        <!-- Niveau 25 -->
+        <div class="level">
+            <div class="level-number">25</div>
+            <div class="spell-node col-5" data-spell="Invocation de la tempête">Invocation de la tempête</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de la Liste de l'Eau
+        const spellsData = {
+            // Niveau 1
+            "Purifier l'eau": {
+                level: 1,
+                portée: "toucher",
+                incantation: "2 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "30 litres",
+                description: "Par ce sort, le magicien est capable de retirer de l'eau les substances nocives et de la rendre ainsi parfaitement potable. Ce sort marche également pour les autres boissons courantes, comme le vin ou l'hydromel."
+            },
+
+            // Niveau 2
+            "Créer de l'eau": {
+                level: 2,
+                portée: "2 m",
+                incantation: "20 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "un récipient",
+                description: "Ce sort condense la vapeur d'eau en suspension dans une large zone, et la transforme en gouttes se formant dans le récipient choisi par le magicien. Dans des conditions normales, il permet de recueillir 3 à 4 litres d'eau. Dans une atmosphère particulièrement humide, ce chiffre pourra monter jusqu'à 10 ou 20 litres, tandis que dans un désert aride il pourra diminuer jusqu'à 50 cl, l'équivalent de deux grands verres d'eau."
+            },
+            "Libérer la pluie": {
+                level: 2,
+                portée: "500 m",
+                incantation: "10 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "1 km2",
+                description: "Ce sort ne fonctionne qu'en présence d'humidité dans l'air ou de nuages dans le ciel. Il déclenche alors la libération de cette humidité sous forme de pluie. Celle-ci peut être fine, soutenue ou battante, suivant le souhait du magicien.\nLa pluie dure pendant 1 heure ou jusqu'à ce que les nuages se soient totalement vidés de leur humidité."
+            },
+
+            // Niveau 3
+            "Respiration aquatique": {
+                level: 3,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature touchée par le magicien acquiert la capacité de respirer librement dans l'eau. Le sort empêche l'eau de pénétrer dans ses poumons, mais en extrait pourtant l'oxygène nécessaire à sa respiration."
+            },
+
+            // Niveau 4
+            "Marcher sur l'eau": {
+                level: 4,
+                portée: "20 m",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature visée devient capable (si elle le souhaite) de marcher sur l'eau ou sur tout autre liquide, comme s'il s'agissait d'un sol dur. Elle peut même traverser ainsi des marécages ou des sables mouvants.\nSi elle se trouve dans l'eau au moment du sort, elle remonte instantanément vers la surface à une vitesse de 15 km/h."
+            },
+            "Brouillard": {
+                level: 4,
+                portée: "30 m",
+                incantation: "3 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "boule de 30m",
+                description: "Les particules d'eau en suspension dans l'air de la zone d'effets s'agrègent et se condensent partiellement. Extérieurement, il semble qu'une brusque brume soit tombée sur la zone d'effet.\nL'épaisseur de ce brouillard soudain dépend de l'humidité de l'air ambiant : en climat humide, le brouillard sera si dense qu'on n'y verra qu'à 2 mètres ; en climat tempéré la visibilité atteindra 10 mètres ; en climat aride, elle pourra atteindre jusqu'à 30 mètres."
+            },
+            "Sables mouvants": {
+                level: 4,
+                portée: "20 m",
+                incantation: "4 s",
+                durée: "15 min",
+                sauvegarde: "-",
+                zone: "10 m2 x 3m",
+                description: "La portion de sol visée par ce sort devient subitement molle et laisse les objets et créatures s'enfoncer en elle. Ce sort ne fonctionne cependant que sur les parties minérales du sol (terre, pierre ou sable), et non sur les parties métalliques, par exemple. De plus, il n'affecte que les parties du sol se trouvant à plus d'un mètre d'une créature intelligente.\nLa vitesse d'enfoncement dans le sol est peu élevée et dépend bien sûr de la masse considérée. Pour une créature humanoïde, elle sera typiquement de 5 cm par seconde. Se débattre aura essentiellement comme résultat d'augmenter cette vitesse de descente.\nLe sol étant complètement mou, il n'est pas possible de s'appuyer sur lui pour prendre une impulsion. Il est donc impossible de sauter hors de la zone de sables mouvants. Il faut soit parvenir à prendre appui sur une berge, soit recevoir une aide extérieure.\nÊtre totalement enseveli dans le sol ne provoque pas la mort de la créature. En effet, il est possible d'y respirer, avec il est vrai un peu plus de difficultés qu'à la surface. Par ailleurs, tout objet ou être se trouvant pris dans la masse de sol mou au moment de l'expiration du sort en est expulsé sans dommage. Il se retrouve simplement sur le sol venant de se raffermir.\nNotez que ce sort peut être lancé sur un plancher en pierre séparant deux étages d'une construction. Les créatures s'enfonçant dans les sables mouvants finissent alors simplement par traverser ce plancher."
+            },
+
+            // Niveau 5
+            "Mur d'eau": {
+                level: 5,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "10m x 4m x 1m",
+                description: "Le mur d'eau créé par ce sort doit reposer verticalement sur une surface solide ou liquide. L'eau rejette tout objet ou créature tentant de traverser le mur. La seule façon d'y parvenir consiste en fait à arriver avec une vitesse suffisante. Celle-ci varie d'environ 20 km/h pour une créature de 80 kg à près de 250 km/h pour une flèche ou un objet aussi léger. Ainsi, si une créature peut le traverser en prenant un élan suffisant (risquant toutefois d'être déséquilibrée et de chuter en sortie de mur), un objet lancé n'y parviendra que dans des cas exceptionnels."
+            },
+            "Nager": {
+                level: 5,
+                portée: "toucher",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature touchée par le magicien acquiert aussitôt la capacité de respirer librement dans l'eau et de s'y mouvoir aisément. Cela est valable même si la créature n'a jamais nagé. Elle se déplace sans fatigue et peut atteindre une vitesse de 100 mètres à la minute."
+            },
+            "Contrôle des courants": {
+                level: 5,
+                portée: "-",
+                incantation: "15 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "boule de 50m *",
+                description: "Grâce à ce sort, le magicien maîtrise le flux principal de l'eau dans la zone d'effet. Celle-ci doit être une étendue à peu près horizontale. Il peut par exemple s'agir d'une rivière, d'un fleuve, d'un petit lac ou d'une partie de mer.\nLe magicien peut annuler totalement tout courant existant. Si le courant initial n'était pas trop fort, le magicien peut même en créer un allant dans la direction de son choix et dont la vitesse peut aller jusqu'à 10 km/h. Cela peut notamment augmenter considérablement la vitesse de progression d'une embarcation. Il peut à volonté modifier la direction de ce courant.\nLe magicien peut également utiliser ce sort pour calmer les eaux dans la zone d'effets : apaiser les remous des rapides d'une rivière, réduire très fortement les vagues ou la houle, etc."
+            },
+
+            // Niveau 6
+            "Bouclier d'eau": {
+                level: 6,
+                portée: "-",
+                incantation: "5 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Ce sortilège crée un bouclier de grande taille constitué d'eau maintenue et renforcée d'ondes magiques. Ce bouclier peut être utilisé par le magicien comme un bouclier normal pour se défendre en combat ou contre des projectiles (compétence « Parade bouclier »). Ce bouclier est particulièrement léger et maniable, ce qui confère au magicien un bonus de +2 à son jet de compétence. Par ailleurs, il peut être utilisé pour se défendre contre les sortilèges des listes du feu et du froid tels que Eclair de feu ou Boule de feu : cela se traduit par un bonus de +4 à la sauvegarde contre ces sorts si le magicien cherche à s'en protéger (cela compte alors comme une action).\nSeul le magicien lui-même peut utiliser le bouclier d'eau. Pour les autres créatures il réagit comme une masse d'eau interne."
+            },
+            "Eau réparatrice": {
+                level: 6,
+                portée: "-",
+                incantation: "15 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Ce sortilège rend le magicien capable de régénérer son corps grâce au pouvoir réparateur de l'eau. Pour en bénéficier, il doit s'immerger dans celle-ci (le sort lui confère une capacité limitée de respiration aquatique et une protection contre le froid de l'eau le cas échéant).\nToutes les blessures immergées dans l'eau sont soignées par celle-ci et guérissent progressivement. En termes de jeu, chaque blessure est soignée de l'équivalent d'un point de vie pour chaque quart d'heure (une blessure de 8 points de dommages mettra ainsi 2 heures à être entièrement guérie). De même, tous les poisons et toutes les maladies sont progressivement éradiqués par l'immersion dans l'eau (en un quart d'heure pour les plus bénins, en quelques heures pour les plus virulents).\nL'immersion dans l'eau soulage également la fatigue du magicien. Si l'immersion est quasi complète, celui-ci récupère l'équivalent de 12 points de fatigue par heure (par exemple 18 points de fatigue pour une immersion interrompue après 1 heure et demie). Si l'immersion est seulement partielle, la récupération s'opère à proportion de la part immergée du corps du magicien."
+            },
+            "Invocation de l'orage": {
+                level: 6,
+                portée: "1 km",
+                incantation: "40 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "1 km2",
+                description: "L'effet de ce sortilège est double : d'une part il provoque l'apparition de conditions climatiques propices à un orage, et d'autre part il déclenche celui-ci. Néanmoins, sa puissance sera d'autant plus grande que les conditions initiales étaient favorables à l'éclatement d'un orage.\nSi le ciel est d'un bleu d'azur, l'apparition de nuages noirs prendra la totalité des 20 minutes que dure le sort.\nS'il est nuageux, un orage de puissance moyenne aura le temps d'éclater après une dizaine de minutes.\nS'il est totalement couvert de nuages menaçants, l'orage débutera dès le début du sort et sera de très forte puissance. La foudre et le tonnerre seront omniprésents, mais en aucun cas celle-ci ne frappera une créature vivante. Elle occasionnera au maximum quelques dégâts matériels.\nNotez qu'il est possible de lancer ce sortilège plusieurs fois de suite (ou d'en augmenter la durée en dépensant davantage d'énergie) ; cela est notamment utile pour obtenir par un premier sort les conditions climatiques adéquates."
+            },
+
+            // Niveau 7
+            "Eau respirable": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 5m *",
+                description: "Ce sort provoque la formation autour du magicien d'une bulle magique à l'intérieur de laquelle l'eau est respirable comme de l'air. Toute créature se trouvant à moins de 5 mètres du magicien peut ainsi respirer parfaitement à son aise.\nLes propriétés physiques du milieu ne sont pas pour autant changées. Il est donc toujours nécessaire de nager. La bulle n'est pas affectée par l'entrée ou la sortie de créatures ni n'interagit avec les autres sortilèges."
+            },
+            "Ami des eaux": {
+                level: 7,
+                portée: "-",
+                incantation: "3 s",
+                durée: "1 min",
+                sauvegarde: "-",
+                zone: "boule de 30m *",
+                description: "Ce sortilège très polyvalent permet au magicien d'acquérir un certain contrôle sur les masses d'eau se trouvant dans la zone d'effet. En se concentrant sur une masse d'eau particulière, le magicien devient capable de la faire changer de forme de manière rapide, dans la limite d'un volume de quelques mètres cubes. Les molécules d'eau affectées acquièrent une consistance plus forte que l'eau habituelle, ce qui peut leur conférer une certaine portance ou un certain impact. Le magicien peut leur imprimer une célérité allant jusqu'à 5 ou 10 m/s.\nCe sort pourra par exemple faire s'élever vers le haut un cylindre d'eau, celui-ci étant assez consistant pour soutenir à son sommet et propulser un objet ou une créature. Il peut également faire apparaître un soudain mur d'eau bloquant une volée de flèches (sa consistance n'atteignant pas toutefois celle d'un mur d'eau créé par le sort éponyme). Il pourra propulser horizontalement une masse d'eau suffisante pour faire chuter une créature ou déséquilibrer un petit groupe. Etc.\nLe magicien peut changer de masse d'eau et impulser des mouvements différents tout au long du sortilège. Il doit toutefois chaque fois se concentrer sur la masse à mettre en mouvement et ne peut effectuer d'autre action complexe en même temps.\nPar ailleurs, ce sort ne crée pas de matière : le magicien manipule uniquement la quantité d'eau déjà présente autour de lui."
+            },
+
+            // Niveau 8
+            "Elémental d'eau": {
+                level: 8,
+                portée: "2 m",
+                incantation: "30 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "1 m3 d'eau",
+                description: "Par ce sortilège, le magicien invoque pour l'aider une créature venant d'un autre plan d'existence. Il s'agit d'un être composé d'eau magiquement liée et légèrement plus dense que la normale. Il sort de l'étendue d'eau sur laquelle le magicien a lancé le sort.\nL'élémental perçoit les ordres mentaux du magicien, pourvu que celui-ci se trouve à moins de 50 mètres, et il s'y conforme. Il est le plus souvent appelé pour aider le magicien lors d'un combat. C'est sans doute le plus polyvalent des quatre types d'élémentaux (air, eau, feu et terre). Il allie en effet un déplacement relativement rapide sur terre (très rapide dans l'eau), des attaques assez puissantes et une bonne résistance aux coups.\nLe magicien peut également utiliser ce sort pour contrôler un élémental d'eau qui a été invoqué ou le renvoyer dans son plan d'existence. Dans ce cas, l'incantation est réduite à seulement 5 secondes. L'élémental a droit à une sauvegarde sous respectivement PM+4 pour la prise de contrôle et PM pour le renvoi dans son plan d'origine.\nLes caractéristiques des élémentaux d'eau sont décrites en annexe du présent livre de magie et plus en détail dans le chapitre « Les créatures surnaturelles » du livre du monde. Leur intelligence est équivalente à celle d'un enfant de quatre ou cinq ans. Ils ont un score de +7 en attaque, +7 en feinte de corps, +5 en esquive, une armure d'une valeur de 4 contre les armes contondantes ou perforantes et infligent des dommages égaux à 2 x marge (plafonné à 18)."
+            },
+
+            // Niveau 10
+            "Globe anti-eau": {
+                level: 10,
+                portée: "-",
+                incantation: "3 s",
+                durée: "3 h",
+                sauvegarde: "-",
+                zone: "boule de 5m *",
+                description: "Ce sort crée une boule se déplaçant avec le magicien et le protégeant contre les effets de l'eau. Au choix du magicien, cette boule exclue de son sein toute eau non contenue dans un récipient (à la manière d'une Bulle d'air (voir le sort du même nom dans la liste de l'Air) qui ne pourrait être brisée) ou rend toute eau y pénétrant respirable (à la manière du sort de niveau 7 Eau respirable) tout en diminuant de moitié sa vitesse.\nPar ailleurs, aucune magie fondée sur la liste de l'Eau autre que celle faite par le magicien lui-même ne peut fonctionner à l'intérieur de cette boule. Ce bannissement reste valable pour les sortilèges ayant une certaine durée et en cas de mouvement du magicien. Si par exemple celui-ci se déplace vers un Mur d'eau, la partie de celui-ci se trouvant à l'intérieur du globe anti-eau sera temporairement dissipée. Elle ne retrouvera ses effets que lorsque le magicien se sera éloigné et qu'elle se trouvera à nouveau hors du globe anti-eau.\nNotez enfin que le contact d'un globe anti-eau dissipe rapidement l'énergie des élémentaux d'eau : ceux-ci perdent 5 points de vie par seconde passée en contact avec le globe. Cela est bien suffisant pour leur inspirer une crainte telle qu'ils ne s'en approchent jamais (ils en ressentent naturellement la présence)."
+            },
+            "Liquéfaction des objets": {
+                level: 10,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "- (Mag-3)",
+                zone: "un objet",
+                description: "Ce sort permet au magicien de rendre liquide n'importe quel objet solide sans pour autant en changer la température. La seule limitation est le poids, qui ne doit pas excéder 1000 kg. Il est même possible de liquéfier seulement une partie (continue et régulière) d'un objet (une partie d'un mur, par exemple).\nL'objet se liquéfie et forme une flaque d'eau teintée de la couleur précédente de l'objet. Le volume occupé par l'objet sous sa forme liquide est identique à celui qu'il occupait sous sa forme solide.\nA la fin du sortilège, l'objet se reforme automatiquement (si seule une partie d'un objet avait été liquéfiée, elle reprend sa place au sein de l'objet en expulsant ce qui s'y trouve). Cependant, si à l'état liquide l'objet avait été séparé en plusieurs morceaux et que ceux-ci avaient été placés dans des endroits qui ne communiquent pas (par exemple dans plusieurs bocaux fermés), il se reforme sous une forme définitivement composée d'autant de morceaux.\nCe sort n'autorise aucune sauvegarde, sauf pour les objets situés au moins en partie à moins de 10 cm d'une créature intelligente (humanoïde ou créature surnaturelle intelligente). Pour de tels objets, la ou les créatures suffisamment proches effectuent un jet de sauvegarde sous leur don Magie moins 3. La réussite par une seule créature suffit à faire échouer le sort."
+            },
+
+            // Niveau 15
+            "Globe d'eau protecteur": {
+                level: 15,
+                portée: "-",
+                incantation: "10 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 1m *",
+                description: "Ce sortilège entoure le magicien d'une boule d'eau respirable se déplaçant avec lui et le protégeant d'attaques venues de l'extérieur. Cette boule se déforme le cas échéant pour suivre la topographie du lieu (pour passer à travers une porte, etc.).\nLes projectiles légers (flèches, carreaux, couteaux de lancer…) sont arrêtés par la boule d'eau. En outre, toute attaque portée contre le magicien avec une arme suffisamment lourde pour traverser l'épaisseur d'eau subit un malus de –8 traduisant le fort ralentissement du coup lors de sa course à travers celle-ci (ce malus constitue une moyenne et peut être ajusté selon la puissance du coup).\nCe bouclier d'eau protège également le magicien de changements brutaux de température. Tous les dommages fondés sur la chaleur ou le froid sont divisés par cinq (avant sauvegarde éventuelle)."
+            },
+
+            // Niveau 20
+            "Liquéfaction des êtres": {
+                level: 20,
+                portée: "20 m",
+                incantation: "7 s",
+                durée: "3 h",
+                sauvegarde: "(Foi-4)",
+                zone: "un être vivant",
+                description: "Ce sort liquéfie un être vivant, quel qu'il soit et pourvu que son poids n'excède pas 10 tonnes. L'être liquéfié reste vivant et conscient mais perd toute perception de son environnement. Son corps se reforme lorsque le sortilège prend fin.\nSi son corps liquéfié est placé dans plusieurs endroit hermétiquement séparé, son corps se reformera cependant en autant de morceaux (le tronc et la tête restant indivisibles). Il lui faudra par la suite les réassembler, soit par un nouveau sort de Liquéfaction des êtres, soit par un sort de Ressouder les membres. Il faut toutefois souligner qu'un magicien si avancé dans la liste de l'Eau se refusera absolument à provoquer ainsi la mutilation d'un être (et fera tout pour empêcher d'autres créatures de la provoquer), sauf si cela est la seule et unique solution pour sauver d'autres vies et si l'être mutilé est lui-même responsable du risque portant sur ces autres vies.\nLes créatures intelligentes qui ne sont pas volontaires bénéficient d'un jet de sauvegarde (sous foi moins 4) pour résister aux effets du sort. Les animaux ou les végétaux en revanche (ou les créatures intelligentes volontaires) sont affectés sans possibilité de sauvegarde."
+            },
+            "Maître des eaux": {
+                level: 20,
+                portée: "-",
+                incantation: "1 min",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "boule de 1 km *",
+                description: "Grâce à ce sort le magicien devient capable de sculpter les étendues d'eau naturelles qui l'entourent : rivières, fleuves, lacs, parties de mer ou d'océan. Il peut virtuellement leur donner n'importe quelle forme, moyennant cependant certaines restrictions :\n- le changement de forme s'opère lentement, la surface de l'eau se déplaçant à une vitesse de 2 mètres par seconde ;\n- le magicien ne peut par ce sort mettre volontairement en danger la vie de créatures intelligentes ;\n- la sculpture est relativement grossière : il est difficile au magicien de sculpter à une échelle inférieure à 5 ou 10 mètres (même si cela dépend du jet de lancement)."
+            },
+
+            // Niveau 25
+            "Invocation de la tempête": {
+                level: 25,
+                portée: "10 km",
+                incantation: "15 min",
+                durée: "spéciale",
+                sauvegarde: "-",
+                zone: "disque de 10 km",
+                description: "Ce sortilège provoque l'apparition d'une violente tempête dans la zone choisie par le magicien. Le vent se lève et les vagues se creusent progressivement au cours des quinze minutes d'incantation. La tempête évolue ensuite de façon normale : si le vent était déjà fort et la mer agitée, elle durera un ou deux jours complets avant de s'apaiser ; si en revanche la mer était particulièrement calme (cas par exemple d'un petit golfe protégé), la tempête s'apaise en quelques heures."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme de la Liste de l'Eau
+                const connections = [
+                    // Chaîne de base : eau pure et création
+                    ['Purifier l\'eau', 'Créer de l\'eau'],
+                    ['Créer de l\'eau', 'Mur d\'eau'],
+                    ['Créer de l\'eau', 'Respiration aquatique'],
+                    ['Libérer la pluie', 'Brouillard'],
+                    ['Libérer la pluie', 'Sables mouvants'],
+                    ['Sables mouvants', 'Contrôle des courants'],
+                    ['Contrôle des courants', 'Ami des eaux'],
+                    ['Ami des eaux', 'Maître des eaux'],
+                    ['Maître des eaux', 'Invocation de la tempête'],
+                    ['Brouillard', 'Invocation de l\'orage'],
+                    ['Invocation de l\'orage', 'Invocation de la tempête'],
+                    ["Mur d\'eau", "Bouclier d\'eau"],
+                    ["Mur d'eau", "Eau réparatrice"],
+                    ['Bouclier d\'eau', "Elémental d\'eau"],
+                    ['Eau réparatrice', "Elémental d\'eau"],
+                    ["Elémental d\'eau", 'Globe anti-eau'],
+                    ["Respiration aquatique", 'Marcher sur l\'eau'],
+                    ["Marcher sur l\'eau", 'Nager'],
+                    ["Nager", 'Eau respirable'],
+                    ["Elémental d'eau", 'Liquéfaction des objets'],
+                    ["Liquéfaction des objets", 'Liquéfaction des êtres'],
+                    ["Globe anti-eau", 'Globe d\'eau protecteur'],
+
+
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

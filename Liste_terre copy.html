@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de la Terre</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DE LA TERRE</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-4" data-spell="Rigidification du sol">Rigidification du sol</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-4" data-spell="Immobilité">Immobilité</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-7" data-spell="Soudure des pierres">Soudure des pierres</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-2" data-spell="Résistance à la douleur">Résistance à la douleur</div>
+            <div class="spell-node col-5" data-spell="Surdité">Surdité</div>
+            <div class="spell-node col-7" data-spell="Travail de la pierre">Travail de la pierre</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-2" data-spell="Peau de pierre">Peau de pierre</div>
+            <div class="spell-node col-4" data-spell="Pétrification">Pétrification</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-2" data-spell="Poings de pierre">Poings de pierre</div>
+            <div class="spell-node col-5" data-spell="Cécité">Cécité</div>
+            <div class="spell-node col-7" data-spell="Mur de pierre">Mur de pierre</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-2" data-spell="Passe-muraille">Passe-muraille</div>
+            <div class="spell-node col-7" data-spell="Bouclier de pierres animées">Bouclier de pierres animées</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-3" data-spell="Excavation">Excavation</div>
+            <div class="spell-node col-4" data-spell="Statue">Statue</div>
+            <div class="spell-node col-7" data-spell="Elémental de terre">Elémental de terre</div>
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-2" data-spell="Communion avec les pierres">Communion avec les pierres</div>
+            <div class="spell-node col-7" data-spell="Être de pierre">Être de pierre</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-4" data-spell="Chair en pierre">Chair en pierre</div>
+            <div class="spell-node col-7" data-spell="Solidification de la matière">Solidification de la matière</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-4" data-spell="Tempête de sable">Tempête de sable</div>
+        </div>
+
+        <!-- Niveau 20 -->
+        <div class="level">
+            <div class="level-number">20</div>
+            <div class="spell-node col-4" data-spell="Tremblement de terre">Tremblement de terre</div>
+        </div>
+
+        <!-- Niveau 25 -->
+        <div class="level">
+            <div class="level-number">25</div>
+            <div class="spell-node col-4" data-spell="Ouverture du sol">Ouverture du sol</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de la Liste de la Terre
+        const spellsData = {
+            // Niveau 1
+            "Rigidification du sol": {
+                level: 1,
+                portée: "10 m",
+                incantation: "2 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "10m x 10m",
+                description: "Ce sol rend instantanément solide tout sol naturel contenant au moins un peu de terre dans la zone d'effets. La boue et le sable, par exemple, deviendront durs. Il sera même possible de marcher sur des sables mouvants.\nLes objets partiellement enfoncés dans le sol au moment où le sort est lancé sont chassés de celui-ci. Cela est notamment valable pour les pieds d'une créature ou les roues d'un chariot, qui se retrouvent simplement posés sur le sol."
+            },
+
+            // Niveau 2
+            "Immobilité": {
+                level: 2,
+                portée: "20 m",
+                incantation: "1/10 s",
+                durée: "-",
+                sauvegarde: "- (V+2)",
+                zone: "spéciale",
+                description: "Ce sort peut être lancé soit sur une créature, soit sur un objet de moins de 10 kg.\nLancé sur un objet, il l'arrête, c'est à dire qu'il réduit sa vitesse à 0 par rapport au sol. Il est néanmoins impossible d'affecter ainsi un objet se trouvant à moins de 20 cm d'une créature vivante. En revanche, ce sortilège peut très bien arrêter le vol d'une flèche. C'est d'ailleurs là une de ses utilisations les plus courantes.\nS'il est lancé sur une créature, celle-ci est autorisée à effectuer un jet de sauvegarde. Si ce jet échoue, la créature interrompt aussitôt son mouvement : si elle courait, elle s'arrête ; si elle s'apprêtait à frapper un adversaire, elle interrompt son attaque ; si son coup était en train de porter, elle subit un malus de 2 à son jet d'attaque.\nCe sort est éphémère : rien n'empêche une créature que le magicien vient par exemple de forcer à s'arrêter de reprendre sa course après une seconde ou deux."
+            },
+
+            // Niveau 3
+            "Soudure des pierres": {
+                level: 3,
+                portée: "20 m",
+                incantation: "10 s",
+                durée: "1 jour",
+                sauvegarde: "-",
+                zone: "100 kg de pierres",
+                description: "Ce sort permet au magicien de souder magiquement des pierres. Le nombre de pierres n'est pas réellement un problème (en restant raisonnable…), la seule limitation porte sur le poids final de l'amas, qui ne peut dépasser 100 kg.\nLe magicien peut disposer comme il le veut les pierres les unes par rapport aux autres. La soudure entre les pierres est ensuite parfaite, exactement comme si l'amas de roche constituait un bloc unique. La résistance mécanique de ces soudures est notamment la même que celle du reste de la pierre."
+            },
+
+            // Niveau 4
+            "Résistance à la douleur": {
+                level: 4,
+                portée: "10 m",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "(Mag)",
+                zone: "1 créature",
+                description: "Ce sortilège a pour effet d'anesthésier fortement les signaux de douleur dans le corps de la créature affecté. Celle-ci sera de ce fait capable de supporter une douleur intense et de passer outre pour poursuivre son action (courir malgré une cheville foulée, marcher sur des braises ardentes, etc.). Ces effets diminuent temporairement de 2 les seuils d'incapacité de toutes les zones de son corps hormis la tête (la créature affectée pourra par exemple continuer à utiliser son bras même si celui-ci est affecté par une blessure qui l'a amené à -1 point de vie).\nIl est à noter que le sortilège ne protège pas en revanche le corps des actions entreprises. La douleur est souvent un signal permettant d'éviter une action qui pourrait s'avérer très dommageable. Si, privée de ce signal, la créature entreprend des actions susceptibles de la blesser, elle en subit pleinement les conséquences (par exemple, courir avec une cheville foulée pourra aggraver la blessure).\nUne créature consciente et consentante pour être affectée par le sortilège l'est automatiquement (en particulier si le magicien lance le sort sur lui-même). Dans le cas contraire, la créature visée effectue un jet de sauvegarde et n'est affectée que si celui-ci échoue."
+            },
+            "Surdité": {
+                level: 4,
+                portée: "20 m",
+                incantation: "4 s",
+                durée: "10 min",
+                sauvegarde: "C",
+                zone: "1 créature",
+                description: "La créature ciblée devient soudain totalement sourde.\nSi elle ne se doute pas que cela résulte d'un sort qu'on lui a lancé, cette brusque surdité est susceptible de fortement la perturber (jet sous niveau mental pour gérer ce stress)."
+            },
+            "Travail de la pierre": {
+                level: 4,
+                portée: "10 m",
+                incantation: "10 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "1 m3",
+                description: "Ce sort permet de sculpter magiquement dans la pierre (et plus généralement dans tout minéral à base de silice ou de calcaire, y compris la terre), afin de lui faire adopter la forme souhaitée. Il n'y a pas suppression de matière, simplement déplacement (le volume total est constant). La transformation est presque instantanée.\nIl n'est bien sûr possible de déplacer de la matière que dans un espace vide au départ (ni dans un solide ni dans un liquide n'ayant pas la possibilité de s'étendre ailleurs). Aucune des dimensions finales de l'objet ne peut dépasser 10 fois sa valeur originelle.\nPar ailleurs, ce sortilège n'affecte pas la matière qui se trouve à moins de 10 cm d'une créature intelligente."
+            },
+
+            // Niveau 5
+            "Peau de pierre": {
+                level: 5,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "15 min",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La peau de la créature touchée se durcit au point de constituer une véritable armure naturelle. Elle diminue automatiquement de 7 points tous les dommages physiques qu'elle reçoit. Cela est valable tant pour les coups d'épée que les sortilèges de boule de feu, par exemple. Cette protection est cumulable avec celle procurée le cas échéant par son armure.\nCependant, ses mouvements sont rendus plus difficiles par la rigidité de la peau. Elle souffre d'un malus de -2 à tous ses jets de vivacité physique et de déplacement dans la nature, et d'un malus de -1 à toutes ses autres actions physiques.\nLe lancement d'un sort est exceptionnellement ici considéré comme une action physique : en effet, la carapace entourant la créature gêne l'émission d'ondes magiques et donc le lancement de sortilèges."
+            },
+            "Pétrification": {
+                level: 5,
+                portée: "10 m",
+                incantation: "4 s",
+                durée: "30 s",
+                sauvegarde: "C+1",
+                zone: "1 créature",
+                description: "Les membres de la créature ciblée se figent soudain. Celle-ci est encore consciente et ses sens fonctionnent, à l'exception du toucher. Mais ses muscles ne répondent plus à ses injonctions.\nA la différence du sort de « Paralysie » de la liste de Maîtrise des esprits, la défaillance est ici physique et non mentale.\nLa créature peut toujours lancer des sortilèges, mais avec le malus habituel de -8 exprimant qu'elle ne peut ni bouger ni parler."
+            },
+
+            // Niveau 6
+            "Poings de pierre": {
+                level: 6,
+                portée: "toucher",
+                incantation: "3 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Le dos de la main et des doigts de la créature touchée se recouvrent d'une fine pellicule ocre dure comme de la pierre. Les coups de poings de la créature bénéficient alors d'un bonus à leurs dommages qui traduit la sécheresse de l'impact. Ce bonus est égal à la marge de toucher finale, avec un maximum de +3 : pas de bonus pour une marge finale de 0, +1 aux dommages pour une marge finale de 1, +2 pour une marge de 2 et +3 pour une marge supérieure ou égale à 3.\nLa pellicule est néanmoins suffisamment fine pour ne pas gêner les mouvements de la main ou la saisie d'objets. En revanche, le bonus aux dommages ne s'applique que pour un combat aux poings nus. Si la créature porte une arme de poing quelconque, les dégâts qu'elle inflige ne sont pas augmentés par le sort."
+            },
+            "Cécité": {
+                level: 6,
+                portée: "10 m",
+                incantation: "5 s",
+                durée: "10 min",
+                sauvegarde: "C+1",
+                zone: "1 créature",
+                description: "La créature ciblée devient aveugle. Elle souffre d'une pénalité de -8 à toutes les actions pour lesquelles la vue intervient. Cela inclut toutes les actions de combat. Sa feinte de corps subit en outre un malus de -2.\nLes sortilèges restent possibles avec le malus habituel au jet de lancement : -4 pour les sorts de zones et –8 pour ceux visant une personne (car celle-ci doit être localisée avec une certaine précision)."
+            },
+            "Mur de pierre": {
+                level: 6,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "6m x 3m x 2m",
+                description: "Le mur de pierre créé par ce sort doit reposer verticalement sur une surface solide. Il est d'une très grande solidité. La seule façon de le franchir est sans doute de le déplacer, soit en le poussant, soit en le faisant basculer. Il ne faut cependant pas perdre de vue que ce mur, dans ses dimensions maximales, pèse plus de 100 tonnes. Il nécessite donc une force considérable pour le faire bouger."
+            },
+
+            // Niveau 7
+            "Passe-muraille": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort rend le magicien capable de traverser (avec son équipement) une épaisseur raisonnable de pierre ou de terre. Il fusionne avec celle-ci et en ressort de l'autre côté.\nLe magicien peut emmener avec lui ses compagnons à condition qu'ils maintiennent un contact direct avec lui pendant toute la traversée. Ils bénéficient alors temporairement par extension de son pouvoir de fusion avec la pierre.\nPendant que le magicien et le cas échéant ses compagnons sont au sein de la pierre, ils ne perçoivent plus l'extérieur et ne voient qu'un grand voile noir.\nJusqu'à la fin du sort, le magicien peut autant de fois qu'il le souhaite franchir ainsi une épaisseur de pierre ou de terre en fusionnant avec elle. La réactivation de ce pouvoir nécessite toutefois 5 secondes à chaque nouveau franchissement."
+            },
+            "Bouclier de pierres animées": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "sphère de 3m *",
+                description: "Une sphère (éventuellement tronquée au niveau du sol) constituée de petites pierres en mouvement très rapide entoure le magicien et se déplace avec lui. La vitesse du magicien ne peut toutefois dépasser celle d'une marche normale, à défaut de quoi la sphère ne parvient plus avancer à sa vitesse et à le devancer.\nLa vision de cette nuée de pierres en mouvement dissuadera tous les animaux et la plupart des créatures intelligentes de tenter de la franchir. Seules les créatures particulièrement déterminées pourront s'y résoudre, et encore devront-elles réussir un jet sous leur Volonté avec un malus de -2 pour y parvenir. Le franchissement de la sphère leur inflige alors de sévères blessures (1d4+4 points de vie généraux).\nLe fait qu'une créature franchisse la sphère en perturbe momentanément la magie et a pour conséquence que la sphère reste immobile pendant 1 tour. Le magicien doit attendre que cette perturbation ait pris fin avant de pouvoir le cas échéant reprendre sa route (sauf à choisir de laisser la sphère derrière lui). En outre, la sphère se dissipe dès lors que 10 créatures l'ont traversée.\nLes pierres en mouvement sont susceptibles d'atteindre les objets propulsés à travers la sphère. Plus les objets sont gros et plus la probabilité d'être touchés lors de la traversée de la sphère est élevée. Les projectiles (flèches, carreaux d'arbalète) ont une chance sur deux (50 %) d'être heurtés par une ou plusieurs pierres, ce qui a pour effet d'interrompre ou de détourner leur vol, leur faisant rater leur cible."
+            },
+
+            // Niveau 8
+            "Excavation": {
+                level: 8,
+                portée: "20 m",
+                incantation: "10 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "30 m3",
+                description: "Ce sort permet au magicien de creuser dans le sol un trou régulier (principalement un cylindre ou un parallélépipède rectangle, bien que d'autres formes soient possibles) représentant un volume de 30 mètres cube (grosso modo 3x3x3 mètres). Le trou doit donner sur l'air libre. Sa longueur ou sa profondeur ne peuvent dépasser le double de sa largeur.\nLe sol s'abaisse peu à peu au cours de l'incantation jusqu'à atteindre après 10 secondes la profondeur voulue. Ce sort est efficace sur tout sol solide constitué principalement de terre ou de pierre (y compris sur le plancher de pierre d'une demeure, qui peut être réduit à une épaisseur nulle)."
+            },
+            "Statue": {
+                level: 8,
+                portée: "10 m",
+                incantation: "5 s",
+                durée: "1 min",
+                sauvegarde: "C-2",
+                zone: "1 créature",
+                description: "Ce sortilège est une version un peu plus puissante du sort de niveau 5 Pétrification. La créature ciblée voit ses muscles se durcir et devient incapable de les commander. Elle ne peut entreprendre aucune action physique, même si ses sens continuent de fonctionner (ainsi que son cœur et tous les autres muscles vitaux).\nElle est de ce fait totalement à la merci de ses adversaires. Néanmoins, la rigidification de son corps lui procure une armure naturelle de 10 points de protection. Tous les dommages qui lui sont portés sont donc réduits de 10, qu'il s'agisse d'attaques de mêlée, par projectiles ou de sortilèges. Son esprit en revanche ne bénéficie d'aucune protection."
+            },
+            "Elémental de terre": {
+                level: 8,
+                portée: "2 m",
+                incantation: "30 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "1 m3 de pierre ou de rocher",
+                description: "Par ce sortilège, le magicien invoque pour l'aider une créature venant d'un autre plan d'existence. Il s'agit d'un être composé de pierre magiquement liée. Il sort du rocher sur lequel le magicien a lancé le sort.\nL'élémental perçoit les ordres mentaux du magicien, pourvu que celui-ci se trouve à moins de 50 mètres, et il s'y conforme. Il est le plus souvent appelé pour aider le magicien lors d'un combat ou pour le protéger. C'est le plus robuste des quatre types d'élémentaux (air, eau, feu et terre) : ses attaques sont relativement puissantes et il est capable d'encaisser beaucoup de coups.\nLe magicien peut également utiliser ce sort pour contrôler un élémental de terre qui a été invoqué ou le renvoyer dans son plan d'existence. Dans ce cas, l'incantation est réduite à seulement 5 secondes. L'élémental a droit à une sauvegarde sous respectivement PM+4 pour la prise de contrôle et PM pour le renvoi sur son plan d'origine.\nLes caractéristiques des élémentaux de terre sont décrites en annexe du présent livre de magie et plus en détail dans le chapitre « Les créatures surnaturelles » du livre du monde. Leur intelligence est équivalente à celle d'un enfant de quatre ou cinq ans. Ils ont un score de +7 en attaque, +4 en feinte de corps, +3 en esquive, +4 en parade, une armure d'une valeur de 8 sur la totalité du corps et infligent des dommages égaux à 3 x marge +1 (plafonné à 25)."
+            },
+
+            // Niveau 9
+            "Communion avec les pierres": {
+                level: 9,
+                portée: "-",
+                incantation: "1 min",
+                durée: "10 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège permet au magicien d'entrer en communion avec son environnement minéral afin d'obtenir des informations. Le mage met environ 1 minute (le temps de lancement du sort) à se mettre en harmonie avec les pierres du lieu où il se trouve (des cailloux dans la terre suffisent).\nIl peut ensuite poser mentalement jusqu'à 10 questions auxquelles les pierres répondront par oui ou non. Les pierres ont une mémoire parfaite des événements, mais sont en revanche incapable d'opérer la distinction entre les diverses races humanoïdes et a fortiori entre les individus, ou de saisir le détail de leurs actions.\nUne variante de ce sort consiste, au lieu de poser 10 questions, à revivre visuellement un ou plusieurs événements passés, dans la limite de la durée du sort. Il est néanmoins nécessaire de pouvoir identifier clairement et simplement chaque événement recherché, afin que les pierres qui l'ont vécu le retrouve (par exemple : « l'avant dernière fois que des créatures humanoïdes sont passées par ici »)."
+            },
+            "Être de pierre": {
+                level: 9,
+                portée: "3 m",
+                incantation: "1 min",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "1 m3 de rocher",
+                description: "Ce sort permet au magicien de créer magiquement un être fait de pierre. Il ne s'agit pas d'invoquer une créature venant d'un autre plan d'existence, mais d'insuffler une vie temporaire à de la matière issue d'un rocher. La créature ainsi créée rentre donc dans la catégorie des créatures surnaturelles, mais pas dans celle des créatures invoquées venant d'un autre plan (cela notamment pour le sortilège Repousser les créatures invoquées).\nLa créature sort du rocher sur lequel le magicien a lancé le sortilège. Elle prend une forme vaguement humanoïde, même si les détails restent l'apanage du magicien. Elle pèse 2 tonnes et mesure environ trois mètres de haut.\nSes caractéristiques sont égales à celles d'un élémental de terre + 1 : elle a ainsi un score de +8 en attaque, +5 en feinte de corps et +4 en esquive. Elle inflige des dommages égaux à 3 x marge +1 (plafonné à 25). Elle possède une armure de 10 sur la totalité du corps, 35 points de vie et 60 points de fatigue.\nMême si elle obéit de son mieux aux ordres du magicien, elle a une intelligence très limitée et ces ordres doivent rester simples. En l'absence d'instructions elle suit le magicien et le défend physiquement.\nLe magicien peut utiliser ce sort pour contrôler un être de pierre. Dans ce cas, l'incantation est réduite à seulement 10 secondes. L'être a droit à une sauvegarde sous PM+4."
+            },
+
+            // Niveau 10
+            "Chair en pierre": {
+                level: 10,
+                portée: "10 m",
+                incantation: "7 s",
+                durée: "3 min",
+                sauvegarde: "C-4",
+                zone: "1 créature",
+                description: "Ce sortilège rigidifie la chair de la créature ciblée et la rend dure comme de la pierre. La créature reste consciente et ses sens continuent à fonctionner, mais son corps est totalement paralysé. Son esprit restant actif elle peut lancer des sorts, mais subit le malus habituel de -8 du fait qu'elle ne peut ni bouger ni parler.\nExtérieurement, le corps de la créature semble être fait de pierre. Il est maintenu parfaitement rigide par les ondes magiques du sortilège et se comporte exactement comme si effectivement il était fait de pierre. Il se trouvera notamment insensible aux attaques physiques, qu'il s'agisse de coups ou de sortilèges.\nCe sortilège peut être utilisé par le magicien pour se protéger ou protéger un ami. Dans ce cas, aucune sauvegarde n'est nécessaire, car le fait d'être consentant permet aux ondes magiques du sortilège de se déployer librement."
+            },
+            "Solidification de la matière": {
+                level: 10,
+                portée: "20 m",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "- (Mag-3)",
+                zone: "30 m3",
+                description: "Ce sort permet au magicien de rendre solide de la matière liquide sans pour autant en changer la température. La limitation principale est le volume, qui ne doit pas excéder 30 mètres cube. La matière solidifiée doit en outre avoir une forme régulière (convexe).\nLa matière se solidifie et forme un objet teinté de la couleur précédente du liquide. Le volume occupé par l'objet sous sa forme solide est identique à celui qu'il occupait sous sa forme liquide. A la fin du sortilège, la matière reprend automatiquement son état normal.\nCe sort n'autorise aucune sauvegarde, sauf si une créature intelligente (humanoïde ou créature surnaturelle intelligente) se trouve dans la matière à solidifier. Dans ce cas, la ou les créatures concernées effectuent un jet de sauvegarde. La réussite par une seule créature suffit à faire échouer le sort. Si les différentes sauvegardes sont ratées, le sort prend effet et les créatures prises dans le liquide solidifié en sont expulsées vers la zone libre la plus proche."
+            },
+
+            // Niveau 12
+            "Tempête de sable": {
+                level: 12,
+                portée: "2 km",
+                incantation: "1 min",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "boule de 2km",
+                description: "Ce sort soulève dans la zone d'effets un puissant vent de sable.\nCette tempête de sable réduit très fortement la visibilité : il est difficile de garder les yeux ouverts en raison du sable dans l'air et même ainsi la portée de la vision est réduite à quelques mètres à peine, comme dans un épais brouillard.\nCertaines rafales peuvent atteindre 100 km/h, ce qui rend malaisé le déplacement pédestre et impossible le vol naturel (le vol magique est néanmoins possible mais au prix d'un contrôle délicat de la trajectoire). Dans ce contexte, la plupart des actions (attaquer, lancer un sort, monter à cheval, etc.) sont résolues comme Difficiles (malus de -4). Les actions de défense (parades, esquives, sauvegardes contre un sort physique) sont résolues comme Malaisées (malus de -2).\nLe magicien est lui-même partiellement protégé de la tempête par une enveloppe magique invisible, qui entoure son corps à une dizaine de centimètres de distance. Cette enveloppe arrête le sable et réduit de moitié la force du vent que subit le magicien. Elle ne protège cependant pas celui-ci contre la mauvaise visibilité liée à la présence très importante de sable et de poussière dans l'air."
+            },
+
+            // Niveau 20
+            "Tremblement de terre": {
+                level: 20,
+                portée: "3 km",
+                incantation: "5 min",
+                durée: "20 s",
+                sauvegarde: "-",
+                zone: "disque de 3km",
+                description: "Par ce sort le magicien déclenche un fort tremblement de terre dans la zone d'effets qu'il a choisie. Ce tremblement de terre est suffisamment puissant pour provoquer l'effondrement d'une partie importante des bâtiments qui n'ont pas été solidement construits.\nIl est également susceptible d'avoir de grands effets sur l'état psychologique des habitants de la zone."
+            },
+
+            // Niveau 25
+            "Ouverture du sol": {
+                level: 25,
+                portée: "100 m",
+                incantation: "5 min",
+                durée: "1 jour",
+                sauvegarde: "-",
+                zone: "spéciale",
+                description: "Ce sortilège permet au magicien de créer une faille abrupte dans le sol sur près de 5 kilomètres de long et une centaine de mètres de large. Les parois de la faille sont escarpées et sont hautes de plus de 200 mètres.\nLe sol s'ouvre progressivement au cours des incantations du magicien, la faille s'allongeant peu à peu depuis son centre (là où se trouve le magicien) dans les deux directions et gagnant progressivement en largeur et en profondeur."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme de la Liste de la Terre
+                const connections = [
+                    // Chaîne de base : sol et pierre
+                    ['Rigidification du sol', 'Soudure des pierres'],
+                    ['Rigidification du sol', 'Immobilité'],
+                    ['Soudure des pierres', 'Travail de la pierre'],
+                    ['Travail de la pierre', 'Mur de pierre'],
+                    ['Mur de pierre', 'Bouclier de pierres animées'],
+                    
+
+                    // Chaîne d'immobilité et pétrification
+                    ['Immobilité', 'Pétrification'],
+                    ['Immobilité', 'Surdité'],
+                    ['Surdité', 'Cécité'],
+                    ['Pétrification', 'Statue'],
+                    ['Statue', 'Chair en pierre'],
+                    ['Statue', 'Solidification de la matière'],
+                    ['Chair en pierre', 'Tempête de sable'],
+
+                    // Chaîne de protection et armure
+                    ['Résistance à la douleur', 'Peau de pierre'],
+                    ['Peau de pierre', 'Poings de pierre'],
+                    ['Poings de pierre', 'Passe-muraille'],
+
+                    // Chaîne de perception
+                    ['Surdité', 'Cécité'],
+
+                    // Chaîne de mouvement et traversée
+                    ['Passe-muraille', 'Excavation'],
+                    ['Passe-muraille', 'Communion avec les pierres'],
+
+                    // Chaîne d'invocation et création
+                    ['Elémental de terre', 'Être de pierre'],
+                    ['Communion avec les pierres', 'Tremblement de terre'],
+
+                    // Chaîne de solidification
+                    ['Mur de pierre', 'Solidification de la matière'],
+
+                    // Chaîne de destruction massive
+                    ['Tempête de sable', 'Tremblement de terre'],
+                    ['Tremblement de terre', 'Ouverture du sol'],
+                    
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
