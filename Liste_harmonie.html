@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de l'Harmonie</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DE L'HARMONIE</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-1" data-spell="Dissipation de la peur">Dissipation de la peur</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-3" data-spell="Empathie">Empathie</div>
+            <div class="spell-node col-5" data-spell="Dissiper la fatigue">Dissiper la fatigue</div>
+            <div class="spell-node col-7" data-spell="Retarder le poison">Retarder le poison</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-1" data-spell="Dissipation de l'agressivité">Dissipation de l'agressivité</div>
+            <div class="spell-node col-3" data-spell="Confiance">Confiance</div>
+            <div class="spell-node col-5" data-spell="Accélération de la guérison">Accélération de la guérison</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-1" data-spell="Neutralité">Neutralité</div>
+            <div class="spell-node col-2" data-spell="Réparation">Réparation</div>
+            <div class="spell-node col-5" data-spell="Soigner les blessures légères">Soigner les blessures légères</div>
+            <div class="spell-node col-7" data-spell="Neutraliser le poison">Neutraliser le poison</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-1" data-spell="Dissipation des émotions">Dissipation des émotions</div>
+            <div class="spell-node col-2" data-spell="Catalepsie">Catalepsie</div>
+            <div class="spell-node col-3" data-spell="Compréhension des langues">Compréhension des langues</div>
+            <div class="spell-node col-7" data-spell="Guérison des maladies">Guérison des maladies</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-1" data-spell="Libérer l'esprit de la magie">Libérer l'esprit de la magie</div>
+            <div class="spell-node col-2" data-spell="Atténuation des sons">Atténuation des sons</div>
+            <div class="spell-node col-5" data-spell="Guérison des blessures graves">Guérison des blessures graves</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-1" data-spell="Zone de sérénité">Zone de sérénité</div>
+            <div class="spell-node col-3" data-spell="Sentir les êtres vivants">Sentir les êtres vivants</div>
+            <div class="spell-node col-6" data-spell="Maintien de l'âme">Maintien de l'âme</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-1" data-spell="Dissipation des illusions">Dissipation des illusions</div>
+            <div class="spell-node col-3" data-spell="Détection du mensonge">Détection du mensonge</div>
+        </div>
+
+        <!-- Niveau 9 -->
+        <div class="level">
+            <div class="level-number">9</div>
+            <div class="spell-node col-6" data-spell="Restaurer la mémoire">Restaurer la mémoire</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-2" data-spell="Globe d’atténuation de la magie">Globe d’atténuation de la magie
+            </div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-2" data-spell="Vision réelle">Vision réelle</div>
+            <div class="spell-node col-6" data-spell="Ressouder un membre">Ressouder un membre</div>
+        </div>
+
+        <!-- Niveau 25 -->
+        <div class="level">
+            <div class="level-number">25</div>
+            <div class="spell-node col-6" data-spell="Rappeler à la vie">Rappeler à la vie</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de la Liste de l'Harmonie
+        const spellsData = {
+            // Niveau 1
+            "Dissipation de la peur": {
+                level: 1,
+                portée: "15 m",
+                incantation: "1 s",
+                durée: "-",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Ce sort calme la créature ciblée. Sa peur disparaît, et elle est désormais capable d'affronter ce qui la provoquait. Elle est de nouveau maîtresse d'elle-même et sûre d'elle.\nCe sortilège cependant n'agit que sur des peurs extérieures, d’origine naturelle ou magique. Il dissipera la crainte d'une créature hideuse ou d'une charge de cavalerie, il annulera les effets d’un sort d’Effroi. En revanche, il ne fera qu'endormir les peurs intérieures, comme les phobies ou le vertige. Il apaisera la personne ciblée en lui faisant oublier la cause de sa peur, mais ne l'en guérira pas. Par exemple, lancée sur un compagnon en train d'escalader une paroi et saisi d'une crise de vertige, il le calmera, lui permettra de regarder vers le haut et de reprendre l'ascension. Mais une prise qui lâche subitement ou un pied qui glisse peut tout à fait déclencher une nouvelle crise."
+            },
+
+            // Niveau 2
+            "Empathie": {
+                level: 2,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "20 min",
+                sauvegarde: "Thp-4",
+                zone: "1 créature",
+                description: "Ce sortilège permet de ressentir les émotions d'une autre créature. Il ne donne aucune information sur leurs causes, en revanche il les décrit avec une certaine finesse.\nLe détail de perception des sentiments dépend des dons de psychologue du magicien (i.e. de son score dans la compétence « Relations avec les autres »). Il pourra ainsi le cas échéant distinguer colère, humiliation, admiration, trouble amoureux, mépris, reconnaissance ou tout autre sentiment similaire."
+            },
+            "Dissiper la fatigue": {
+                level: 2,
+                portée: "toucher",
+                incantation: "8 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Par le contact de ses mains, le magicien peut faire passer ses ondes magiques directement dans le corps de la personne qu'il veut aider. Cela est d'ailleurs le cas pour tous les sorts de soins.\nLa nature même des ondes magiques implique que leur apport redonne des forces. En dehors du coût de base du sort (2 pts de concentration et 2 pts de fatigue), pour chaque point de concentration et de fatigue dépensé par le magicien, la cible reprend 2 points de fatigue. Le rituel dure 8 secondes plus 2 secondes par point de concentration supplémentaire dépensé.\nRemarque : si le magicien lance le sort sur lui-même, l'amplification de son énergie n'a pas lieu et il ne gagne qu'un point de fatigue par points de concentration et de fatigue dépensés. Deux magiciens maîtrisant ce sort peuvent mutuellement se redonner plus de points de fatigue qu’ils n’en dépensent."
+            },
+            "Retarder le poison": {
+                level: 2,
+                portée: "20 m",
+                incantation: "1 s",
+                durée: "6 h",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Ce sort stoppe la progression d'un poison dans le corps d'une créature pour une durée de 6 heures. Passé ce délai, le poison reprend son œuvre destructrice. Ce sort agit quel que soit le poison, sa force ou son mode de contamination (ingestif ou insinuatif)."
+            },
+
+            // Niveau 3
+            "Dissipation de l'agressivité": {
+                level: 3,
+                portée: "30 m",
+                incantation: "2 s",
+                durée: "-",
+                sauvegarde: "NM-3",
+                zone: "1 créature",
+                description: "Ce sort calme une créature en train ou sur le point de se battre. Elle se contentera de se défendre si on l'attaque, mais n'attaquera pas en premier ni ne se montrera agressive, physiquement ou verbalement. Ce sortilège ne fait que « remettre à zéro » les compteurs d'agressivité ; il ne les bloque pas."
+            },
+            "Confiance": {
+                level: 3,
+                portée: "15 m",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "Ab-2",
+                zone: "1 créature",
+                description: "Ce sort rassure la créature ciblée et lui inspire un sentiment de confiance envers le magicien. Elle ne voudra pas croire à des intentions mauvaises de sa part et aura tendance à croire ce qu'il dit si cela semble possible."
+            },
+            "Accélération de la guérison": {
+                level: 3,
+                portée: "5 m",
+                incantation: "3 s",
+                durée: "spéciale",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Ce sort permet de stabiliser l'état d'une créature blessée et d’accélérer sa guérison naturelle. Les blessures guérissent 3 fois plus vite que la normale. La récupération de points de vie est ainsi 3 fois plus rapide."
+            },
+
+            // Niveau 4
+            "Neutralité": {
+                level: 4,
+                portée: "-",
+                incantation: "5 s",
+                durée: "15 min",
+                sauvegarde: "spéciale",
+                zone: "le magicien",
+                description: "La présence naturelle du magicien devient une aura de paix. Toute créature voulant l'attaquer hésite fortement. La sauvegarde consiste en un jet du magicien sous son Charisme, opposé à l'humeur des créatures. Le sort se rompt si le magicien agit de façon agressive."
+            },
+            "Réparation": {
+                level: 4,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "un objet (< 4 kg)",
+                description: "Le magicien ressoude les morceaux d'un objet cassé en passant son doigt sur les cassures, comme avec une colle magique. L'objet paraît n'avoir jamais été brisé."
+            },
+            "Soigner les blessures légères": {
+                level: 4,
+                portée: "toucher",
+                incantation: "10 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Soigne des blessures légères. Coût total: 4 PC et 4 PF (fixe) + 1 PF par point de vie soigné (variable). La guérison prend 1 minute par point de vie récupéré."
+            },
+            "Neutraliser le poison": {
+                level: 4,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Tout poison présent dans le corps de la créature touchée est instantanément neutralisé. Les effets déjà subis demeurent. Peut aussi être appliqué à un aliment ou une boisson."
+            },
+
+            // Niveau 5
+            "Dissipation des émotions": {
+                level: 5,
+                portée: "10 m",
+                incantation: "2 s",
+                durée: "5 min",
+                sauvegarde: "V-2",
+                zone: "boule de 3m",
+                description: "Les créatures dans la zone perdent soudain leurs émotions violentes (agressivité, peur, colère, désespoir) et cessent de se battre. À la fin, elles retrouvent la capacité de ressentir, pas forcément les émotions initiales."
+            },
+            "Catalepsie": {
+                level: 5,
+                portée: "-",
+                incantation: "1 s",
+                durée: "3 h",
+                sauvegarde: "-",
+                zone: "1 créature volontaire",
+                description: "Donne l'aspect de la mort (respiration et battements cessent). Corps en sommeil profond. Au réveil, faiblesse temporaire (-2 actions physiques). Les blessures reçues restent actives au réveil."
+            },
+            "Compréhension des langues": {
+                level: 5,
+                portée: "-",
+                incantation: "5 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien comprend et parle les langages des autres races humanoïdes ou intelligentes via un champ d'ondes magiques. Ne fonctionne pas pour animaux ni plantes."
+            },
+            "Guérison des maladies": {
+                level: 5,
+                portée: "toucher",
+                incantation: "15 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature est instantanément guérie de ses maladies. Les traces physiques éventuelles restent. Efficace contre toute maladie."
+            },
+
+            // Niveau 6
+            "Libérer l'esprit de la magie": {
+                level: 6,
+                portée: "15 m",
+                incantation: "4 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Dissipe les sorts indésirables affectant l'esprit de la cible (ceux contre lesquels une sauvegarde a été tentée). Les sorts de niveau ≥ 12 ont une chance de résister égale à 3 × leur niveau."
+            },
+            "Atténuation des sons": {
+                level: 6,
+                portée: "10 m",
+                incantation: "4 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "sphère de 3m (*)",
+                description: "Réduit fortement le volume de tout son traversant la sphère. Le magicien peut fixer la zone ou la centrer sur lui-même (elle suit alors ses déplacements). Les sortilèges ne sont pas affectés."
+            },
+            "Guérison des blessures graves": {
+                level: 6,
+                portée: "toucher",
+                incantation: "15 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Comme Soigner les blessures légères, mais soigne n'importe quelle blessure, y compris les blessures générales. Ne ressoude pas un membre tranché. Coût: 6 PC et 6 PF (fixe) + 1 PF par point de vie soigné."
+            },
+
+            // Niveau 7
+            "Zone de sérénité": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "10 min",
+                sauvegarde: "VM-4",
+                zone: "boule de 15m *",
+                description: "Toute créature dans la zone doit réussir une sauvegarde ou perd toute velléité agressive et accepte de discuter. Si l'agression devient physique, l'effet se rompt pour elle."
+            },
+            "Sentir les êtres vivants": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "20 min",
+                sauvegarde: "spécial",
+                zone: "boule de 50m *",
+                description: "Perçoit présence et localisation de toutes les créatures vivantes dans la zone, et peut analyser leurs émotions (sauvegarde Thp-4 pour l'analyse). La zone suit le magicien."
+            },
+            "Maintien de l'âme": {
+                level: 7,
+                portée: "2 m",
+                incantation: "2 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Empêche la mort définitive si lancé dans les 30 s suivant la mort. Retient l'esprit en le nourrissant d'ondes magiques minimales. Peut échouer si le corps subit de nouveaux dommages."
+            },
+
+            // Niveau 8
+            "Dissipation des illusions": {
+                level: 8,
+                portée: "-",
+                incantation: "3 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "boule de 100 m",
+                description: "Dissipe instantanément toutes les illusions dans un rayon de 100 m. Les illusions de niveau ≤ 7 sont dissipées automatiquement ; celles de niveau ≥ 8 ont une chance de résister égale à 3 × leur niveau."
+            },
+            "Détection du mensonge": {
+                level: 8,
+                portée: "-",
+                incantation: "3 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Sonde superficiellement l'esprit d'une créature pour y sentir les marques du mensonge. Le magicien sait si la personne dit la vérité, ment, ou présente les faits de façon trompeuse. Faible concentration, peut parler/agitr normalement."
+            },
+
+            // Niveau 9
+            "Restaurer la mémoire": {
+                level: 9,
+                portée: "toucher",
+                incantation: "10 s",
+                durée: "spécial",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "Rend immédiatement l'ensemble des souvenirs effacés par autre chose que le temps et améliore temporairement la netteté de tous les souvenirs (2 h)."
+            },
+
+            // Niveau 10
+            "Globe d’atténuation de la magie": {
+                level: 10,
+                portée: "-",
+                incantation: "10 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "boule de 5m *",
+                description: "Atténue les effets des sorts dans la zone selon leur proximité avec l'Harmonie : Eau/Harmonie: normal ; Nature/Magie pure/Detections/Contrôle de soi: -25% ; Métamorphoses/Créatures/Esprits/Illusions: -50% ; Air/Lumière/Isolement/Terre: -75% ; Feu/Froid: aucun effet. Les sorts de niveau ≥ 10 ont 2×niveau % de chance de fonctionner normalement."
+            },
+
+            // Niveau 15
+            "Vision réelle": {
+                level: 15,
+                portée: "-",
+                incantation: "30 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "portée des sens",
+                description: "Révèle le monde tel qu’il est réellement : voit toutes illusions et magies, leurs listes et puissance, l'aura des personnes. N'accorde pas de perception au-delà des sens normaux (sauf pour magie/aura)."
+            },
+            "Ressouder un membre": {
+                level: 15,
+                portée: "-",
+                incantation: "1 min",
+                durée: "permanent",
+                sauvegarde: "spécial",
+                zone: "spécial",
+                description: "Permet de ressouder un membre détaché avec des risques d'échec selon délai, conservation et netteté de la séparation (jusqu’à 25% chacun). En cas de réussite, le membre est à 0 PV et récupère ensuite."
+            },
+
+            // Niveau 25
+            "Rappeler à la vie": {
+                level: 25,
+                portée: "toucher",
+                incantation: "30 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "1 créature morte récemment",
+                description: "Rend la vie à une créature morte depuis moins de 10 minutes ou bénéficiant d’un Maintien de l’âme. Elle revient très faible (1 PV, 1 PF, 0 PC) et perd définitivement 1 point de Constitution."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0; // Commencer 8px au-dessus du bas
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0; // Arriver 8px en dessous du haut
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme de la Liste de la Lumière et de l'Électricité
+                const connections = [
+                    // Chaîne de lumière de base
+                    ['Dissipation de la peur', 'Dissipation de l\'agressivité'],
+                    ['Dissipation de l\'agressivité', 'Neutralité'],
+                    ['Neutralité', 'Dissipation des émotions'],
+                    ['Dissipation des émotions', 'Libérer l\'esprit de la magie'],
+                    ['Libérer l\'esprit de la magie', 'Zone de sérénité'],
+                    ['Zone de sérénité', 'Dissipation des illusions'],
+                    ['Dissipation des illusions', 'Vision réelle'],
+                    ['Réparation', 'Catalepsie'],
+                    ['Catalepsie', 'Atténuation des sons'],
+                    ['Atténuation des sons', "Globe d’atténuation de la magie"],
+                    ['Empathie', "Confiance"],
+                    ['Confiance', "Compréhension des langues"],
+                    ['Compréhension des langues', "Sentir les êtres vivants"],
+                    ['Sentir les êtres vivants', "Détection du mensonge"],
+                    ['Dissiper la fatigue', "Accélération de la guérison"],
+                    ['Accélération de la guérison', "Soigner les blessures légères"],
+                    ['Soigner les blessures légères', "Guérison des blessures graves"],
+                    ['Guérison des blessures graves', "Maintien de l'âme"],
+                    ['Maintien de l\'âme', "Restaurer la mémoire"],
+                    ['Restaurer la mémoire', "Ressouder un membre"],
+                    ['Ressouder un membre', "Rappeler à la vie"],
+                    ['Retarder le poison', "Neutraliser le poison"],
+                    ['Neutraliser le poison', "Guérison des maladies"],
+                    ['Guérison des maladies', "Maintien de l'âme"],
+
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
