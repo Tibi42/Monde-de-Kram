@@ -77,6 +77,16 @@ document.addEventListener("click", function (event) {
     if (magicType === "Métamorphoses") {
       openMetamorphosesModal();
     }
+
+    // Ouvrir la liste de la Nature si le bouton "Nature" est cliqué
+    if (magicType === "Nature") {
+      openNatureModal();
+    }
+
+    // Ouvrir la liste de la Terre si le bouton "Terre" est cliqué
+    if (magicType === "Terre") {
+      openTerreModal();
+    }
   }
 });
 
@@ -268,6 +278,74 @@ function openMetamorphosesModal() {
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && metaModal.parentNode) {
       document.body.removeChild(metaModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste de la Nature
+function openNatureModal() {
+  const natureModal = document.createElement("div");
+  natureModal.id = "natureModal";
+  natureModal.className = "modal";
+  natureModal.style.display = "flex";
+
+  natureModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeNatureModal">&times;</span>
+      <iframe src="Liste_nature.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(natureModal);
+
+  const closeBtn = document.getElementById("closeNatureModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(natureModal);
+  });
+
+  natureModal.addEventListener("click", function (event) {
+    if (event.target === natureModal) {
+      document.body.removeChild(natureModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && natureModal.parentNode) {
+      document.body.removeChild(natureModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste de la Terre
+function openTerreModal() {
+  const terreModal = document.createElement("div");
+  terreModal.id = "terreModal";
+  terreModal.className = "modal";
+  terreModal.style.display = "flex";
+
+  terreModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeTerreModal">&times;</span>
+      <iframe src="Liste_terre.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(terreModal);
+
+  const closeBtn = document.getElementById("closeTerreModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(terreModal);
+  });
+
+  terreModal.addEventListener("click", function (event) {
+    if (event.target === terreModal) {
+      document.body.removeChild(terreModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && terreModal.parentNode) {
+      document.body.removeChild(terreModal);
     }
   });
 }
