@@ -107,6 +107,11 @@ document.addEventListener("click", function (event) {
     if (magicType === "Maîtrise des esprits") {
       openMaitriseEspritsModal();
     }
+
+    // Ouvrir la liste de l'Isolement si le bouton "Isolement" est cliqué
+    if (magicType === "Isolement") {
+      openIsolementModal();
+    }
   }
 });
 
@@ -482,7 +487,7 @@ function openMaitriseEspritsModal() {
   maitriseEspritsModal.innerHTML = `
     <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
       <span class="close" id="closeMaitriseEspritsModal">&times;</span>
-      <iframe src="Liste_maitrise_esprits.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_maitriseEsprits.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
     </div>
   `;
 
@@ -502,6 +507,40 @@ function openMaitriseEspritsModal() {
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && maitriseEspritsModal.parentNode) {
       document.body.removeChild(maitriseEspritsModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste de l'Isolement
+function openIsolementModal() {
+  const isolementModal = document.createElement("div");
+  isolementModal.id = "isolementModal";
+  isolementModal.className = "modal";
+  isolementModal.style.display = "flex";
+
+  isolementModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeIsolementModal">&times;</span>
+      <iframe src="Liste_isolement.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(isolementModal);
+
+  const closeBtn = document.getElementById("closeIsolementModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(isolementModal);
+  });
+
+  isolementModal.addEventListener("click", function (event) {
+    if (event.target === isolementModal) {
+      document.body.removeChild(isolementModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && isolementModal.parentNode) {
+      document.body.removeChild(isolementModal);
     }
   });
 }

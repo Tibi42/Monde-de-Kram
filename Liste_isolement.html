@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de l'Isolement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spell-node.clicked {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 350px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #4a90e2;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DE L'ISOLEMENT</h1>
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-4" data-spell="Résistance à la maladie">Résistance à la maladie</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-4" data-spell="Résistance au poison">Résistance au poison</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-2" data-spell="Repousser les animaux">Repousser les animaux</div>
+            <div class="spell-node col-4" data-spell="Expulser la maladie">Expulser la maladie</div>
+            <div class="spell-node col-6" data-spell="Globe de température immuable">Globe de température immuable</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-4" data-spell="Expulser le poison">Expulser le poison</div>
+            <div class="spell-node col-5" data-spell="Sphère d'isolement sonore">Sphère d'isolement sonore</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-2" data-spell="Repousser les humanoïdes">Repousser les humanoïdes</div>
+            <div class="spell-node col-5" data-spell="Sphère d'isolement visuel">Sphère d'isolement visuel</div>
+            <div class="spell-node col-7" data-spell="Globe de protection contre les projectiles">Globe de protection
+                contre les projectiles</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-5" data-spell="Sphère d'isolement sensoriel">Sphère d'isolement sensoriel</div>
+            <div class="spell-node col-7" data-spell="Mur élémentaire">Mur élémentaire</div>
+        </div>
+
+        <!-- Niveau 7 -->
+        <div class="level">
+            <div class="level-number">7</div>
+            <div class="spell-node col-2" data-spell="Repousser les créatures invoquées">Repousser les créatures
+                invoquées</div>
+            <div class="spell-node col-4" data-spell="Barrière mentale">Barrière mentale</div>
+            <div class="spell-node col-6" data-spell="Sphère d'isolement magique">Sphère d'isolement magique</div>
+            <div class="spell-node col-7" data-spell="Sphère des éléments">Sphère des éléments</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-2" data-spell="Projection">Projection</div>
+            <div class="spell-node col-4" data-spell="Voile de non-détection">Voile de non-détection</div>
+            <div class="spell-node col-6" data-spell="Armure magique">Armure magique</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-2" data-spell="Repousser les créatures surnaturelles">Repousser les créatures
+                surnaturelles</div>
+            <div class="spell-node col-6" data-spell="Sphère d'isolement physique">Sphère d'isolement physique</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-6" data-spell="Globe de suspension de la magie">Globe de suspension de la magie
+            </div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-2" data-spell="Répulsion universelle">Répulsion universelle</div>
+        </div>
+
+        <!-- Niveau 25 -->
+        <div class="level">
+            <div class="level-number">25</div>
+            <div class="spell-node col-4" data-spell="Sphère d'isolement suprême">Sphère d'isolement suprême</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de la Liste de l'Isolement
+        const spellsData = {
+            // Niveau 1
+            "Résistance à la maladie": {
+                level: 1,
+                portée: "-",
+                incantation: "3 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège augmente très fortement la résistance du magicien face à la maladie. Il devient hermétique à tout corps étranger. Tous ses jets de résistance à la maladie se font avec un bonus de +10 à sa Constitution."
+            },
+
+            // Niveau 2
+            "Résistance au poison": {
+                level: 2,
+                portée: "-",
+                incantation: "3 s",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sortilège augmente très fortement la résistance du magicien face au poison ou au venin. Il devient hermétique à toute substance étrangère. Tous ses jets de résistance au poison se font avec un bonus de +12 à sa Constitution."
+            },
+
+            // Niveau 3
+            "Repousser les animaux": {
+                level: 3,
+                portée: "-",
+                incantation: "2 s",
+                durée: "30 min",
+                sauvegarde: "« Mag »",
+                zone: "un type d'animaux",
+                description: "Ce sortilège permet au magicien d'empêcher un certain type d'animaux de s'approcher de lui. Par « type » il faut entendre un ensemble d'animaux facilement définissable, c'est-à-dire en général une espèce (les chiens, les crocodiles…), mais également possiblement un groupe relativement constitué (les fauves lâchés dans une arène, les animaux présents dans une étable…) ou encore une famille (les insectes, les poissons…).\nLes animaux visés sont incapables de s'approcher à moins de 10 mètres du magicien : l'aura de celui-ci les effraie sans qu'ils sachent vraiment pourquoi. S'ils se trouvaient à moins de 10 mètres de lui, ils s'en éloignent dès qu'ils le peuvent.\nLa sauvegarde inversée de ce sortilège consiste en un jet du magicien sous son propre don Magie. Le maître du jeu ajoute un bonus ou un malus à ce jet de sauvegarde pour tenir compte de l'agressivité et du nombre des animaux visés. Typiquement, ce malus pourra aller jusqu'à -6 pour un groupe nombreux de bêtes sauvages particulièrement affamées.\nCe sortilège ne dissipe pas l'agressivité des bêtes. Il se contente de les tenir à distance respectable.\nLe cas échéant il fonctionne également de façon limitée sur les végétaux évolué animés d'une volonté propre, les empêchant d'attaquer le magicien."
+            },
+            "Expulser la maladie": {
+                level: 3,
+                portée: "-",
+                incantation: "3 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort élimine tout organisme étranger indésirable dans le corps du magicien. La maladie qu'il véhiculait est immédiatement et totalement guérie. Les traces de son passage demeurent (cicatrices de boutons, par exemple), mais tous ses effets présents et futurs sont évités."
+            },
+            "Globe de température immuable": {
+                level: 3,
+                portée: "-",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 3m *",
+                description: "Le magicien crée une sphère à l'intérieur de laquelle se maintient une température fixe quelles que soient les conditions extérieures. Le magicien choisit cette température au moment où il lance son sortilège, dans une échelle allant de 5 à 35 degrés Celsius.\nLes conditions naturelles n'affectent pas cette zone de température immuable. Ainsi, un vent glacé soufflera bien dans la zone, mais sera, le temps de son passage, porté magiquement à la température ambiante.\nEn revanche, la chaleur et le froid magiques prennent effet à l'intérieur de la zone. La magie du Globe de température immuable réduit simplement leurs effets. En termes de jeu, les dommages dus à une chaleur ou à un froid magique sont réduits d'un tiers à l'intérieur du globe (avant un éventuel jet de sauvegarde). Les sortilèges de niveau 1 ou 2 modifiant la température d'un lieu ou d'un objet sont quant à eux purement et simplement inefficaces."
+            },
+
+            // Niveau 4
+            "Expulser le poison": {
+                level: 4,
+                portée: "-",
+                incantation: "3 s",
+                durée: "permanent",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Ce sort élimine toute substance étrangère indésirable dans le corps du magicien. Tout poison ou venin est immédiatement et totalement neutralisé.\nCela ne confère cependant au magicien aucune résistance future vis à vis d'une nouvelle inoculation."
+            },
+            "Sphère d'isolement sonore": {
+                level: 4,
+                portée: "-",
+                incantation: "3 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "sphère de 3m *",
+                description: "La Sphère d'isolement sonore empêche les sons produits en son sein d'en sortir. Cela peut en particulier permettre au magicien et à ceux qui l'entourent de se déplacer parfaitement discrètement.\nEn sens inverse, les sons provenant de l'extérieur de la sphère pénètrent en son sein, mais de manière atténuée.\nLes sortilèges, quant à eux, traversent cette barrière d'ondes magiques sans être affectés."
+            },
+
+            // Niveau 5
+            "Repousser les humanoïdes": {
+                level: 5,
+                portée: "25 m",
+                incantation: "3 s",
+                durée: "30 min",
+                sauvegarde: "VM-4+N",
+                zone: "N créatures",
+                description: "Ce sort permet au magicien d'empêcher un ou plusieurs humanoïdes (i.e. un individu d'une des races intelligentes) de l'approcher.\nLe magicien choisit les humanoïdes qu'il souhaite affecter et qui se trouvent dans le rayon de la portée du sort. Il en choisit librement le nombre (avec la seule contrainte que tous ceux choisis soient à portée). Toutefois, plus le nombre visé est important et plus ils auront de chance d'échapper aux effets du sort.\nChaque créature visée effectue un jet de sauvegarde sous sa vivacité mentale moins 4, avec toutefois comme bonus le nombre de créatures visées par le magicien.\nEx : un magicien tente de repousser 3 humanoïdes. Son niveau en magie (voir chapitre « Jouer la magie ») lui confère le bénéfice de 2 modulations du sort, qu'il utilise pour ajouter un malus de -2 à la sauvegarde. Par conséquent, chacun des 3 humanoïdes devra effectuer une sauvegarde sous son attribut vivacité mentale avec un modificateur de -4 (malus de base) +3 (bonus égal au nombre de créatures affectées) -2 (malus lié aux modulations du sort) = -3.\nChaque humanoïde affecté (i.e. qui a raté sa sauvegarde) se retrouve psychologiquement incapable d'approcher le magicien à moins de 10 mètres. Le malaise qu'il éprouve à l'idée d'être plus près du magicien l'empêche de s'approcher.\nLe sortilège ne change pas les dispositions de l'humanoïde envers le magicien. S'il était agressif, il pourra l'attaquer, mais de loin (par des armes à distance, des projectiles ou le cas échéant des sortilèges).\nL'humanoïde essaiera autant que possible de rester à une distance respectable du magicien, notamment si ce dernier s'avance vers lui. Mais cela ne se fera pas au détriment de sa propre sécurité. Par exemple, si l'humanoïde est en train de combattre, le fait que le magicien s'approche de lui ne le fera pas fuir tout à coup. En revanche, cela le poussera à se déplacer pour placer autant que possible son adversaire entre lui-même et le magicien."
+            },
+            "Sphère d'isolement visuel": {
+                level: 5,
+                portée: "-",
+                incantation: "4 s",
+                durée: "20 min",
+                sauvegarde: "6e sens -6",
+                zone: "sphère de 3m *",
+                description: "Ce sort crée autour du magicien une sphère qui empêche les créatures situées à l'extérieur de voir en son sein. L'enveloppe d'ondes magiques a pour effet que les rayons visuels provenant de l'intérieur soient arrêtés et que ceux provenant de l'extérieur contournent la sphère pour l'essentiel, de sorte que celle-ci et ce qu'elle contient sont en pratique quasiment invisibles depuis l'extérieur : on voit ce qui se trouve derrière la sphère comme si ce qui est en son sein était transparent.\nL'occultation dont bénéficie l'intérieur de la sphère dépend des mouvements en son sein : si l'intérieur de la sphère reste immobile, l'invisibilité depuis l'extérieur demeure quasi parfaite ; en revanche, en cas de mouvements, de petites imperfections apparaissent sur la sphère et peuvent être repérées par des créatures situées à l'extérieur. Celles-ci sont par conséquent autorisées à effectuer un jet de sauvegarde sous sixième sens -6 (le maître du jeu peut moduler la difficulté de la sauvegarde selon que les créatures concernées sont ou non vigilantes et selon la rapidité des mouvements au sein de la sphère). La réussite du jet de sauvegarde signifie que la créature a décelé de petites imperfections et peut suivre le mouvement général de la sphère ; la créature n'est pas pour autant en mesure de voir au sein de la sphère.\nEn sens inverse, une petite partie des rayons lumineux provenant de l'extérieur de la sphère pénètrent en son sein, de sorte que le magicien et les créatures qui l'entourent perçoivent l'extérieur mais de manière floue et atténuée. Ils distingueront la topographie des lieux et la forme vague des objets et des créatures, mais ne seront par exemple pas capables de distinguer les traits des visages ni de reconnaître une personne en particulier au sein de plusieurs de même corpulence.\nLe réseau d'ondes magiques qui composent la sphère d'isolement visuel est relativement fragile et résiste mal à la traversée, partielle ou totale, de créatures intelligentes : chaque traversée (dans un sens ou dans l'autre) lui retire un quart de sa force. Elle devient chaque fois un peu plus trouble (révélant donc une anomalie) avant de totalement disparaître lors d'une quatrième traversée."
+            },
+            "Globe de protection contre les projectiles": {
+                level: 5,
+                portée: "-",
+                incantation: "3 s",
+                durée: "20 min",
+                sauvegarde: "-",
+                zone: "sphère de 4m *",
+                description: "Ce sort crée autour du magicien une sphère translucide légèrement bleutée qui empêche les projectiles ou les objets lancés de rentrer en son sein.\nLa protection offerte dépend de la masse de l'objet ou du projectile concerné :\n- un projectile léger, tel une flèche, un carreau d'arbalète ou un couteau de lancer sera entièrement arrêté et tombera au sol, privé de la totalité de sa vitesse précédente de déplacement ;\n- un carreau de baliste lourde ou une hache de lancer parviendra à franchir la sphère de protection mais sera ralenti par son franchissement. En termes de jeu, ce ralentissement se traduira par une diminution de 4 de sa marge éventuelle de toucher ;\n- enfin, des projectiles lourds, tels que le bloc de pierre d'un trébuchet, sont trop massifs pour être affectés par la sphère de protection et la franchissent sans subir de ralentissement sensible."
+            },
+
+            // Niveau 6
+            "Sphère d'isolement sensoriel": {
+                level: 6,
+                portée: "-",
+                incantation: "5 s",
+                durée: "20 min",
+                sauvegarde: "6e sens -6",
+                zone: "sphère de 3m *",
+                description: "Ce sortilège fonctionne comme une combinaison des sortilèges « Sphère d'isolement sonore » et « Sphère d'isolement visuel » (voir ci-dessus). Il bloque également les odeurs.\nCela conduit ainsi le magicien et ceux qui l'entourent à être quasi-indétectables depuis l'extérieur, tout en continuant en sens inverse à percevoir l'extérieur de la sphère, de manière toutefois atténuée.\nComme pour le sortilège de « Sphère d'isolement visuel », le réseau d'ondes magiques qui le compose est relativement fragile et se rompt à la quatrième créature intelligente qui le franchit dans un sens ou dans l'autre, mettant fin prématurément au sortilège."
+            },
+            "Mur élémentaire": {
+                level: 6,
+                portée: "spécial",
+                incantation: "spécial",
+                durée: "spécial",
+                sauvegarde: "-",
+                zone: "spécial",
+                description: "Ce sortilège permet au magicien de copier le mur élémentaire de son choix : mur d'air, mur d'eau, mur de glace, mur de pierre ou mur de feu (comme une Sphère de feu mais plan et de taille 6m x 3m x 50cm).\nLes caractéristiques du sort sont exactement celles du mur imité. Le magicien choisit bien sûr chaque fois quel mur il souhaite copier."
+            },
+
+            // Niveau 7
+            "Repousser les créatures invoquées": {
+                level: 7,
+                portée: "30 m",
+                incantation: "4 s",
+                durée: "30 min",
+                sauvegarde: "« Foi » - N",
+                zone: "N créatures",
+                description: "Ce sort affecte les créatures qui ont été magiquement invoquées depuis un autre plan d'existence (voir la liste des Créatures surnaturelles). Il les rend incapables de s'approcher volontairement du magicien (ou d'utiliser un stratagème pour y parvenir).\nLe magicien choisit les créatures qu'il souhaite affecter et qui se trouvent dans le rayon de la portée du sort. Il effectue ensuite un jet de sauvegarde inversée sous son propre don Foi affecté en malus du nombre de créatures visées.\nEx : un magicien avec un score de foi de 14 tente de repousser 3 créatures invoquées. Son niveau en magie (voir chapitre « Jouer la magie ») lui confère le bénéfice de 2 modulations du sort, qu'il utilise pour ajouter un bonus de +2 à la sauvegarde (un bonus et non un malus car il s'agit ici d'une sauvegarde inversée). Par conséquent, pour réussir à affecter et repousser les 3 créatures visées il devra réussir un jet sous 14 (score de foi) -3 (nombre créatures visées) +2 (bonus lié aux modulations du sort) = 13.\nSi le magicien réussit son jet de sauvegarde inversée, la ou les créatures visées se retrouvent psychologiquement incapables d'approcher le magicien à moins de 10 mètres. Le malaise qu'elles éprouvent à l'idée d'être plus près du magicien les empêche de s'approcher.\nLe sortilège ne change pas les dispositions de ces créatures envers le magicien. Si elles étaient agressives, elles pourraient l'attaquer, mais de loin (par des armes à distance, des projectiles ou le cas échéant des sortilèges).\nLes créatures affectées essaieront autant que possible de rester à une distance respectable du magicien, notamment si ce dernier s'avance vers elles. Mais cela ne se fera pas au détriment de leur propre sécurité. Par exemple, si une créature est en train de combattre, le fait que le magicien s'approche d'elle ne la fera pas fuir tout à coup. En revanche, cela la poussera à se déplacer pour placer autant que possible son adversaire entre elle-même et le magicien."
+            },
+            "Barrière mentale": {
+                level: 7,
+                portée: "-",
+                incantation: "4 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien voit sa résistance aux sorts mentaux très fortement augmentée. Tous ses jets de sauvegarde concernant ce type de sorts bénéficient d'un bonus de +6.\nPar ailleurs, il devient totalement insensible aux scrutations de son esprit, notamment aux sorts d'Empathie, de Détection du mensonge, de Sonder les esprits et de Sentir les êtres vivants. Les magiciens utilisant ces sortilèges sur lui détecteront la présence d'une barrière mentale forte, mais seulement s'ils réussissent un jet de Sentir la magie (voir chapitre « Jouer la magie »).\nEnfin, le magicien peut refuser tout contact télépathique qu'il juge inopportun."
+            },
+            "Sphère d'isolement magique": {
+                level: 7,
+                portée: "-",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "sphère de 3m *",
+                description: "Grâce à ce sort le magicien s'entoure d'une sphère parfaitement hermétique aux ondes magiques. Les sortilèges prennent normalement effet du côté où se trouve le magicien qui les lance, mais n'affectent nullement l'autre. Cela est valable tant pour les sortilèges mentaux que physiques. Par exemple, une boule de feu lancée à cheval sur la sphère sera tronquée de sa partie qui aurait dû se situer de l'autre côté.\nCette sphère d'isolement magique est constituée d'un réseau si dense d'ondes magiques que tout magicien est susceptible d'en ressentir la présence, sans même la rechercher. Il est automatiquement autorisé à lancer un jet de Connaissance des arcanes ou de Connaissance de l'occulte avec une difficulté « Assez facile » (i.e. avec un bonus de +2). Un jet réussi indique qu'il perçoit la présence de la sphère.\nSeuls les sortilèges d'un niveau supérieur ou égal à 8 ont une chance de franchir cette barrière. Cette chance est alors égale en pourcentage à 3 fois le niveau du sort.\nLa sphère se dissipe après 30 minutes ou quand elle a effectivement arrêté plus de 30 niveaux de sorts cumulés."
+            },
+            "Sphère des éléments": {
+                level: 7,
+                portée: "-",
+                incantation: "spécial",
+                durée: "spéciale",
+                sauvegarde: "-",
+                zone: "spéciale (*)",
+                description: "Ce sortilège permet au magicien de copier la sphère élémentaire de son choix : Sphère de feu, Globe glacé, Sphère mouvante électrique ou Bouclier de pierres animées.\nLes caractéristiques du sort sont exactement celles de la sphère imitée. Le magicien choisit bien sûr chaque fois quelle sphère il souhaite copier."
+            },
+
+            // Niveau 8
+            "Projection": {
+                level: 8,
+                portée: "spéciale",
+                incantation: "1 s",
+                durée: "-",
+                sauvegarde: "-",
+                zone: "spéciale",
+                description: "Ce sort crée une brusque poussée capable de projeter des objets ou des créatures en arrière (i.e. en direction opposée au magicien). Tout ce qui se trouve dans un cône partant un magicien et mesurant 20 mètres de long et 10 mètres de large à son terme (soit un angle au départ du magicien d'environ 30°) est affecté par le sort.\nLa poussée est suffisante pour faire reculer en titubant de plusieurs pas un homme robuste. Toute créature ainsi projetée en arrière effectue un jet de Vivacité physique difficile (i.e. à -4) pour ne pas tomber en arrière en fin de mouvement.\nLes objets non arrimés, même relativement pondéreux, sont projetés en arrière, à une vitesse initiale de l'ordre de 10 km/h.\nL'incantation de ce sortilège étant particulièrement brève, il est possible de le lancer même en étant engagé en combat et en n'ayant pas l'initiative."
+            },
+            "Voile de non-détection": {
+                level: 8,
+                portée: "-",
+                incantation: "5 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "boule de 3m *",
+                description: "Ce sort rend l'intérieur de la zone d'effets insensible aux sortilèges de la liste des Détections. La sphère entourant le magicien agit comme une barrière imperméable aux ondes magiques qui suivent les motifs de la liste des Détections (ou s'en inspirant).\nCela a pour conséquence que même des sorts comme Vision Nocturne ne fonctionnent pas à l'intérieur du globe de non-détection. Le sortilège de Vision réelle (y compris dans ses versions des listes de l'Harmonie et des Illusions) décèlera une sphère où la magie de l'Isolement est à l'œuvre, mais sera incapable de franchir ce barrage pour voir à l'intérieur.\nLes sortilèges de niveau supérieur ou égal à 10 ont cependant une chance de franchir cette barrière. Cette chance est égale en pourcentage à 2 fois le niveau du sort concerné."
+            },
+            "Armure magique": {
+                level: 8,
+                portée: "-",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "le magicien",
+                description: "Le magicien s'entoure d'une gaine d'ondes magiques qui le protège des dommages physiques.\nCette armure magique a une valeur de 6 points : tous les dégâts à réalité physique (coup, projectile, effet d'un sort à réalité physique, etc.) que le magicien serait amené à subir seront réduits de 6 points (après application de ses éventuelles sauvegarde).\nCet effet est cumulable le cas échéant avec celui d'une protection physique que porterait le magicien (par exemple, une zone de son corps déjà protégée par une armure en côte de mailles (protection = 4) bénéficiera en tout d'une protection de 10 (4+6=10) contre les coups et les projectiles). En revanche, il ne peut se cumuler avec celui d'une autre protection magique (comme le sortilège de Peau de pierre, par exemple), car les 2 magies interfèrent.\nCette gaine d'ondes magiques ne gêne pas les mouvements du magicien et ne lui occasionne aucun malus à ses jets d'action physique (notamment ses jets de combat)."
+            },
+
+            // Niveau 10
+            "Repousser les créatures surnaturelles": {
+                level: 10,
+                portée: "30 m",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "« Foi »+2-N",
+                zone: "N créatures",
+                description: "Ce sortilège affecte les créatures surnaturelles, qu'elles aient été invoquées, créées ou qu'elles soient venues par leurs propres pouvoirs. Il les rend incapables de s'approcher volontairement du magicien (ou d'utiliser un stratagème pour y parvenir).\nLe magicien choisit les créatures qu'il souhaite affecter et qui se trouvent dans le rayon de la portée du sort. Il effectue ensuite un jet de sauvegarde inversée son propre don Foi + 2 affecté en malus du nombre de créatures visées.\nEx : un magicien avec un score de foi de 16 tente de repousser 4 créatures surnaturelles. Son niveau en magie (voir chapitre « Jouer la magie ») lui confère le bénéfice de 3 modulations du sort, qu'il utilise pour ajouter un bonus de +3 à la sauvegarde (un bonus et non un malus car il s'agit ici d'une sauvegarde inversée). Par conséquent, pour réussir à affecter et repousser les 3 créatures visées il devra réussir un jet sous 16 (score de foi) +2 (bonus de base) -4 (nombre créatures visées) +3 (bonus lié aux modulations du sort) = 17. Il a ainsi toutes les chances d'y parvenir.\nSi le magicien réussit son jet de sauvegarde inversée, la ou les créatures visées se retrouvent psychologiquement incapables d'approcher le magicien à moins de 15 mètres. Le malaise qu'elles éprouvent à l'idée d'être plus près du magicien les empêche de s'approcher. Seules les créatures surnaturelles les plus puissantes peuvent résister malgré tout.\nLe sortilège ne change pas les dispositions des créatures affectées envers le magicien. Si elles étaient agressives, elles peuvent l'attaquer, mais de loin (par des armes à distance, des projectiles ou le cas échéant des sortilèges).\nLes créatures affectées essaieront autant que possible de rester à une distance respectable du magicien, notamment si ce dernier s'avance vers elles. Mais cela ne se fera pas au détriment de leur propre sécurité. Par exemple, si une créature est en train de combattre, le fait que le magicien s'approche d'elle ne la fera pas fuir tout à coup. En revanche, cela la poussera à se déplacer pour placer autant que possible son adversaire entre elle-même et le magicien."
+            },
+            "Sphère d'isolement physique": {
+                level: 10,
+                portée: "-",
+                incantation: "7 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "sphère de 3m *",
+                description: "Par ce sort le magicien s'entoure d'une sphère d'ondes magiques tissées en un réseau si dense qu'il ne laisse passer aucune matière physique. Cette sphère est parfaitement invisible et indestructible. Elle bloque toute créature et tout objet tentant de la traverser, exactement un globe de verre incassable qui entourerait le magicien. Les sortilèges et les perceptions (vue et ouïe mais pas l'odorat toutefois) franchissent en revanche sans difficulté cette barrière (sauf les sorts ayant une réalité physique, bien sûr).\nEn se déplaçant, le magicien peut utiliser cette sphère pour repousser une personne ou un objet : la pression exercée correspond alors à celle de sa propre force divisée par 2. Inversement, le magicien peut être empêché dans ses mouvements si la sphère est bloquée (par exemple par un couloir trop petit). Il peut même se trouver repoussé contre son gré par une pression adéquate exercée sur la sphère (la force de ses adversaires est divisée par deux car ils doivent faire également bouger la sphère).\nRappel : une zone d'effets peut toujours être réduite par le magicien au moment de lancer le sort. Rien n'empêche par exemple le magicien de ne s'entourer que d'une sphère de 1 mètre de rayon, afin de ne pas se retrouver bêtement bloqué par le passage d'un couloir (exceptionnellement il peut même changer la forme de la zone d'effets pour en faire un ovoïde de par exemple 2 mètres de haut et 1 mètre de large entourant son corps)."
+            },
+
+            // Niveau 12
+            "Globe de suspension de la magie": {
+                level: 12,
+                portée: "-",
+                incantation: "8 s",
+                durée: "30 min",
+                sauvegarde: "spéciale",
+                zone: "boule de 5m *",
+                description: "Ce sortilège puissant suspend toute magie en son sein. Les sorts instantanés, tel qu'une Boule de feu, peuvent y prendre effet mais voient leur puissance réduite de moitié par la traversée. Tous les autres sont suspendus tant que le magicien ne s'éloigne pas ou que son globe prend fin. Seuls les sortilèges de niveau 10 ou plus ont une chance de ne pas être suspendus (cette chance est égale en pourcentage à 2 fois leur niveau, par exemple 30 % pour un sort de niveau 15).\nLa zone d'effets se déplace avec le magicien et suspend par conséquent la magie qu'il rencontre : par exemple, un mur de flammes est tronqué de sa partie se trouvant dans le globe lorsque le magicien s'en approche, ce qui permet au magicien de le traverser sans danger ; une fois à l'extérieur du globe, le mur de flammes se reforme complètement.\nLa suspension affecte également le lancement des sortilèges dans la zone d'effets (y compris par le magicien lui-même !), occasionnant un malus de –10 à la compétence qu'il utiliser pour lancer des sorts (Maîtrise des esprits ou Théognosie).\nLa magie du globe est suffisamment forte pour que tout magicien se trouvant en son sein ressente que la magie est perturbée."
+            },
+
+            // Niveau 15
+            "Répulsion universelle": {
+                level: 15,
+                portée: "-",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "VM-5",
+                zone: "spéciale",
+                description: "Ce sort affecte tout être vivant (humanoïde, animal ou créature surnaturelle) situé à proximité du magicien et l'empêche de s'approcher à moins de 15 mètres de lui au cours de la durée du sort. Tout être vivant qui rate sa sauvegarde ressent soudain un malaise psychologique insupportable à s'approcher du magicien. Sans pour autant que ses dispositions à son égard changent (s'il était agressif il le reste et peut attaquer à distance), il sera contraint de conserver une distance minimale de 15 mètres entre eux. Si le magicien s'approche, il essaiera de s'éloigner afin de conserver cette distance minimale, mais sans pour autant se mettre en danger immédiat.\nCe sort affecte également les êtres vivants qui n'étaient pas à proximité du magicien au moment du lancement du sort mais qui s'y trouvent par la suite pendant la durée du sort (en particulier à la suite d'un déplacement de leur part ou de celle du magicien).\nA contrario, le magicien peut décider au moment du lancement de ce sort d'exclure de ses effets certaines créatures présentes à proximité de lui (en particulier ses compagnons aventuriers)."
+            },
+
+            // Niveau 25
+            "Sphère d'isolement suprême": {
+                level: 25,
+                portée: "-",
+                incantation: "10 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "boule de 3m *",
+                description: "Le magicien s'entoure d'une sphère invisible complètement hermétique et qui se déplace avec lui (il peut l'adapter à la forme de son corps pour qu'elle l'englobe au plus juste). Ni matière physique, ni magie ne peuvent franchir cette barrière.\nLe magicien peut décider de rendre cette sphère opaque aux perceptions – auquel cas elle se comporte comme une sphère d'isolement sensoriel (voir sortilège du même nom) – ou bien de la rendre transparente – auquel cas ondes lumineuses, sons et odeurs la traversent librement dans les deux sens.\nLorsque le magicien s'arrête, la sphère se fixe magiquement et rien ne peut la faire bouger jusqu'à ce que le magicien reprenne son chemin. Le magicien, en se déplaçant, peut en revanche utiliser cette sphère pour repousser une personne ou un objet (sa propre force est simplement divisée par 2)."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0;
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0;
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme de la Liste de l'Isolement
+                const connections = [
+                    // Chaînes de résistance
+                    ["Résistance à la maladie", "Résistance au poison"],
+                    ["Résistance au poison", "Expulser la maladie"],
+                    ["Résistance au poison", "Repousser les animaux"],
+                    ["Résistance au poison", "Globe de température immuable"],
+                    ["Résistance à la magie", "Résistance à la maladie"],
+                    ["Expulser la maladie", "Expulser le poison"],
+                    ["Expulser le poison", "Repousser les humanoïdes"],
+                    ["Repousser les humanoïdes", "Repousser les créatures invoquées"],
+                    ["Repousser les créatures invoquées", "Projection"],
+                    ["Projection", "Repousser les créatures surnaturelles"],
+                    ["Repousser les créatures surnaturelles", "Répulsion universelle"],
+                    ["Répulsion universelle", "Sphère d'isolement suprême"],
+                    ["Globe de température immuable", "Sphère d'isolement sonore"],
+                    ["Globe de température immuable", "Globe de protection contre les projectiles"],
+                    ["Sphère d'isolement sonore", "Sphère d'isolement visuel"],
+                    ["Sphère d'isolement visuel", "Sphère d'isolement sensoriel"],
+                    ["Sphère d'isolement sensoriel", "Barrière mentale"],
+                    ["Barrière mentale", "Voile de non-détection"],
+                    ["Sphère d'isolement sensoriel", "Sphère d'isolement magique"],
+                    ["Globe de protection contre les projectiles", "Mur élémentaire"],
+                    ["Globe de protection contre les projectiles", "Sph de protection contre les projectiles"],
+                    ["Mur élémentaire", "Sphère des éléments"],
+                    ["Sphère d'isolement magique", "Armure magique"],
+                    ["Armure magique", "Sphère d'isolement physique"],
+                    ["Sphère d'isolement physique", "Globe de suspension de la magie"],
+                    ["Globe de suspension de la magie", "Sphère d'isolement suprême"],
+
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
