@@ -231,54 +231,55 @@
         <!-- Niveau 1 -->
         <div class="level" style="margin-top: 0;">
             <div class="level-number">1</div>
-            <div class="spell-node col-3" data-spell="Appel du froid">Appel du froid</div>
-            <div class="spell-node col-6" data-spell="Refroidir">Refroidir</div>
+            <div class="spell-node col-2" data-spell="Appel du froid">Appel du froid</div>
+            <div class="spell-node col-7" data-spell="Refroidir">Refroidir</div>
         </div>
 
         <!-- Niveau 2 -->
         <div class="level">
             <div class="level-number">2</div>
-            <div class="spell-node col-4" data-spell="Congélation des liquides">Congélation des liquides</div>
+            <div class="spell-node col-7" data-spell="Congélation des liquides">Congélation des liquides</div>
         </div>
 
         <!-- Niveau 3 -->
         <div class="level">
             <div class="level-number">3</div>
-            <div class="spell-node col-2" data-spell="Rideau de froid">Rideau de froid</div>
-            <div class="spell-node col-6" data-spell="Blizzard">Blizzard</div>
+            <div class="spell-node col-1" data-spell="Rideau de froid">Rideau de froid</div>
+            <div class="spell-node col-3" data-spell="Blizzard">Blizzard</div>
         </div>
 
         <!-- Niveau 4 -->
         <div class="level">
             <div class="level-number">4</div>
-            <div class="spell-node col-2" data-spell="Ligne de glace">Ligne de glace</div>
+            <div class="spell-node col-2" data-spell="Exacerbation des émotions">Exacerbation des émotions</div>
+            <div class="spell-node col-3" data-spell="Ligne de glace">Ligne de glace</div>
             <div class="spell-node col-4" data-spell="Neige">Neige</div>
-            <div class="spell-node col-6" data-spell="Exacerbation des émotions">Exacerbation des émotions</div>
-            <div class="spell-node col-7" data-spell="Engourdissement">Engourdissement</div>
+
+            <div class="spell-node col-6" data-spell="Engourdissement">Engourdissement</div>
         </div>
 
         <!-- Niveau 5 -->
         <div class="level">
             <div class="level-number">5</div>
-            <div class="spell-node col-2" data-spell="Résistance au froid">Résistance au froid</div>
+            <div class="spell-node col-1" data-spell="Résistance au froid">Résistance au froid</div>
             <div class="spell-node col-4" data-spell="Verglas">Verglas</div>
-            <div class="spell-node col-6" data-spell="Refroidissement des solides">Refroidissement des solides</div>
+            <div class="spell-node col-7" data-spell="Refroidissement des solides">Refroidissement des solides</div>
         </div>
 
         <!-- Niveau 6 -->
         <div class="level">
             <div class="level-number">6</div>
-            <div class="spell-node col-2" data-spell="Mur de glace">Mur de glace</div>
-            <div class="spell-node col-4" data-spell="Glaive de glace">Glaive de glace</div>
-            <div class="spell-node col-6" data-spell="Boule de froid">Boule de froid</div>
+            <div class="spell-node col-1" data-spell="Mur de glace">Mur de glace</div>
+            <div class="spell-node col-5" data-spell="Glaive de glace">Glaive de glace</div>
+            <div class="spell-node col-3" data-spell="Boule de froid">Boule de froid</div>
             <div class="spell-node col-7" data-spell="Métal glacé">Métal glacé</div>
         </div>
 
         <!-- Niveau 8 -->
         <div class="level">
             <div class="level-number">8</div>
-            <div class="spell-node col-3" data-spell="Globe glacé">Globe glacé</div>
-            <div class="spell-node col-5" data-spell="Souffle glacé">Souffle glacé</div>
+            <div class="spell-node col-1" data-spell="Globe glacé">Globe glacé</div>
+            <div class="spell-node col-3" data-spell="Souffle glacé">Souffle glacé</div>
             <div class="spell-node col-7" data-spell="Être glacé">Être glacé</div>
         </div>
 
@@ -286,20 +287,20 @@
         <div class="level">
             <div class="level-number">10</div>
             <div class="spell-node col-3" data-spell="Tempête de glace">Tempête de glace</div>
-            <div class="spell-node col-6" data-spell="Gelure">Gelure</div>
+            <div class="spell-node col-7" data-spell="Gelure">Gelure</div>
         </div>
 
         <!-- Niveau 12 -->
         <div class="level">
             <div class="level-number">12</div>
             <div class="spell-node col-3" data-spell="Invocation du froid">Invocation du froid</div>
-            <div class="spell-node col-7" data-spell="Globe antifroid">Globe antifroid</div>
+            <div class="spell-node col-1" data-spell="Globe antifroid">Globe antifroid</div>
         </div>
 
         <!-- Niveau 15 -->
         <div class="level">
             <div class="level-number">15</div>
-            <div class="spell-node col-4" data-spell="Congélation">Congélation</div>
+            <div class="spell-node col-3" data-spell="Congélation">Congélation</div>
         </div>
     </div>
     <div class="spell-info" id="spellInfo">
@@ -662,43 +663,30 @@
                 // Créer les connexions selon le diagramme de la Liste du Froid
                 const connections = [
                     // Chaîne de base : froid et température
-                    ['Appel du froid', 'Refroidir'],
-                    ['Appel du froid', 'Congélation des liquides'],
-                    ['Appel du froid', 'Refroidissement des solides'],
-                    
-                    // Chaîne de congélation
-                    ['Refroidir', 'Congélation des liquides'],
-                    ['Congélation des liquides', 'Refroidissement des solides'],
-                    ['Refroidissement des solides', 'Métal glacé'],
-                    
-                    // Chaîne de barrière et défense
-                    ['Rideau de froid', 'Mur de glace'],
-                    ['Mur de glace', 'Globe glacé'],
-                    ['Globe glacé', 'Globe antifroid'],
-                    
-                    // Chaîne d'attaque et destruction
-                    ['Ligne de glace', 'Boule de froid'],
-                    ['Boule de froid', 'Souffle glacé'],
-                    ['Souffle glacé', 'Tempête de glace'],
-                    ['Tempête de glace', 'Congélation'],
-                    
-                    // Chaîne de protection et résistance
-                    ['Résistance au froid', 'Globe antifroid'],
-                    
-                    // Chaîne de glace et arme
-                    ['Glaive de glace', 'Être glacé'],
-                    
-                    // Chaîne de précipitations
-                    ['Blizzard', 'Neige'],
-                    ['Neige', 'Verglas'],
-                    ['Verglas', 'Congélation'],
-                    
-                    // Chaîne d'enchantement
-                    ['Exacerbation des émotions', 'Engourdissement'],
-                    ['Engourdissement', 'Gelure'],
-                    
-                    // Chaîne d'invocation
-                    ['Invocation du froid', 'Congélation'],
+                    ["Appel du froid", "Rideau de froid"],
+                    ["Appel du froid", "Exacerbation des émotions"],
+                    ["Appel du froid", "Blizzard"],
+                    ["Rideau de froid", "Résistance au froid"],
+                    ["Résistance au froid", "Mur de glace"],
+                    ["Mur de glace", "Globe glacé"],
+                    ["Globe glacé", "Globe antifroid"],
+                    ["Globe glacé", "Tempête de glace"],
+                    ["Blizzard", "Ligne de glace"],
+                    ["Blizzard", "Neige"],
+                    ["Ligne de glace", "Boule de froid"],
+                    ["Boule de froid", "Souffle glacé"],
+                    ["Souffle glacé", "Tempête de glace"],
+                    ["Tempête de glace", "Invocation du froid"],
+                    ["Invocation du froid", "Congélation"],
+                    ["Neige", "Verglas"],
+                    ["Verglas", "Glaive de glace"],
+                    ["Refroidir", "Congélation des liquides"],
+                    ["Congélation des liquides", "Engourdissement"],
+                    ["Congélation des liquides", "Refroidissement des solides"],
+                    ["Refroidissement des solides", "Métal glacé"],
+                    ["Métal glacé", "Être glacé"],
+                    ["Être glacé", "Gelure"],
+                    ["Gelure", "Congélation"],
                 ];
 
                 let createdArrows = 0;
