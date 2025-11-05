@@ -122,6 +122,16 @@ document.addEventListener("click", function (event) {
     if (magicType === "Froid") {
       openFroidModal();
     }
+
+    // Ouvrir la liste de l'Harmonie si le bouton "Harmonie" est cliqué
+    if (magicType === "Harmonie") {
+      openHarmonieModal();
+    }
+
+    // Ouvrir la liste de l'Eau si le bouton "Eau" est cliqué
+    if (magicType === "Eau") {
+      openEauModal();
+    }
   }
 });
 
@@ -135,9 +145,9 @@ function openAirModal() {
 
   // Créer le contenu de la modale
   airModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeAirModal">&times;</span>
-      <iframe src="liste_air.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="liste_air.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -175,9 +185,9 @@ function openControleDeSoiModal() {
 
   // Créer le contenu de la modale
   controleDeSoiModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeControleDeSoiModal">&times;</span>
-      <iframe src="liste_ControleDeSoi.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="liste_ControleDeSoi.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -217,9 +227,9 @@ function openCreatureSurnaturelleModal() {
 
   // Créer le contenu de la modale
   creatureSurnaturelleModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeCreatureSurnaturelleModal">&times;</span>
-      <iframe src="liste_creatureSurnaturelle.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="liste_creatureSurnaturelle.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -257,9 +267,9 @@ function openMagiePureModal() {
   magiePureModal.style.display = "flex";
 
   magiePureModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeMagiePureModal">&times;</span>
-      <iframe src="Liste_magiePure.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_magiePure.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -291,9 +301,9 @@ function openMetamorphosesModal() {
   metaModal.style.display = "flex";
 
   metaModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeMetamorphosesModal">&times;</span>
-      <iframe src="Liste_metamorphoses.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_metamorphoses.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -325,9 +335,9 @@ function openNatureModal() {
   natureModal.style.display = "flex";
 
   natureModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeNatureModal">&times;</span>
-      <iframe src="Liste_nature.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_nature.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -359,9 +369,9 @@ function openTerreModal() {
   terreModal.style.display = "flex";
 
   terreModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeTerreModal">&times;</span>
-      <iframe src="Liste_terre.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_terre.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -393,9 +403,9 @@ function openLumiereElectriciteModal() {
   lumElModal.style.display = "flex";
 
   lumElModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeLumElModal">&times;</span>
-      <iframe src="Liste_lumiereElectricite.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_lumiereElectricite.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -427,9 +437,9 @@ function openDetectionModal() {
   detectionModal.style.display = "flex";
 
   detectionModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeDetectionModal">&times;</span>
-      <iframe src="Liste_detection.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_detection.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -461,9 +471,9 @@ function openIllusionsModal() {
   illusionsModal.style.display = "flex";
 
   illusionsModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeIllusionsModal">&times;</span>
-      <iframe src="Liste_illusions.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_illusions.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -495,9 +505,9 @@ function openMaitriseEspritsModal() {
   maitriseEspritsModal.style.display = "flex";
 
   maitriseEspritsModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeMaitriseEspritsModal">&times;</span>
-      <iframe src="Liste_maitriseEsprits.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_maitriseEsprits.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -529,9 +539,9 @@ function openIsolementModal() {
   isolementModal.style.display = "flex";
 
   isolementModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeIsolementModal">&times;</span>
-      <iframe src="Liste_isolement.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_isolement.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -563,9 +573,9 @@ function openFeuModal() {
   feuModal.style.display = "flex";
 
   feuModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeFeuModal">&times;</span>
-      <iframe src="Liste_feu.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_feu.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -597,9 +607,9 @@ function openFroidModal() {
   froidModal.style.display = "flex";
 
   froidModal.innerHTML = `
-    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
       <span class="close" id="closeFroidModal">&times;</span>
-      <iframe src="Liste_froid.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+      <iframe src="Liste_froid.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
     </div>
   `;
 
@@ -619,6 +629,74 @@ function openFroidModal() {
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && froidModal.parentNode) {
       document.body.removeChild(froidModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste de l'Eau
+function openEauModal() {
+  const eauModal = document.createElement("div");
+  eauModal.id = "eauModal";
+  eauModal.className = "modal";
+  eauModal.style.display = "flex";
+
+  eauModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
+      <span class="close" id="closeEauModal">&times;</span>
+      <iframe src="Liste_eau.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(eauModal);
+
+  const closeBtn = document.getElementById("closeEauModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(eauModal);
+  });
+
+  eauModal.addEventListener("click", function (event) {
+    if (event.target === eauModal) {
+      document.body.removeChild(eauModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && eauModal.parentNode) {
+      document.body.removeChild(eauModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste de l'Harmonie
+function openHarmonieModal() {
+  const harmonieModal = document.createElement("div");
+  harmonieModal.id = "harmonieModal";
+  harmonieModal.className = "modal";
+  harmonieModal.style.display = "flex";
+
+  harmonieModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1400px; overflow: auto;">
+      <span class="close" id="closeHarmonieModal">&times;</span>
+      <iframe src="Liste_harmonie.html" style="width: 100%; height: calc(100vh - 80px); border: none; display: block;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(harmonieModal);
+
+  const closeBtn = document.getElementById("closeHarmonieModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(harmonieModal);
+  });
+
+  harmonieModal.addEventListener("click", function (event) {
+    if (event.target === harmonieModal) {
+      document.body.removeChild(harmonieModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && harmonieModal.parentNode) {
+      document.body.removeChild(harmonieModal);
     }
   });
 }

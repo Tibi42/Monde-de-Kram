@@ -219,6 +219,45 @@
         .col-2-3 {
             grid-column: 2 / 4;
         }
+
+        /* Améliorations visuelles */
+        .diagram-container {
+            padding: 28px;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            background: #fff;
+        }
+
+        .level {
+            gap: 12px;
+            margin: 18px 0;
+            min-height: 56px;
+        }
+
+        .level-number {
+            background: linear-gradient(180deg, #ffffff, #f3f3f3);
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 4px;
+            font-size: 12px;
+            min-width: 120px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .spell-node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
+        }
     </style>
 </head>
 
@@ -655,10 +694,10 @@
             line.setAttribute('y1', fromY);
             line.setAttribute('x2', toX);
             line.setAttribute('y2', toY);
-            line.setAttribute('stroke', '#000');
-            line.setAttribute('stroke-width', '3');
+            line.setAttribute('stroke', '#666');
+            line.setAttribute('stroke-width', '2.5');
             line.setAttribute('marker-end', 'url(#arrowhead)');
-            line.setAttribute('opacity', '0.8');
+            line.setAttribute('opacity', '0.75');
 
             svg.appendChild(line);
         }
@@ -712,7 +751,7 @@
 
                 const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
                 polygon.setAttribute('points', '0 0, 6 2, 0 4');
-                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('fill', '#666');
                 polygon.setAttribute('opacity', '0.8');
 
                 marker.appendChild(polygon);
