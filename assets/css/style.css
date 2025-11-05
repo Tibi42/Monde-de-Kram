@@ -63,19 +63,6 @@ button:hover {
   overflow-y: auto;
 }
 
-/* Spécifique à la modale du diagramme principal: occupe presque tout l'écran */
-#modal .modal-content {
-  width: 98vw;
-  max-width: 98vw;
-  height: 98vh;
-  max-height: 98vh;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
 .close {
   color: #aaa;
   float: right;
@@ -99,31 +86,14 @@ button:hover {
   position: relative;
   display: inline-block;
   margin: 20px auto;
-  width: fit-content;
-  text-align: center;
-}
-
-/* Centrer le diagramme dans la modale principale */
-#modal .diagram-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: fit-content;
-  margin: 0 auto;
-  position: relative;
 }
 
 .modal-image {
   max-width: 100%;
   height: auto;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  transform: scale(1.3);
-  transform-origin: center center;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
 }
 
 /* Styles pour les labels des flèches */
@@ -137,56 +107,8 @@ button:hover {
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   white-space: nowrap;
-  z-index: 10;
 }
 
-/* Ajuster les positions pour compenser le scale de 1.3 de l'image */
-/* Les positions doivent être multipliées par 1.3 pour correspondre à l'image agrandie */
-#modal .arrow-label-top {
-  top: calc(10px * 1.3);
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-#modal .arrow-label-right {
-  top: 50%;
-  right: calc(10px * 1.3);
-  transform: translateY(-50%);
-}
-
-#modal .arrow-label-bottom {
-  bottom: calc(10px * 1.3);
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-#modal .arrow-label-left {
-  top: 50%;
-  left: calc(10px * 1.3);
-  transform: translateY(-50%);
-}
-
-#modal .arrow-label-top-right {
-  top: calc(20px * 1.3);
-  right: calc(20px * 1.3);
-}
-
-#modal .arrow-label-bottom-right {
-  bottom: calc(20px * 1.3);
-  right: calc(20px * 1.3);
-}
-
-#modal .arrow-label-bottom-left {
-  bottom: calc(20px * 1.3);
-  left: calc(20px * 1.3);
-}
-
-#modal .arrow-label-top-left {
-  top: calc(20px * 1.3);
-  left: calc(20px * 1.3);
-}
-
-/* Positions par défaut pour les autres modales */
 .arrow-label-top {
   top: 10px;
   left: 50%;
@@ -231,33 +153,35 @@ button:hover {
   left: 20px;
 }
 
-/* Styles pour les boutons magiques - même style que les listes */
+/* Styles pour les boutons magiques */
 .magic-button {
   background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+  color: #000;
   border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 6px 8px;
+  margin: 2px;
   border-radius: 10px;
-  padding: 8px 12px;
-  margin: 4px;
-  text-align: center;
   font-size: 12px;
   font-weight: bold;
-  color: #000;
   cursor: pointer;
   transition: all 0.3s ease;
-  position: relative;
-  min-width: 120px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   white-space: nowrap;
   display: inline-block;
+  min-width: 120px;
+  box-sizing: border-box;
 }
 
 .magic-button:hover {
-  background-color: #eaf1ff;
+  background-color: #e3f2fd;
   transform: translateY(-2px);
   box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
 }
 
-.magic-button:active {
+.magic-button:active,
+.magic-button.clicked {
+  background-color: #4a90e2;
+  color: white;
   transform: translateY(0);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
