@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste du Froid</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .diagram-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: visible;
+        }
+
+        .level {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+            min-height: 40px;
+            position: relative;
+            align-items: center;
+        }
+
+        .level-number {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid #000;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .spell-node {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin: 2px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-width: 80px;
+            z-index: 5;
+        }
+
+        .spell-node:hover {
+            background-color: #e3f2fd;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+        }
+
+        .spell-node.clicked {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .arrow {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+            transform-origin: left center;
+        }
+
+        .arrow::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .arrow-vertical {
+            width: 2px;
+        }
+
+        .arrow-diagonal {
+            width: 2px;
+        }
+
+        .arrow-horizontal {
+            height: 2px;
+        }
+
+        .arrow-horizontal::after {
+            border-left: 8px solid #000;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-right: none;
+            right: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-line {
+            position: absolute;
+            background: #000;
+            z-index: 1;
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #000;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .diagram-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        h1 {
+            text-align: center;
+            color: #000;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .spell-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            padding: 15px;
+            max-width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+        }
+
+        .spell-info h3 {
+            margin: 0 0 10px 0;
+            color: #2196f3;
+        }
+
+        .spell-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        #spellDescription {
+            text-align: justify;
+        }
+
+        /* Classes de positionnement par colonne */
+        .col-1 {
+            grid-column: 1;
+        }
+
+        .col-2 {
+            grid-column: 2;
+        }
+
+        .col-3 {
+            grid-column: 3;
+        }
+
+        .col-4 {
+            grid-column: 4;
+        }
+
+        .col-5 {
+            grid-column: 5;
+        }
+
+        .col-6 {
+            grid-column: 6;
+        }
+
+        .col-7 {
+            grid-column: 7;
+        }
+
+        .col-8 {
+            grid-column: 8;
+        }
+
+        .col-2-3 {
+            grid-column: 2 / 4;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>LISTE DU FROID</h1>
+
+
+    <div class="diagram-container" id="diagramContainer">
+
+        <!-- Niveau 1 -->
+        <div class="level" style="margin-top: 0;">
+            <div class="level-number">1</div>
+            <div class="spell-node col-3" data-spell="Appel du froid">Appel du froid</div>
+            <div class="spell-node col-6" data-spell="Refroidir">Refroidir</div>
+        </div>
+
+        <!-- Niveau 2 -->
+        <div class="level">
+            <div class="level-number">2</div>
+            <div class="spell-node col-4" data-spell="Congélation des liquides">Congélation des liquides</div>
+        </div>
+
+        <!-- Niveau 3 -->
+        <div class="level">
+            <div class="level-number">3</div>
+            <div class="spell-node col-2" data-spell="Rideau de froid">Rideau de froid</div>
+            <div class="spell-node col-6" data-spell="Blizzard">Blizzard</div>
+        </div>
+
+        <!-- Niveau 4 -->
+        <div class="level">
+            <div class="level-number">4</div>
+            <div class="spell-node col-2" data-spell="Ligne de glace">Ligne de glace</div>
+            <div class="spell-node col-4" data-spell="Neige">Neige</div>
+            <div class="spell-node col-6" data-spell="Exacerbation des émotions">Exacerbation des émotions</div>
+            <div class="spell-node col-7" data-spell="Engourdissement">Engourdissement</div>
+        </div>
+
+        <!-- Niveau 5 -->
+        <div class="level">
+            <div class="level-number">5</div>
+            <div class="spell-node col-2" data-spell="Résistance au froid">Résistance au froid</div>
+            <div class="spell-node col-4" data-spell="Verglas">Verglas</div>
+            <div class="spell-node col-6" data-spell="Refroidissement des solides">Refroidissement des solides</div>
+        </div>
+
+        <!-- Niveau 6 -->
+        <div class="level">
+            <div class="level-number">6</div>
+            <div class="spell-node col-2" data-spell="Mur de glace">Mur de glace</div>
+            <div class="spell-node col-4" data-spell="Glaive de glace">Glaive de glace</div>
+            <div class="spell-node col-6" data-spell="Boule de froid">Boule de froid</div>
+            <div class="spell-node col-7" data-spell="Métal glacé">Métal glacé</div>
+        </div>
+
+        <!-- Niveau 8 -->
+        <div class="level">
+            <div class="level-number">8</div>
+            <div class="spell-node col-3" data-spell="Globe glacé">Globe glacé</div>
+            <div class="spell-node col-5" data-spell="Souffle glacé">Souffle glacé</div>
+            <div class="spell-node col-7" data-spell="Être glacé">Être glacé</div>
+        </div>
+
+        <!-- Niveau 10 -->
+        <div class="level">
+            <div class="level-number">10</div>
+            <div class="spell-node col-3" data-spell="Tempête de glace">Tempête de glace</div>
+            <div class="spell-node col-6" data-spell="Gelure">Gelure</div>
+        </div>
+
+        <!-- Niveau 12 -->
+        <div class="level">
+            <div class="level-number">12</div>
+            <div class="spell-node col-3" data-spell="Invocation du froid">Invocation du froid</div>
+            <div class="spell-node col-7" data-spell="Globe antifroid">Globe antifroid</div>
+        </div>
+
+        <!-- Niveau 15 -->
+        <div class="level">
+            <div class="level-number">15</div>
+            <div class="spell-node col-4" data-spell="Congélation">Congélation</div>
+        </div>
+    </div>
+    <div class="spell-info" id="spellInfo">
+        <h3><span id="spellName"></span> (niv <span id="spellLevel"></span>)</h3>
+        <table>
+            <tr>
+                <td><strong>Portée :</strong></td>
+                <td><span id="spellPortée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Incantation :</strong></td>
+                <td><span id="spellIncantation"></span></td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td><strong>Durée :</strong></td>
+                <td><span id="spellDurée"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Sauvegarde :</strong></td>
+                <td><span id="spellSauvegarde"></span></td>
+            </tr>
+            <tr>
+                <td><strong>Zone :</strong></td>
+                <td><span id="spellZone"></span></td>
+            </tr>
+        </table>
+        <p id="spellDescription"></p>
+    </div>
+
+    <script>
+        // Données de la Liste du Froid
+        const spellsData = {
+            // Niveau 1
+            "Appel du froid": {
+                level: 1,
+                portée: "-",
+                incantation: "2 s",
+                durée: "2 h",
+                sauvegarde: "-",
+                zone: "boule de 3m *",
+                description: "Ce sort permet d'abaisser la température de l'air à l'intérieur de la zone d'effet. Le magicien décide une fois pour toute au début du sort de la température qu'il régnera ; celle-ci peut aller de la température naturelle à environ -5 degrés Celsius. La zone d'effets se déplace ensuite avec le magicien.\nNotez que tout autre sort affectant la température occulte celui-ci (mais ne le dissipe pas)."
+            },
+            "Refroidir": {
+                level: 1,
+                portée: "10 m",
+                incantation: "1 s",
+                durée: "10 min",
+                sauvegarde: "-",
+                zone: "un objet (< 1m3)",
+                description: "L'objet ciblé devient soudain très froid, d'une température à peine supérieure à 0 degré Celsius (ce qui est la température d'un glaçon, à titre de comparaison). On ressent ce froid dès que l'on touche l'objet en question, et il est difficile, car désagréable, de maintenir ce contact.\nCet état dure pendant 10 minutes, et ce quels que soient les moyens naturels (non magiques) employés pour le réchauffer. Notez cependant que l'objet ne doit pas se trouver au moment du sort à moins de 20 cm d'un être intelligent."
+            },
+
+            // Niveau 2
+            "Congélation des liquides": {
+                level: 2,
+                portée: "5 m",
+                incantation: "5 s",
+                durée: "temps de chauffer",
+                sauvegarde: "-",
+                zone: "3 m3",
+                description: "Ce sort porte presque instantanément (en 5 secondes d'incantation) tout liquide contenu dans la zone d'effets à une température de -20 degré Celsius, soit une température inférieure à la température de solidification de l'eau.\nLe retour à la température ambiante se fait ensuite naturellement. Par exemple, lancé sur une rivière, ce sort créera un cube de glace coulant avec le courant (si celui-ci est assez fort) et fondant peu à peu.\nUne restriction de taille est cependant à noter : il est impossible de choisir une zone d'effets contenant un être vivant. Ses émissions d'ondes magiques troubleraient en effet trop le sort.\nNotez également qu'exceptionnellement le magicien peut agrandir la zone d'effets au-delà d'un triplement : la zone d'effets peut être agrandie d'1 mètre cube par point (de fatigue et de concentration) supplémentaire dépensé, avec pour seule limite les forces que le magicien peut ou veut consacrer à son sort."
+            },
+
+            // Niveau 3
+            "Rideau de froid": {
+                level: 3,
+                portée: "3 m",
+                incantation: "2 s",
+                durée: "5 min",
+                sauvegarde: "-",
+                zone: "8m x 3m",
+                description: "Ce sort crée un mur d'air froid fixe comportant des flocons de neige et des morceaux de glace en suspension. Il est large de 30 cm et se remarque facilement en raison des mouvements d'air qui l'animent. Le magicien peut lui donner au choix une forme plate (mur) ou circulaire (cylindre) s'il le place autour de lui-même.\nToute créature le franchissant se voit infliger des gelures superficielles se propageant magiquement à l'ensemble du corps. Elle perd 1d4+2 points de vie, sans sauvegarde.\nLe rideau se crée progressivement pendant les 2 secondes que dure l'incantation. Si une créature se trouve à l'endroit où le magicien décide de le positionner, elle a ainsi le temps de s'en écarter avant qu'il n'ait acquis sa pleine vigueur."
+            },
+            "Blizzard": {
+                level: 3,
+                portée: "40 m",
+                incantation: "7 s",
+                durée: "5 min",
+                sauvegarde: "-",
+                zone: "boule de 40m",
+                description: "Un vent froid, tourbillonnant, se met à souffler dans toute la zone d'effets. Il charrie de petits flocons qui se déposent sur les vêtements et sur le sol, et rendent pénible de garder les yeux ouverts.\nEn termes de jeu, on considère que l'acuité de la vision est divisée par 3 ou que les jets de perception visuelle subissent un malus de -6. De plus, les torches ont une chance sur deux de s'éteindre. Enfin, l'utilisation d'arcs ou d'arbalètes devient difficile, ce qui occasionne un malus de -4 à courte portée, -6 à moyenne portée et -8 à longue portée."
+            },
+
+            // Niveau 4
+            "Ligne de glace": {
+                level: 4,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "-",
+                sauvegarde: "Co-1",
+                zone: "une cible",
+                description: "Un fin pinceau d'air glacé part de la main du magicien, et va frapper la cible qu'il lui désigne. Son contact glacé provoque des gelures causant 1d4+3 points de dommages, moins la marge de réussite de la sauvegarde. La ligne de glace atteint sa cible en un point précis et les dégâts qu'elle cause sont par conséquent localisés suivant le tableau utilisé pour les attaques par projectiles.\nIl est possible d'utiliser les effets de modulation des sorts (voir chapitre « Jouer la magie ») pour viser certaines zones particulières, ou plus exactement pour retirer certaines zones du tableau de localisation : pour 1 point de modulation le magicien peut retirer 2 zones de localisation, et pour 2 points de modulation le magicien peut en retirer 4. Dans ce second cas, cela lui permettra par exemple de cibler sa ligne de glace sur les zones « Tête », « Poitrine » et « Abdomen » d'un humanoïde.\nLe maître du jeu peut accorder un bonus de +2 à la sauvegarde d'un personnage s'attendant à une attaque de ce type (sort à réalité physique) et qui n'a pas entrepris d'autre action que cette sauvegarde dans le tour."
+            },
+            "Neige": {
+                level: 4,
+                portée: "100 m",
+                incantation: "7 s",
+                durée: "10 min",
+                sauvegarde: "-",
+                zone: "cylindre de 50m",
+                description: "Ce sort refroidit fortement l'air dans la zone d'effets (un cylindre de plusieurs kilomètres de haut et formant à la base un disque de 50 mètres de rayon), ce qui a pour effet de provoquer la condensation de la vapeur d'eau et sa chute sous forme de neige. Celle-ci se fait sous la forme de flocons tombant lentement jusqu'au sol.\nSi les conditions sont favorables, c'est à dire notamment si la zone d'effets est surplombée de nuages, la quantité de neige peut être importante. Elle peut représenter jusqu'à une épaisseur d'une quinzaine de centimètres au cours des 10 minutes que dure le sort. En revanche, si le ciel est bleu et l'atmosphère sèche, la chute de neige ne dépassera pas 1 cm d'épaisseur.\nCette neige est naturelle, et a donc les effets attendus ; elle est notamment glissante, et les actions physiques réclamant un certain équilibre sont toutes considérées comme « malaisées » voire « difficiles »."
+            },
+            "Exacerbation des émotions": {
+                level: 4,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "15 min",
+                sauvegarde: "Ab",
+                zone: "1 créature",
+                description: "Si la créature visée rate son jet de sauvegarde, les émotions qu'elle ressent sont soudain grandement amplifiées. Une légère appréhension se transformera en peur, la peur en effroi panique ; une pointe de jalousie se transformera en une brûlure dévorante ; un agacement en colère ; une inclinaison en un souffle amoureux ; une légère mélancolie en profonde tristesse.\nLe sortilège ne déclenche pas les émotions, il les porte simplement à un niveau beaucoup plus élevé. En outre, seules les émotions présentes à la conscience de la créature sont affectées. Afin de tirer pleinement parti des effets de ce sort, le magicien ou les autres créatures peuvent en partie influencer l'expression de ces émotions en soufflant sur les braises que le sortilège transformera alors en flammes. Par exemple, appeler l'attention de la créature sur un élément la rendant un peu jalouse engendrera soudain une jalousie intense, mais cela ne fonctionnera que si l'élément en question rend effectivement un peu jalouse la créature."
+            },
+            "Engourdissement": {
+                level: 4,
+                portée: "20 m",
+                incantation: "3 s",
+                durée: "1 min",
+                sauvegarde: "C-2",
+                zone: "1 créature",
+                description: "La créature affectée par ce sort (ayant raté sa sauvegarde) subit un engourdissement de ses muscles : ceux-ci lui semblent soudain lents et pesants et répondent moins bien aux ordres de son cerveau. En termes de jeu, la créature subit un malus de -2 à tous ses jets d'action physique, en particulier en combat (jets d'attaque et jets de défense). Si la sauvegarde est ratée de plus de 4 points, l'engourdissement est particulièrement fort et le malus subi est de -4."
+            },
+
+            // Niveau 5
+            "Résistance au froid": {
+                level: 5,
+                portée: "toucher",
+                incantation: "5 s",
+                durée: "1 heure",
+                sauvegarde: "-",
+                zone: "1 créature",
+                description: "La créature bénéficiant du sort devient insensible au froid naturel.\nDe plus, pendant toute la durée du sort, elle bénéficie d'un bonus de +2 à ses sauvegardes contre les sorts fondés sur le froid et ces sorts ne lui infligent que la moitié des dégâts normaux, avant sauvegarde éventuelle (les sorts infligeant 1 point de vie par tour infligeront seulement 1 point de vie tous les 2 tours)."
+            },
+            "Verglas": {
+                level: 5,
+                portée: "20 m",
+                incantation: "7 s",
+                durée: "15 min",
+                sauvegarde: "-",
+                zone: "disque de 20m",
+                description: "Ce sortilège recouvre le sol d'une fine couche de verglas, le rendant très glissant. Le déplacement précautionneux est toujours possible, mais toute autre action physique (courir, combattre, etc.) sera considérée comme « difficile », voire « très difficile » si les conditions du lieu (humidité, sol lisse) se prêtent bien à l'installation du verglas. De plus, un jet sous la vivacité physique (avec une difficulté dépendant de l'action entreprise) sera nécessaire chaque tour pour ne pas se terminer par une chute sur le sol…\nLe verglas est dense au centre de la zone d'effets et diminue progressivement jusqu'à devenir négligeable en limite de zone. Les pleins effets se font donc surtout sentir au centre de la zone de verglas, puis s'atténuent en s'en éloignant. Lors d'un combat de mêlée entre deux créatures, les deux subiront approximativement les mêmes malus."
+            },
+            "Refroidissement des solides": {
+                level: 5,
+                portée: "10 m",
+                incantation: "5 s",
+                durée: "temps de chauffer",
+                sauvegarde: "-",
+                zone: "2 m3",
+                description: "Tout objet solide dans la zone d'effets du sort devient extrêmement froid, d'une température de l'ordre de -50 degrés Celsius. Le contact avec un tel objet est très douloureux, et les créatures les tenant devront les lâcher ; sinon, elles perdent trois points de vie par tour dans chaque zone en contact avec un tel objet.\nCe sort affecte tout objet, même l'épée tenue par un combattant, à l'exception unique des vêtements ou armures (ou d'un objet situé encore plus près du corps), qui sont protégés par l'émission d'ondes magiques par la créature concernée (lesquelles perturbent trop le sortilège pour qu'il fonctionne correctement).\nLe refroidissement est progressif pendant le temps d'incantation. La vitesse de réchauffement dépend ensuite énormément du matériau constituant l'objet, et de la température ambiante. Le métal se réchauffera vite (une trentaine de secondes pour une épée pour redevenir utilisable), la pierre ou le bois beaucoup moins (jusqu'à plusieurs dizaines de minutes).\nComme pour le sort de Congélation des liquides, le magicien peut agrandir la zone d'effets au-delà d'un triplement. L'augmentation est de 0,5 mètre cube supplémentaire par point (de fatigue et de concentration) supplémentaire dépensé."
+            },
+
+            // Niveau 6
+            "Mur de glace": {
+                level: 6,
+                portée: "20 m",
+                incantation: "2 s",
+                durée: "40 min",
+                sauvegarde: "-",
+                zone: "6m x 3m x 0,5m",
+                description: "Ce sort crée un mur de glace vertical ou horizontal dont les dimensions sont données ci-dessus. Il doit nécessairement reposer sur une base stable, c'est à dire ne pas être dans une position où son poids l'amènerait à bouger. Il est donc impossible de le faire tomber sur des adversaires.\nEn revanche, une fois en place, il est impossible de le déplacer. A part en le brisant, par la force ou la magie, il est impossible de le franchir. Et son épaisseur de 50 cm suffit en général à éviter ce sort funeste."
+            },
+            "Glaive de glace": {
+                level: 6,
+                portée: "-",
+                incantation: "5 s",
+                durée: "30 min",
+                sauvegarde: "-",
+                zone: "-",
+                description: "Ce sortilège crée une épée constituée de glace effilée maintenue et renforcée d'ondes magiques. Ce glaive peut être utilisé par le magicien comme une épée normale (compétence « Epée à 1 main »), notamment en combat. Il provoque des dégâts équivalents à ceux d'une épée longue (l'éventuel bonus de force s'applique) et retranche 4 points à la valeur de l'éventuelle armure protégeant la zone qu'il touche.\nSeul le magicien lui-même peut utiliser ce glaive de glace. Les autres créatures ne sont pas en mesure de le contrôler."
+            },
+            "Boule de froid": {
+                level: 6,
+                portée: "30 m",
+                incantation: "4 s",
+                durée: "-",
+                sauvegarde: "Co",
+                zone: "boule de 3m",
+                description: "Ce sort crée une petite boule qui explose brutalement. Le magicien la déplace mentalement, de sorte qu'elle explose là où il le désire. Le déplacement est extrêmement rapide, ce qui rend difficile de se protéger de l'explosion.\nToute créature se trouvant dans la zone d'effets est brûlée par le froid du souffle et perd 3d4+2 points de vie, moins la marge de réussite de sa sauvegarde. Les créatures situées le plus près du cœur de l'explosion (à moins de 1 mètre) subissent un malus de -2 à leur jet de sauvegarde.\nLe fait de tenter une sauvegarde est équivalent à une esquive : la créature concernée se jette sur le côté pour tenter d'éviter l'explosion. Cela interrompt donc toute action en cours.\nEn outre, le choc de l'explosion crée un effet d'hébétude chez ceux qui le subissent, qui empêche d'agir pendant quelques secondes. Les créatures ayant réussi leur sauvegarde perdent 2 secondes à se remettre du choc, ce qui peut leur faire perdre l'initiative ou retarder leur attaque en combat. Les créatures ayant raté leur sauvegarde perdent un tour complet sans agir et subissent un malus de -2 à leurs actions éventuelles de défense (parades ou esquives) durant ce tour."
+            },
+            "Métal glacé": {
+                level: 6,
+                portée: "15 m",
+                incantation: "4 s",
+                durée: "1 min",
+                sauvegarde: "- (Mag+2)",
+                zone: "un objet en métal",
+                description: "La température de l'objet visé par le magicien diminue très rapidement (2 degrés par seconde). Au bout d'une minute, elle se met à croître au même rythme, et retourne à sa valeur initiale. Pour que le sort fonctionne, le poids de l'objet ne doit pas excéder 30 kg.\nLe contact avec l'objet devient très vite douloureux, et inflige des dommages dès -20 degrés. Les dégâts pour chaque zone en contact avec lui, par tour, sont égaux au nombre de dizaine de degrés de la température en dessous de -20 : 1 point de vie de -20 à -29 degrés, 2 de -30 à -39, etc.\nBien sûr, lancé sur l'armure d'un adversaire, ce sort peut être particulièrement redoutable. Il est cependant difficile d'affecter un objet se trouvant à moins de 20 cm d'une créature intelligente car celle-ci émet des ondes magiques interférant avec le sortilège. Pour cette raison, chaque créature à moins de 20 cm de l'objet ciblé lance un jet de sauvegarde sous son don Magie + 2 ; une réussite annule les effets du sort. Les créatures situées à plus de 20 cm de l'objet au moment du lancement du sort n'ont en revanche aucune sauvegarde."
+            },
+
+            // Niveau 8
+            "Globe glacé": {
+                level: 8,
+                portée: "-",
+                incantation: "5 s",
+                durée: "1 h",
+                sauvegarde: "-",
+                zone: "boule de 3m *",
+                description: "Ce sort crée une sphère de morceaux de glace tourbillonnant de 3 mètres de rayon et de 50 cm d'épaisseur centrée sur le magicien et qui le suit dans ses déplacements. La vitesse du magicien ne peut toutefois dépasser celle d'une marche normale, à défaut de quoi la sphère ne parvient plus avancer à sa vitesse et à le devancer.\nLa vision de cette impressionnante nuée de morceaux de glace en mouvement dissuadera tous les animaux et la plupart des créatures intelligentes de tenter de la franchir. Seules les créatures particulièrement déterminées pourront s'y résoudre, et encore devront-elles réussir un jet sous leur Volonté avec un malus de -2 pour y parvenir. Le franchissement de la sphère leur inflige alors de sévères blessures (1d4+4 points de vie généraux).\nLe fait qu'une créature franchisse la sphère en perturbe momentanément la magie et a pour conséquence que la sphère reste immobile pendant 1 tour. Le magicien doit attendre que cette perturbation ait pris fin avant de pouvoir le cas échéant reprendre sa route (sauf à choisir de laisser la sphère derrière lui). En outre, la sphère se dissipe dès lors que 10 créatures l'ont traversée.\nLes morceaux de glace en mouvement sont susceptibles d'atteindre les objets propulsés à travers la sphère. Plus les objets sont gros et plus la probabilité d'être touchés lors de la traversée de la sphère est élevée. Les projectiles (flèches, carreaux d'arbalète) ont une chance sur deux (50 %) d'être heurtés par un ou plusieurs morceaux de glace, ce qui a pour effet d'interrompre ou de détourner leur vol, leur faisant rater leur cible.\nLa sphère maintient une température constante de 15 degrés en son sein, et ce quel que soit son environnement. De plus, elle divise par 3 l'efficacité des sortilèges basés sur le feu qui la traversent."
+            },
+            "Souffle glacé": {
+                level: 8,
+                portée: "-",
+                incantation: "7 s",
+                durée: "1 s",
+                sauvegarde: "Co-1",
+                zone: "cône de 30° x 20m",
+                description: "Des mains du magicien part un souffle glacial en forme de cône. Celui-ci mesure 20 mètres de long et a une base circulaire d'un rayon de 5 mètres (ce qui correspond à peu près à un cône faisant 30 degrés à son sommet).\nLe froid glacial du souffle inflige de sévères blessures aux créatures. Celles-ci subissent 3d4+2 points de dommages généraux, moins la marge de réussite de leur sauvegarde. Les créatures situées sur les 10 premiers mètres du parcours du souffle subissent un malus de -2 à leur jet de sauvegarde. A contrario une créature partiellement protégée du souffle (par un muret, un compagnon plus grand, se jetant à terre à l'avance, etc.) bénéficiera d'un bonus de +2 à +8 à sa sauvegarde selon l'ampleur de la protection.\nLe fait de tenter une sauvegarde est équivalent à une esquive : la créature concernée se jette sur le côté pour tenter d'éviter le souffle. Cela interrompt donc toute action en cours.\nEn outre, le choc de cette tempête de glace provoque une hébétude parmi les créatures touchées. Celles-ci perdent un tour avant de pouvoir agir et subissent un malus de -2 à leurs éventuels jets de défense (parade ou esquive) si elles sont attaquées pendant ce laps de temps."
+            },
+            "Être glacé": {
+                level: 8,
+                portée: "3 m",
+                incantation: "1 min",
+                durée: "4 h",
+                sauvegarde: "-",
+                zone: "0,2 m3 de glace",
+                description: "Ce sort permet au magicien de créer magiquement un être fait de glace. Il ne s'agit pas d'invoquer une créature venant d'un autre plan d'existence, mais d'insuffler une vie temporaire à de la glace. La créature ainsi créée rentre donc dans la catégorie des créatures surnaturelles, mais pas dans celle des créatures invoquées venant d'un autre plan (cela vaut notamment pour le sortilège Repousser les créatures invoquées).\nLa créature sort du morceau de glace sur lequel le magicien a lancé le sortilège. Elle prend une forme vaguement humanoïde, même si les détails restent à choisir par le magicien. Elle mesure environ trois mètres et pèse 200 kilos.\nSes caractéristiques sont similaires à celles d'un être de feu (cf. sortilège du même nom, soit des scores de +10 en attaque, +6 en feinte de corps et +5 en esquive et des dommages égaux à 2 x marge +1). Elle possède une armure de 4 sur la totalité du corps, 35 points de vie et 40 points de fatigue. Elle obéit correctement aux ordres du magicien. Elle a une intelligence relativement limitée et les ordres ne doivent pas être trop complexes. En l'absence d'instructions elle suit le magicien et attaque toute personne semblant le menacer.\nLe magicien peut utiliser ce sort pour contrôler un être glacé. Dans ce cas, l'incantation est réduite à seulement 5 secondes. L'être a droit à une sauvegarde sous PM+4."
+            },
+
+            // Niveau 10
+            "Tempête de glace": {
+                level: 10,
+                portée: "20 m",
+                incantation: "8 s",
+                durée: "2 s",
+                sauvegarde: "(Co-2)",
+                zone: "boule de 20m",
+                description: "Ce sortilège déclenche une véritable tempête glacée, qui part du magicien et se répand dans la zone d'effet. Tous les animaux et les créatures faibles ou lâches s'enfuiront devant un tel déluge, sauf circonstances exceptionnelles.\nLe froid glacial de ce déferlement brûle sévèrement toutes les créatures se trouvant en son sein : celles-ci perdent 2d4+2 points de vie. Les créatures en périphérie de la zone (à moins de 10 mètres de son bord) sont autorisées à un jet de sauvegarde, dont la marge de réussite vient le cas échéant en déduction des dommages subis.\nLe souffle glacé disperse de plus tous les objets suffisamment légers pour être emportés (le souffle a la force d'un vent d'environ 100 km/h). Il éteint toutes les torches.\nEnfin, le choc de cette tempête de glace provoque une hébétude parmi les créatures touchées. Celles-ci perdent un tour avant de pouvoir agir et subissent un malus de -2 à leurs éventuels jets de défense (parade ou esquive) si elles sont attaquées pendant ce laps de temps."
+            },
+            "Gelure": {
+                level: 10,
+                portée: "30 m",
+                incantation: "5 s",
+                durée: "10 min",
+                sauvegarde: "C-4",
+                zone: "1 créature",
+                description: "Ce sortilège permet au magicien de geler un membre (un bras ou une jambe pour un humanoïde) de la créature visée. Si la créature rate sa sauvegarde, le membre se fige comme s'il était gelé dans un bloc de glace. Il devient très froid. Son porteur n'est plus capable de le contrôler et ne ressent plus rien par son intermédiaire. Le membre lâche tout ce qu'il tenait au moment du sort.\nCette gelure magique, bien que douloureuse, ne cause aucun dommage à sa victime. Son seul effet est de rendre inutilisable l'un de ses membres.\nLe membre gelé perturbe en outre l'équilibre et les mouvements de la créature affectée : toutes les actions physiques s'effectuent en « difficile » (ou avec un malus de -4) en cas de jambe gelée et en « malaisé » (ou avec un malus de -2) en cas de bras gelé."
+            },
+
+            // Niveau 12
+            "Invocation du froid": {
+                level: 12,
+                portée: "-",
+                incantation: "1 min",
+                durée: "12 h",
+                sauvegarde: "-",
+                zone: "boule de 1km",
+                description: "Ce sort provoque un rapide refroidissement de l'atmosphère. Pendant la minute d'incantation qu'exige son lancement, la température décroît progressivement pour atteindre 0 °C. Elle se maintient alors magiquement à ce niveau pendant toute la durée du sort, avant de reprendre rapidement son niveau normal lorsque celui-ci expire.\nIl est possible d'utiliser les effets de modulation des sorts (voir chapitre « Jouer la magie ») pour rendre le froid plus sévère : pour 2 points de modulation le froid atteint - 10 °C et pour 4 points de modulation il atteint - 20 °C.\nAucun sort de niveau inférieur à 12 autre que « Globe de température immuable » ne peut altérer la température au sein de la zone (les sorts instantanés comme Boule de feu prennent néanmoins effet). Les moyens mécaniques sont en revanche efficaces (notamment le feu naturel).\nLe magicien bénéficie quant à lui d'une immunité à son propre sort, puisqu'il s'entoure naturellement pour toute sa durée d'une enveloppe magique de 2 mètres de rayon maintenant en son sein une température fixée de son choix (ne pouvant simplement pas être supérieure à la température naturelle de la zone au moment de l'incantation)."
+            },
+            "Globe antifroid": {
+                level: 12,
+                portée: "-",
+                incantation: "3 s",
+                durée: "3 h",
+                sauvegarde: "-",
+                zone: "boule de 5m *",
+                description: "Ce sort crée une boule se déplaçant avec le magicien et le protégeant contre les effets du froid. La température naturelle régnant dans la boule ne peut descendre sous 20 degrés Celsius. Les sortilèges de la liste du Froid lancés par d'autres magiciens ne peuvent prendre effet dans cette boule (que ces magiciens soient eux-mêmes ou non à l'intérieur de la boule), même si cela ne les empêche pas de prendre effet à l'extérieur.\nCe bannissement de toute magie du Froid extérieure reste valable pour les sortilèges ayant une certaine durée et en cas de mouvement du magicien. Si par exemple celui-ci se déplace vers un Mur de glace, la partie de celui-ci se trouvant à l'intérieur du globe antifroid sera temporairement dissipée. Elle ne retrouvera ses effets que lorsque le magicien se sera éloigné et qu'elle se trouvera à nouveau hors du globe antifroid.\nEnfin, le contact d'un globe antifroid blesse cruellement les êtres glacés : ceux-ci perdent 5 points de vie par seconde passée en contact avec le globe. Cela est bien suffisant pour leur inspirer une crainte telle qu'ils ne s'en approchent jamais (ils en ressentent naturellement la présence)."
+            },
+
+            // Niveau 15
+            "Congélation": {
+                level: 15,
+                portée: "30 m",
+                incantation: "10 s",
+                durée: "-",
+                sauvegarde: "Co-var",
+                zone: "cube de 10m de côté",
+                description: "Au cours des 10 secondes d'incantation, la température dans la zone d'effets chute de façon vertigineuse, gelant tout ce que cette zone contient. Dès les premières secondes le sol se couvre de verglas (cf. sort du même nom). La température baisse ensuite progressivement à un niveau tel que même la vapeur d'eau de l'air ambiant semble se solidifier : après 10 secondes, la zone d'effets devient un immense cube de glace de 10 mètres d'arête.\nLe froid est tel dans la zone d'effets qu'il est extrêmement difficile de se concentrer. Toutes les actions subissent un malus de -2 et il est impossible de lancer des sortilèges exigeant plus d'une seconde d'incantation.\nLes créatures présentes à l'intérieur de la zone d'effets peuvent tenter de quitter celle-ci afin d'éviter d'être emprisonnées dans la glace. En raison du verglas et du choc causé par le froid dans la zone, elles doivent pour cela réussir un jet de sauvegarde sous leur coordination avec comme malus le nombre de mètres à parcourir (donc par exemple Co-5 pour une créature située au centre de la zone d'effets et devant parcourir 5 mètres pour en sortir).\nUne réussite à la sauvegarde indique que la créature est parvenue à sortir de la zone d'effets avant la formation complète de la glace. En raison du froid intense, elle a cependant perdu 1d4+2 points de vie moins la marge de réussite de sa sauvegarde.\nUne sauvegarde ratée indique que la créature est restée emprisonnée, au moins partiellement, dans le cube de glace. Elle perd 2d4+4 points de vie généraux, puis 1 point supplémentaire par tranche de 5 minutes où elle reste prisonnière de la glace.\nUne fois le cube de glace formé, il évolue normalement. En particulier, il fondra à une vitesse dépendant de la température ambiante. Il est possible de tenter d'accélérer sa fonte (par des moyens magiques ou naturels) afin de libérer des amis prisonniers. Cela aura bien sûr d'autant plus de chances de succès que ceux-ci seront proches du bord du cube (i.e. auront raté leur sauvegarde de peu)."
+            }
+        };
+
+        // Fonction pour créer une flèche SVG entre deux éléments
+        function createArrow(fromElement, toElement, svg) {
+            const fromRect = fromElement.getBoundingClientRect();
+            const toRect = toElement.getBoundingClientRect();
+            const containerRect = document.getElementById('diagramContainer').getBoundingClientRect();
+
+            // Calculer les positions relatives au conteneur avec plus de précision
+            const fromX = fromRect.left + fromRect.width / 2 - containerRect.left;
+            const fromY = fromRect.bottom - containerRect.top + 0;
+            const toX = toRect.left + toRect.width / 2 - containerRect.left;
+            const toY = toRect.top - containerRect.top - 0;
+
+            // Vérifier que les positions sont valides
+            if (isNaN(fromX) || isNaN(fromY) || isNaN(toX) || isNaN(toY)) {
+                console.log('Position invalide pour la flèche');
+                return;
+            }
+
+            // Créer la ligne SVG avec un style plus visible
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', fromX);
+            line.setAttribute('y1', fromY);
+            line.setAttribute('x2', toX);
+            line.setAttribute('y2', toY);
+            line.setAttribute('stroke', '#000');
+            line.setAttribute('stroke-width', '3');
+            line.setAttribute('marker-end', 'url(#arrowhead)');
+            line.setAttribute('opacity', '0.8');
+
+            svg.appendChild(line);
+        }
+
+        // Fonction pour créer toutes les flèches
+        function createAllArrows() {
+            // Attendre que les éléments soient rendus
+            setTimeout(() => {
+                // Supprimer l'ancien SVG
+                const oldSvg = document.querySelector('.diagram-svg');
+                if (oldSvg) {
+                    oldSvg.remove();
+                }
+
+                // Vérifier que tous les éléments existent
+                const allElements = document.querySelectorAll('.spell-node');
+                console.log(`Éléments trouvés: ${allElements.length}`);
+
+                if (allElements.length === 0) {
+                    console.log('Éléments non trouvés, nouvelle tentative...');
+                    setTimeout(createAllArrows, 500);
+                    return;
+                }
+
+                // Vérifier que le conteneur existe
+                const container = document.getElementById('diagramContainer');
+                if (!container) {
+                    console.log('Conteneur non trouvé');
+                    return;
+                }
+
+                // Créer le SVG
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.className = 'diagram-svg';
+                svg.setAttribute('width', "100%");
+                svg.setAttribute('height', "100%");
+                svg.style.position = 'absolute';
+                svg.style.top = '0';
+                svg.style.left = '0';
+                svg.style.zIndex = '0';
+
+                // Créer le marqueur de flèche
+                const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                marker.setAttribute('id', 'arrowhead');
+                marker.setAttribute('markerWidth', '6');
+                marker.setAttribute('markerHeight', '4');
+                marker.setAttribute('refX', '5');
+                marker.setAttribute('refY', '2');
+                marker.setAttribute('orient', 'auto');
+
+                const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                polygon.setAttribute('points', '0 0, 6 2, 0 4');
+                polygon.setAttribute('fill', '#000');
+                polygon.setAttribute('opacity', '0.8');
+
+                marker.appendChild(polygon);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                // Créer les connexions selon le diagramme de la Liste du Froid
+                const connections = [
+                    // Chaîne de base : froid et température
+                    ['Appel du froid', 'Refroidir'],
+                    ['Appel du froid', 'Congélation des liquides'],
+                    ['Appel du froid', 'Refroidissement des solides'],
+                    
+                    // Chaîne de congélation
+                    ['Refroidir', 'Congélation des liquides'],
+                    ['Congélation des liquides', 'Refroidissement des solides'],
+                    ['Refroidissement des solides', 'Métal glacé'],
+                    
+                    // Chaîne de barrière et défense
+                    ['Rideau de froid', 'Mur de glace'],
+                    ['Mur de glace', 'Globe glacé'],
+                    ['Globe glacé', 'Globe antifroid'],
+                    
+                    // Chaîne d'attaque et destruction
+                    ['Ligne de glace', 'Boule de froid'],
+                    ['Boule de froid', 'Souffle glacé'],
+                    ['Souffle glacé', 'Tempête de glace'],
+                    ['Tempête de glace', 'Congélation'],
+                    
+                    // Chaîne de protection et résistance
+                    ['Résistance au froid', 'Globe antifroid'],
+                    
+                    // Chaîne de glace et arme
+                    ['Glaive de glace', 'Être glacé'],
+                    
+                    // Chaîne de précipitations
+                    ['Blizzard', 'Neige'],
+                    ['Neige', 'Verglas'],
+                    ['Verglas', 'Congélation'],
+                    
+                    // Chaîne d'enchantement
+                    ['Exacerbation des émotions', 'Engourdissement'],
+                    ['Engourdissement', 'Gelure'],
+                    
+                    // Chaîne d'invocation
+                    ['Invocation du froid', 'Congélation'],
+                ];
+
+                let createdArrows = 0;
+                connections.forEach(([from, to]) => {
+                    const fromElement = document.querySelector(`[data-spell="${from}"]`);
+                    const toElement = document.querySelector(`[data-spell="${to}"]`);
+
+                    if (fromElement && toElement) {
+                        console.log(`Création flèche: ${from} -> ${to}`);
+                        createArrow(fromElement, toElement, svg);
+                        createdArrows++;
+                    } else {
+                        console.log(`Éléments non trouvés: ${from} -> ${to}`);
+                        console.log(`From: ${fromElement ? 'trouvé' : 'non trouvé'}, To: ${toElement ? 'trouvé' : 'non trouvé'}`);
+                    }
+                });
+
+                // Ajouter le SVG au conteneur
+                document.getElementById('diagramContainer').appendChild(svg);
+
+                console.log(`Flèches créées: ${createdArrows}/${connections.length}`);
+                console.log(`Position SVG: top=0, left=0, z-index=10`);
+            }, 500);
+        }
+
+        // Créer les flèches au chargement de la page
+        window.addEventListener('load', createAllArrows);
+
+        // Gestion des clics sur les sorts
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('spell-node')) {
+                const spellName = e.target.dataset.spell;
+                const spellData = spellsData[spellName];
+
+                if (spellData) {
+                    // Afficher les informations du sort
+                    document.getElementById('spellName').textContent = spellName;
+                    document.getElementById('spellDescription').textContent = spellData.description;
+                    document.getElementById('spellLevel').textContent = spellData.level;
+                    document.getElementById('spellInfo').style.display = 'block';
+                    document.getElementById('spellPortée').textContent = spellData.portée;
+                    document.getElementById('spellIncantation').textContent = spellData.incantation;
+                    document.getElementById('spellDurée').textContent = spellData.durée;
+                    document.getElementById('spellSauvegarde').textContent = spellData.sauvegarde;
+                    document.getElementById('spellZone').textContent = spellData.zone;
+
+                    // Animation du sort cliqué
+                    e.target.classList.add('clicked');
+                    setTimeout(() => {
+                        e.target.classList.remove('clicked');
+                    }, 1000);
+                }
+            }
+        });
+
+        // Fermer les informations en cliquant ailleurs
+        document.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('spell-node') && !e.target.closest('.spell-info')) {
+                document.getElementById('spellInfo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -112,6 +112,16 @@ document.addEventListener("click", function (event) {
     if (magicType === "Isolement") {
       openIsolementModal();
     }
+
+    // Ouvrir la liste du Feu si le bouton "Feu" est cliqué
+    if (magicType === "Feu") {
+      openFeuModal();
+    }
+
+    // Ouvrir la liste du Froid si le bouton "Froid" est cliqué
+    if (magicType === "Froid") {
+      openFroidModal();
+    }
   }
 });
 
@@ -541,6 +551,74 @@ function openIsolementModal() {
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && isolementModal.parentNode) {
       document.body.removeChild(isolementModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste du Feu
+function openFeuModal() {
+  const feuModal = document.createElement("div");
+  feuModal.id = "feuModal";
+  feuModal.className = "modal";
+  feuModal.style.display = "flex";
+
+  feuModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeFeuModal">&times;</span>
+      <iframe src="Liste_feu.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(feuModal);
+
+  const closeBtn = document.getElementById("closeFeuModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(feuModal);
+  });
+
+  feuModal.addEventListener("click", function (event) {
+    if (event.target === feuModal) {
+      document.body.removeChild(feuModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && feuModal.parentNode) {
+      document.body.removeChild(feuModal);
+    }
+  });
+}
+
+// Fonction pour ouvrir la modale de la liste du Froid
+function openFroidModal() {
+  const froidModal = document.createElement("div");
+  froidModal.id = "froidModal";
+  froidModal.className = "modal";
+  froidModal.style.display = "flex";
+
+  froidModal.innerHTML = `
+    <div class="modal-content" style="width: 95vw; height: 95vh; max-width: 1200px; max-height: 90vh; overflow: hidden;">
+      <span class="close" id="closeFroidModal">&times;</span>
+      <iframe src="Liste_froid.html" style="width: 100%; height: calc(115% - 20px); border: none; margin-top: 20px;"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(froidModal);
+
+  const closeBtn = document.getElementById("closeFroidModal");
+  closeBtn.addEventListener("click", function () {
+    document.body.removeChild(froidModal);
+  });
+
+  froidModal.addEventListener("click", function (event) {
+    if (event.target === froidModal) {
+      document.body.removeChild(froidModal);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && froidModal.parentNode) {
+      document.body.removeChild(froidModal);
     }
   });
 }
