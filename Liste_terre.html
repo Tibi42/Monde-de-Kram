@@ -15,23 +15,26 @@
 
         .diagram-container {
             background: white;
-            padding: 20px;
+            padding: 14px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 1000px;
+            max-width: 1300px;
             margin: 0 auto;
             position: relative;
             overflow: visible;
+            box-sizing: border-box;
         }
 
         .level {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 8px;
-            margin: 10px 0;
-            min-height: 40px;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 16px;
+            margin: 7px 0;
+            min-height: 28px;
             position: relative;
             align-items: center;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .level-number {
@@ -42,7 +45,7 @@
             background: white;
             border: 2px solid #000;
             border-radius: 4px;
-            padding: 2px 6px;
+            padding: 1px 4px;
             font-weight: bold;
             font-size: 12px;
         }
@@ -51,8 +54,8 @@
             background: white;
             border: 2px solid #000;
             border-radius: 6px;
-            padding: 4px 8px;
-            margin: 2px;
+            padding: 3px 6px;
+            margin: 0;
             text-align: center;
             font-size: 10px;
             font-weight: bold;
@@ -60,7 +63,10 @@
             transition: all 0.3s ease;
             position: relative;
             min-width: 80px;
+            max-width: 100%;
             z-index: 5;
+            justify-self: start;
+            box-sizing: border-box;
         }
 
         .spell-node:hover {
@@ -222,16 +228,16 @@
 
         /* Améliorations visuelles */
         .diagram-container {
-            padding: 28px;
+            padding: 20px;
             border-radius: 14px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             background: #fff;
         }
 
         .level {
-            gap: 12px;
-            margin: 18px 0;
-            min-height: 56px;
+            gap: 132px;
+            margin: 13px 0;
+            min-height: 39px;
         }
 
         .level-number {
@@ -239,7 +245,7 @@
             border: 1px solid rgba(0, 0, 0, 0.5);
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            padding: 4px 8px;
+            padding: 3px 6px;
             font-size: 12px;
         }
 
@@ -247,11 +253,14 @@
             background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
             border: 1px solid rgba(0, 0, 0, 0.12);
             border-radius: 10px;
-            padding: 8px 12px;
-            margin: 4px;
+            padding: 6px 8px;
+            margin: 0;
             font-size: 12px;
             min-width: 120px;
+            max-width: 100%;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            justify-self: start;
+            box-sizing: border-box;
         }
 
         .spell-node:hover {
@@ -282,7 +291,7 @@
         <!-- Niveau 3 -->
         <div class="level">
             <div class="level-number">3</div>
-            <div class="spell-node col-7" data-spell="Soudure des pierres">Soudure des pierres</div>
+            <div class="spell-node col-6" data-spell="Soudure des pierres">Soudure des pierres</div>
         </div>
 
         <!-- Niveau 4 -->
@@ -290,7 +299,7 @@
             <div class="level-number">4</div>
             <div class="spell-node col-2" data-spell="Résistance à la douleur">Résistance à la douleur</div>
             <div class="spell-node col-5" data-spell="Surdité">Surdité</div>
-            <div class="spell-node col-7" data-spell="Travail de la pierre">Travail de la pierre</div>
+            <div class="spell-node col-6" data-spell="Travail de la pierre">Travail de la pierre</div>
         </div>
 
         <!-- Niveau 5 -->
@@ -305,14 +314,14 @@
             <div class="level-number">6</div>
             <div class="spell-node col-2" data-spell="Poings de pierre">Poings de pierre</div>
             <div class="spell-node col-5" data-spell="Cécité">Cécité</div>
-            <div class="spell-node col-7" data-spell="Mur de pierre">Mur de pierre</div>
+            <div class="spell-node col-6" data-spell="Mur de pierre">Mur de pierre</div>
         </div>
 
         <!-- Niveau 7 -->
         <div class="level">
             <div class="level-number">7</div>
             <div class="spell-node col-2" data-spell="Passe-muraille">Passe-muraille</div>
-            <div class="spell-node col-7" data-spell="Bouclier de pierres animées">Bouclier de pierres animées</div>
+            <div class="spell-node col-6" data-spell="Bouclier de pierres animées">Bouclier de pierres animées</div>
         </div>
 
         <!-- Niveau 8 -->
@@ -320,21 +329,21 @@
             <div class="level-number">8</div>
             <div class="spell-node col-3" data-spell="Excavation">Excavation</div>
             <div class="spell-node col-4" data-spell="Statue">Statue</div>
-            <div class="spell-node col-7" data-spell="Elémental de terre">Elémental de terre</div>
+            <div class="spell-node col-6" data-spell="Elémental de terre">Elémental de terre</div>
         </div>
 
         <!-- Niveau 9 -->
         <div class="level">
             <div class="level-number">9</div>
             <div class="spell-node col-2" data-spell="Communion avec les pierres">Communion avec les pierres</div>
-            <div class="spell-node col-7" data-spell="Être de pierre">Être de pierre</div>
+            <div class="spell-node col-6" data-spell="Être de pierre">Être de pierre</div>
         </div>
 
         <!-- Niveau 10 -->
         <div class="level">
             <div class="level-number">10</div>
             <div class="spell-node col-4" data-spell="Chair en pierre">Chair en pierre</div>
-            <div class="spell-node col-7" data-spell="Solidification de la matière">Solidification de la matière</div>
+            <div class="spell-node col-6" data-spell="Solidification de la matière">Solidification de la matière</div>
         </div>
 
         <!-- Niveau 12 -->
@@ -716,10 +725,6 @@
                     ['Rigidification du sol', 'Immobilité'],
                     ['Soudure des pierres', 'Travail de la pierre'],
                     ['Travail de la pierre', 'Mur de pierre'],
-                    ['Mur de pierre', 'Bouclier de pierres animées'],
-
-
-                    // Chaîne d'immobilité et pétrification
                     ['Immobilité', 'Pétrification'],
                     ['Immobilité', 'Surdité'],
                     ['Surdité', 'Cécité'],
@@ -727,29 +732,20 @@
                     ['Statue', 'Chair en pierre'],
                     ['Statue', 'Solidification de la matière'],
                     ['Chair en pierre', 'Tempête de sable'],
-
-                    // Chaîne de protection et armure
                     ['Résistance à la douleur', 'Peau de pierre'],
                     ['Peau de pierre', 'Poings de pierre'],
                     ['Poings de pierre', 'Passe-muraille'],
-
-                    // Chaîne de perception
                     ['Surdité', 'Cécité'],
-
-                    // Chaîne de mouvement et traversée
                     ['Passe-muraille', 'Excavation'],
                     ['Passe-muraille', 'Communion avec les pierres'],
-
-                    // Chaîne d'invocation et création
-                    ['Elémental de terre', 'Être de pierre'],
                     ['Communion avec les pierres', 'Tremblement de terre'],
-
-                    // Chaîne de solidification
-                    ['Mur de pierre', 'Solidification de la matière'],
-
-                    // Chaîne de destruction massive
+                    ['Mur de pierre', 'Bouclier de pierres animées'],
+                    ['Bouclier de pierres animées', 'Elémental de terre'],
+                    ['Elémental de terre', 'Être de pierre'],
+                    ['Être de pierre', 'Solidification de la matière'],
                     ['Tempête de sable', 'Tremblement de terre'],
                     ['Tremblement de terre', 'Ouverture du sol'],
+                    ['Pétrification', 'Peau de pierre'],
 
                 ];
 

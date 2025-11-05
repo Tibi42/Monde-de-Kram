@@ -15,23 +15,26 @@
 
         .diagram-container {
             background: white;
-            padding: 20px;
+            padding: 14px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 1000px;
+            max-width: 1300px;
             margin: 0 auto;
             position: relative;
             overflow: visible;
+            box-sizing: border-box;
         }
 
         .level {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 8px;
-            margin: 10px 0;
-            min-height: 40px;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 16px;
+            margin: 7px 0;
+            min-height: 28px;
             position: relative;
             align-items: center;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .level-number {
@@ -42,7 +45,7 @@
             background: white;
             border: 2px solid #000;
             border-radius: 4px;
-            padding: 2px 6px;
+            padding: 1px 4px;
             font-weight: bold;
             font-size: 12px;
         }
@@ -51,8 +54,8 @@
             background: white;
             border: 2px solid #000;
             border-radius: 6px;
-            padding: 4px 8px;
-            margin: 2px;
+            padding: 3px 6px;
+            margin: 0;
             text-align: center;
             font-size: 10px;
             font-weight: bold;
@@ -60,7 +63,10 @@
             transition: all 0.3s ease;
             position: relative;
             min-width: 80px;
+            max-width: 100%;
             z-index: 5;
+            justify-self: start;
+            box-sizing: border-box;
         }
 
         .spell-node:hover {
@@ -222,16 +228,16 @@
 
         /* Améliorations visuelles */
         .diagram-container {
-            padding: 28px;
+            padding: 20px;
             border-radius: 14px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             background: #fff;
         }
 
         .level {
-            gap: 12px;
-            margin: 18px 0;
-            min-height: 56px;
+            gap: 132px;
+            margin: 13px 0;
+            min-height: 39px;
         }
 
         .level-number {
@@ -239,7 +245,7 @@
             border: 1px solid rgba(0, 0, 0, 0.5);
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            padding: 4px 8px;
+            padding: 3px 6px;
             font-size: 12px;
         }
 
@@ -247,11 +253,14 @@
             background: linear-gradient(180deg, #ffffff 0%, #f6fbff 100%);
             border: 1px solid rgba(0, 0, 0, 0.12);
             border-radius: 10px;
-            padding: 8px 12px;
-            margin: 4px;
+            padding: 6px 8px;
+            margin: 0;
             font-size: 12px;
             min-width: 120px;
+            max-width: 100%;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            justify-self: start;
+            box-sizing: border-box;
         }
 
         .spell-node:hover {
@@ -309,8 +318,8 @@
         <div class="level">
             <div class="level-number">6</div>
             <div class="spell-node col-1" data-spell="Mur de glace">Mur de glace</div>
-            <div class="spell-node col-5" data-spell="Glaive de glace">Glaive de glace</div>
             <div class="spell-node col-3" data-spell="Boule de froid">Boule de froid</div>
+            <div class="spell-node col-5" data-spell="Glaive de glace">Glaive de glace</div>
             <div class="spell-node col-7" data-spell="Métal glacé">Métal glacé</div>
         </div>
 
